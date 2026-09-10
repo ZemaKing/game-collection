@@ -4,14 +4,14 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 3 — Supabase Project Setup
+Current Phase: Phase 4 — Core Database Schema & RLS
 MVP Status: Not Started
 
 ## MVP Progress
 
 - [x] Phase 1 — Project Foundation
 - [x] Phase 2 — Design System & Application Shell
-- [ ] Phase 3 — Supabase Project Setup
+- [x] Phase 3 — Supabase Project Setup
 - [ ] Phase 4 — Core Database Schema & RLS
 - [ ] Phase 5 — Seed / Sample Data
 - [ ] Phase 6 — Dashboard & Collection Summary
@@ -143,7 +143,7 @@ A connected, working Supabase client.
 
 ### Definition of Done
 
-- [ ] App can execute a trivial Supabase query without error in dev and via Vercel preview env vars
+- [x] App can execute a trivial Supabase query without error in dev and via Vercel preview env vars
 
 ### Out of Scope
 
@@ -151,7 +151,7 @@ Any actual content tables.
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
