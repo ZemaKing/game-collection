@@ -1,9 +1,13 @@
 function HomePage() {
   return (
-    <main>
-      <h1>My Collection</h1>
-      <p>Project foundation is up and running.</p>
-    </main>
+    <div>
+      <h1 className="text-2xl font-bold text-text">
+        Welcome back, Collector! 👋
+      </h1>
+      <p className="mt-1 text-sm text-muted">
+        Your gaming universe, beautifully organized.
+      </p>
+    </div>
   )
 }
 
