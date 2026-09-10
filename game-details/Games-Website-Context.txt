@@ -1,0 +1,36 @@
+Games Website — Technical Notes
+
+Architecture
+• Supabase (Postgres) + Vercel
+• GitHub → Vercel automatic CI/CD deployment
+• Frontend connects to Supabase via @supabase/supabase-js
+
+Why Supabase instead of static JSON
+• Each new item in static JSON requires a git commit + redeploy
+• Static JSON is inconvenient for multi-device entry, especially adding content from a phone
+• Database-backed search/filtering avoids doing everything in the frontend over one large JSON file
+
+Supabase / Storage
+• Use Supabase database for the game collection data
+• Use Supabase Storage for physical collectibles and personal photos
+• Standard game cover art can come from RAWG/IGDB
+
+Authentication / write access
+• The website is essentially single-user for administration
+• Public read access can be allowed
+• Adding/editing/deleting data must be protected
+• Use Supabase RLS (Row Level Security)
+• Admin writes can be handled through an authenticated/password-protected admin route; do not expose privileged/service credentials in the frontend
+
+Deployment
+• Vercel hosts the frontend
+• GitHub is the source repository
+• Push to GitHub → automatic Vercel deployment
+
+Supabase project organization
+• Use a separate Supabase project for the Games website
+• Keeping projects separate makes RLS rules, schema management, resets and maintenance cleaner
+
+Related existing site
+• The existing diecast website can remain static while additions are infrequent
+• It can later migrate to the same Supabase pattern if mobile/admin data entry becomes useful
