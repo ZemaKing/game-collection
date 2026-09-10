@@ -1,7 +1,11 @@
 import { Search } from 'lucide-react'
+import { LocaleToggle } from '@/components/LocaleToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { useLocale } from '@/hooks/useLocale'
 
 export function Topbar() {
+  const { t } = useLocale()
+
   return (
     <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-3 md:px-6">
       <div className="relative hidden max-w-md flex-1 sm:block">
@@ -12,7 +16,7 @@ export function Topbar() {
         <input
           type="search"
           disabled
-          placeholder="Search games, editions, platforms..."
+          placeholder={t('topbar.searchPlaceholder')}
           className="w-full rounded-full border border-border bg-bg py-2 pr-16 pl-9 text-sm text-text placeholder:text-muted focus:outline-none disabled:cursor-not-allowed"
         />
         <kbd className="absolute top-1/2 right-3 -translate-y-1/2 rounded border border-border px-1.5 py-0.5 text-xs text-muted">
@@ -22,17 +26,18 @@ export function Topbar() {
 
       <button
         type="button"
-        aria-label="Search"
+        aria-label={t('topbar.search')}
         className="flex size-10 items-center justify-center rounded-full border border-border bg-bg text-text sm:hidden"
       >
         <Search size={18} />
       </button>
 
       <div className="ml-auto flex items-center gap-3">
+        <LocaleToggle />
         <ThemeToggle />
         <div
           className="flex size-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-fg"
-          title="Collector"
+          title={t('topbar.collector')}
         >
           C
         </div>

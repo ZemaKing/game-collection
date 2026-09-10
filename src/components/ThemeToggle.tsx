@@ -5,16 +5,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu'
+import { useLocale } from '@/hooks/useLocale'
 import { useTheme, type Theme } from '@/hooks/useTheme'
+import type { TranslationKey } from '@/lib/i18n'
 
-const OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
-  { value: 'light', label: 'Light', icon: Sun },
-  { value: 'dark', label: 'Dark', icon: Moon },
-  { value: 'system', label: 'System', icon: Monitor },
+const OPTIONS: { value: Theme; labelKey: TranslationKey; icon: typeof Sun }[] = [
+  { value: 'light', labelKey: 'theme.light', icon: Sun },
+  { value: 'dark', labelKey: 'theme.dark', icon: Moon },
+  { value: 'system', labelKey: 'theme.system', icon: Monitor },
 ]
 
 export function ThemeToggle() {
   const { theme, resolvedTheme, setTheme } = useTheme()
+  const { t } = useLocale()
   const ActiveIcon = resolvedTheme === 'dark' ? Moon : Sun
 
   return (
@@ -22,17 +25,17 @@ export function ThemeToggle() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="Change theme"
+          aria-label={t('theme.change')}
           className="flex size-10 items-center justify-center rounded-full border border-border bg-surface text-text hover:bg-card-hover"
         >
           <ActiveIcon size={18} />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {OPTIONS.map(({ value, label, icon: Icon }) => (
+        {OPTIONS.map(({ value, labelKey, icon: Icon }) => (
           <DropdownMenuItem key={value} onSelect={() => setTheme(value)}>
             <Icon size={16} />
-            <span className="flex-1">{label}</span>
+            <span className="flex-1">{t(labelKey)}</span>
             {theme === value && <Check size={16} />}
           </DropdownMenuItem>
         ))}

@@ -6,6 +6,7 @@ import {
 } from '@/hooks/useTheme'
 
 const STORAGE_KEY = 'theme'
+const DEFAULT_THEME: Theme = 'dark'
 
 function getSystemTheme(): ResolvedTheme {
   return window.matchMedia('(prefers-color-scheme: light)').matches
@@ -17,7 +18,7 @@ function getStoredTheme(): Theme {
   const stored = window.localStorage.getItem(STORAGE_KEY)
   return stored === 'light' || stored === 'dark' || stored === 'system'
     ? stored
-    : 'system'
+    : DEFAULT_THEME
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {

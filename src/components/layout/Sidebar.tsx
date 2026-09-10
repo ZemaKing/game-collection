@@ -1,13 +1,21 @@
 import { Gamepad2, Plus } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
+import { useLocale } from '@/hooks/useLocale'
 import {
   collectionNavItems,
   platformNavItems,
   primaryNavItems,
-  type NavItem,
 } from '@/lib/navigation'
 
-function NavRow({ label, to, icon: Icon }: NavItem) {
+function NavRow({
+  label,
+  to,
+  icon: Icon,
+}: {
+  label: string
+  to: string
+  icon: typeof Gamepad2
+}) {
   return (
     <NavLink
       to={to}
@@ -36,6 +44,8 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 export function Sidebar() {
+  const { t } = useLocale()
+
   return (
     <aside className="hidden w-20 shrink-0 flex-col border-r border-border bg-surface p-3 md:flex xl:w-64">
       <div className="flex items-center justify-center gap-2 px-1 py-3 xl:justify-start">
@@ -43,39 +53,39 @@ export function Sidebar() {
           <Gamepad2 size={18} />
         </div>
         <span className="hidden text-sm font-bold tracking-wide text-text xl:inline">
-          MY COLLECTION
+          {t('sidebar.title')}
         </span>
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
         <div className="flex flex-col gap-1">
           {primaryNavItems.map((item) => (
-            <NavRow key={item.to} {...item} />
+            <NavRow key={item.to} to={item.to} icon={item.icon} label={t(item.labelKey)} />
           ))}
         </div>
 
-        <SectionLabel>Platforms</SectionLabel>
+        <SectionLabel>{t('nav.platformsSection')}</SectionLabel>
         <div className="flex flex-col gap-1">
           {platformNavItems.map((item) => (
             <NavRow key={item.to} {...item} />
           ))}
         </div>
 
-        <SectionLabel>Collection</SectionLabel>
+        <SectionLabel>{t('nav.collectionSection')}</SectionLabel>
         <div className="flex flex-col gap-1">
           {collectionNavItems.map((item) => (
-            <NavRow key={item.to} {...item} />
+            <NavRow key={item.to} to={item.to} icon={item.icon} label={t(item.labelKey)} />
           ))}
         </div>
       </nav>
 
       <button
         type="button"
-        title="Add New Item"
+        title={t('sidebar.addNewItem')}
         className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
       >
         <Plus size={18} />
-        <span className="hidden xl:inline">Add New Item</span>
+        <span className="hidden xl:inline">{t('sidebar.addNewItem')}</span>
       </button>
     </aside>
   )
