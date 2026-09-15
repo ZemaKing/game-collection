@@ -234,17 +234,17 @@ Realistic, reusable sample data across all item types and planned UI states.
 
 ### Tasks
 
-- [ ] Seed platforms, genres, tags, statuses, conditions, and representative values
-- [ ] Seed several rows for each of the six item types
-- [ ] Seed Owned and Wishlist examples
-- [ ] Seed special-edition contents and cross-item relationships
-- [ ] Seed cover images and gallery images
-- [ ] Seed records that exercise search, filters, duplicate detection, completeness, and recent activity
-- [ ] Make `supabase/seed.sql` idempotent
+- [x] Seed platforms, genres, tags, statuses, conditions, and representative values
+- [x] Seed several rows for each of the six item types
+- [x] Seed Owned and Wishlist examples
+- [x] Seed special-edition contents and cross-item relationships
+- [x] Seed cover images and gallery images
+- [x] Seed records that exercise search, filters, duplicate detection, completeness, and recent activity
+- [x] Make `supabase/seed.sql` idempotent
 
 ### Testing & Verification
 
-- [ ] Verify table counts and normalized `all_items` output
+- [x] Verify table counts and normalized `all_items` output
 - [ ] Verify every listing/detail/state mockup has representative data
 
 ### Definition of Done
