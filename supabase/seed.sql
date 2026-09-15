@@ -47,66 +47,65 @@ on conflict (id) do update set name = excluded.name, slug = excluded.slug;
 
 insert into public.games
   (id, title, platform_id, developer, publisher, region, barcode, release_date, description,
-   status, collection_date, value, currency, condition, notes, created_at, updated_at)
+   collection_date, condition, notes, created_at, updated_at)
 values
   ('00000000-0000-4000-8000-000000001001', 'God of War Ragnarök',
    '00000000-0000-4000-8000-000000000001', 'Santa Monica Studio', 'Sony Interactive Entertainment',
    'EU', '711719574028', '2022-11-09',
    'Kratos and Atreus journey across the Norse realms as Fimbulwinter approaches.',
-   'owned', '2026-08-20', 69.99, 'EUR', 'mint', 'Bought new on release week restock.',
+   '2026-08-20', 'mint', 'Bought new on release week restock.',
    now() - interval '25 days', now() - interval '25 days'),
 
   ('00000000-0000-4000-8000-000000001002', 'Elden Ring',
    '00000000-0000-4000-8000-000000000001', 'FromSoftware', 'Bandai Namco',
    'EU', '3391892022942', '2022-02-25',
    'An open-world action RPG set in the Lands Between.',
-   'owned', '2026-06-01', 49.99, 'EUR', 'good', null,
+   '2026-06-01', 'good', null,
    now() - interval '100 days', now() - interval '100 days'),
 
   ('00000000-0000-4000-8000-000000001003', 'Elden Ring',
    '00000000-0000-4000-8000-000000000003', 'FromSoftware', 'Bandai Namco',
    null, null, '2022-02-25',
    'PC copy, kept separate from the PS5 disc copy - same title, legitimate second platform.',
-   'owned', '2026-02-10', 39.99, 'EUR', 'sealed', 'Digital re-purchase for Steam Deck.',
+   '2026-02-10', 'sealed', 'Digital re-purchase for Steam Deck.',
    now() - interval '210 days', now() - interval '210 days'),
 
   ('00000000-0000-4000-8000-000000001004', 'Hades',
    '00000000-0000-4000-8000-000000000003', 'Supergiant Games', 'Supergiant Games',
    null, null, '2020-09-17', 'A rogue-like dungeon crawler set in Greek myth.',
-   'owned', '2026-09-01', 19.99, 'EUR', 'sealed', null,
+   '2026-09-01', 'sealed', null,
    now() - interval '10 days', now() - interval '10 days'),
 
   ('00000000-0000-4000-8000-000000001005', 'Stardew Valley',
    '00000000-0000-4000-8000-000000000003', 'ConcernedApe', 'ConcernedApe',
    null, null, '2016-02-26', null,
-   'wishlist', null, 14.99, 'EUR', null, null,
+   '2026-09-10', null, null,
    now() - interval '5 days', now() - interval '5 days'),
 
   ('00000000-0000-4000-8000-000000001006', 'Horizon Forbidden West',
    '00000000-0000-4000-8000-000000000002', 'Guerrilla Games', 'Sony Interactive Entertainment',
    'EU', '711719408651', '2022-02-18',
    'Aloy ventures into a majestic but dangerous frontier.',
-   'owned', '2025-03-12', 29.99, 'EUR', 'good', 'Disc has minor surface scratches.',
+   '2025-03-12', 'good', 'Disc has minor surface scratches.',
    now() - interval '340 days', now() - interval '340 days'),
 
   ('00000000-0000-4000-8000-000000001007', 'Baldur''s Gate 3',
    '00000000-0000-4000-8000-000000000004', 'Larian Studios', 'Larian Studios',
    null, null, '2023-08-03', 'A party-based RPG set in the Forgotten Realms.',
-   'wishlist', null, 59.99, 'EUR', null, 'Waiting for a sale.',
+   '2026-09-12', null, null,
    now() - interval '3 days', now() - interval '3 days'),
 
   ('00000000-0000-4000-8000-000000001008', 'God of War Ragnarok',
    '00000000-0000-4000-8000-000000000002', 'Santa Monica Studio', 'Sony Interactive Entertainment',
    'US', '711719574011', '2022-11-09', null,
-   'wishlist', null, null, 'EUR', null,
+   '2026-09-14', null,
    'Near-duplicate of the PS5 copy (no diacritic, PS4 version) - for duplicate-detection testing.',
    now() - interval '1 days', now() - interval '1 days')
 on conflict (id) do update set
   title = excluded.title, platform_id = excluded.platform_id, developer = excluded.developer,
   publisher = excluded.publisher, region = excluded.region, barcode = excluded.barcode,
-  release_date = excluded.release_date, description = excluded.description, status = excluded.status,
-  collection_date = excluded.collection_date, value = excluded.value, currency = excluded.currency,
-  condition = excluded.condition, notes = excluded.notes;
+  release_date = excluded.release_date, description = excluded.description,
+  collection_date = excluded.collection_date, condition = excluded.condition, notes = excluded.notes;
 
 insert into public.game_genres (game_id, genre_id) values
   ('00000000-0000-4000-8000-000000001001', '00000000-0000-4000-8000-000000000101'),
@@ -128,18 +127,17 @@ on conflict do nothing;
 
 insert into public.special_editions
   (id, title, platform_id, edition_name, region, release_date, description,
-   status, collection_date, value, currency, condition, notes, created_at, updated_at)
+   collection_date, condition, notes, created_at, updated_at)
 values
   ('00000000-0000-4000-8000-000000002001', 'God of War Ragnarök — Collector''s Edition',
    '00000000-0000-4000-8000-000000000001', 'Collector''s Edition', 'EU', '2022-11-09',
    'Includes the base game, steelbook case, art book, and a Kratos & Atreus figure.',
-   'owned', '2026-08-20', 249.99, 'EUR', 'mint', 'Display piece, kept sealed apart from the disc.',
+   '2026-08-20', 'mint', 'Display piece, kept sealed apart from the disc.',
    now() - interval '25 days', now() - interval '25 days')
 on conflict (id) do update set
   title = excluded.title, platform_id = excluded.platform_id, edition_name = excluded.edition_name,
   region = excluded.region, release_date = excluded.release_date, description = excluded.description,
-  status = excluded.status, collection_date = excluded.collection_date, value = excluded.value,
-  currency = excluded.currency, condition = excluded.condition, notes = excluded.notes;
+  collection_date = excluded.collection_date, condition = excluded.condition, notes = excluded.notes;
 
 -- ---------------------------------------------------------------------
 -- Steelbooks
@@ -147,25 +145,24 @@ on conflict (id) do update set
 
 insert into public.steelbooks
   (id, title, platform_id, game_title, edition_name, steelbook_number, region, release_date,
-   description, status, collection_date, value, currency, condition, notes, created_at, updated_at)
+   description, collection_date, condition, notes, created_at, updated_at)
 values
   ('00000000-0000-4000-8000-000000003001', 'God of War Ragnarök Steelbook',
    '00000000-0000-4000-8000-000000000001', 'God of War Ragnarök', 'Collector''s Edition', null,
    'EU', '2022-11-09', 'Steelbook case included with the Collector''s Edition.',
-   'owned', '2026-08-20', null, 'EUR', 'mint', null,
+   '2026-08-20', 'mint', null,
    now() - interval '25 days', now() - interval '25 days'),
 
   ('00000000-0000-4000-8000-000000003002', 'Horizon Forbidden West Steelbook',
    '00000000-0000-4000-8000-000000000002', 'Horizon Forbidden West', 'Launch Edition', 'G2',
    'EU', '2022-02-18', null,
-   'owned', '2025-03-12', 12.00, 'EUR', 'good', 'Bought separately from a retailer promo.',
+   '2025-03-12', 'good', 'Bought separately from a retailer promo.',
    now() - interval '340 days', now() - interval '340 days')
 on conflict (id) do update set
   title = excluded.title, platform_id = excluded.platform_id, game_title = excluded.game_title,
   edition_name = excluded.edition_name, steelbook_number = excluded.steelbook_number,
   region = excluded.region, release_date = excluded.release_date, description = excluded.description,
-  status = excluded.status, collection_date = excluded.collection_date, value = excluded.value,
-  currency = excluded.currency, condition = excluded.condition, notes = excluded.notes;
+  collection_date = excluded.collection_date, condition = excluded.condition, notes = excluded.notes;
 
 -- ---------------------------------------------------------------------
 -- Artbooks
@@ -173,23 +170,23 @@ on conflict (id) do update set
 
 insert into public.artbooks
   (id, title, publisher, page_count, isbn, language, release_date, description,
-   status, collection_date, value, currency, condition, notes, created_at, updated_at)
+   collection_date, condition, notes, created_at, updated_at)
 values
   ('00000000-0000-4000-8000-000000004001', 'The Art of God of War Ragnarök',
    'Dark Horse Books', 232, '978-1506727820', 'English', '2022-11-09',
    'Concept art book included with the Collector''s Edition.',
-   'owned', '2026-08-20', null, 'EUR', 'mint', null,
+   '2026-08-20', 'mint', null,
    now() - interval '25 days', now() - interval '25 days'),
 
   ('00000000-0000-4000-8000-000000004002', 'Horizon Forbidden West: The Complete Art',
    'Titan Books', 264, '978-1789097461', 'English', '2022-03-01', null,
-   'wishlist', null, 34.99, 'EUR', null, null,
+   '2026-09-08', null, null,
    now() - interval '7 days', now() - interval '7 days')
 on conflict (id) do update set
   title = excluded.title, publisher = excluded.publisher, page_count = excluded.page_count,
   isbn = excluded.isbn, language = excluded.language, release_date = excluded.release_date,
-  description = excluded.description, status = excluded.status, collection_date = excluded.collection_date,
-  value = excluded.value, currency = excluded.currency, condition = excluded.condition, notes = excluded.notes;
+  description = excluded.description, collection_date = excluded.collection_date,
+  condition = excluded.condition, notes = excluded.notes;
 
 -- ---------------------------------------------------------------------
 -- Figures
@@ -197,24 +194,23 @@ on conflict (id) do update set
 
 insert into public.figures
   (id, title, manufacturer, character_name, scale, material, height_cm, release_date,
-   description, status, collection_date, value, currency, condition, notes, created_at, updated_at)
+   description, collection_date, condition, notes, created_at, updated_at)
 values
   ('00000000-0000-4000-8000-000000005001', 'Kratos & Atreus Figure',
    'Sony Interactive Entertainment', 'Kratos & Atreus', null, 'PVC', 18.50, '2022-11-09',
    'Figure included with the Collector''s Edition.',
-   'owned', '2026-08-20', null, 'EUR', 'mint', 'Favorite Photo alongside the steelbook.',
+   '2026-08-20', 'mint', 'Favorite Photo alongside the steelbook.',
    now() - interval '25 days', now() - interval '25 days'),
 
   ('00000000-0000-4000-8000-000000005002', 'Geralt of Rivia Figure',
    'Dark Horse', 'Geralt of Rivia', '1/7', 'PVC', 27.00, '2021-06-15', null,
-   'wishlist', null, 89.99, 'EUR', null, null,
+   '2026-09-13', null, null,
    now() - interval '2 days', now() - interval '2 days')
 on conflict (id) do update set
   title = excluded.title, manufacturer = excluded.manufacturer, character_name = excluded.character_name,
   scale = excluded.scale, material = excluded.material, height_cm = excluded.height_cm,
-  release_date = excluded.release_date, description = excluded.description, status = excluded.status,
-  collection_date = excluded.collection_date, value = excluded.value, currency = excluded.currency,
-  condition = excluded.condition, notes = excluded.notes;
+  release_date = excluded.release_date, description = excluded.description,
+  collection_date = excluded.collection_date, condition = excluded.condition, notes = excluded.notes;
 
 -- ---------------------------------------------------------------------
 -- Stuff
@@ -222,22 +218,21 @@ on conflict (id) do update set
 
 insert into public.stuff
   (id, title, category, manufacturer, release_date, description,
-   status, collection_date, value, currency, condition, notes, created_at, updated_at)
+   collection_date, condition, notes, created_at, updated_at)
 values
   ('00000000-0000-4000-8000-000000006001', 'PS5 DualSense Controller (Midnight Black)',
    'Accessory', 'Sony Interactive Entertainment', '2020-11-12', null,
-   'owned', '2026-01-15', 64.99, 'EUR', 'good', 'Second controller for co-op.',
+   '2026-01-15', 'good', 'Second controller for co-op.',
    now() - interval '240 days', now() - interval '240 days'),
 
   ('00000000-0000-4000-8000-000000006002', 'Elden Ring Poster',
    'Poster', 'Bandai Namco', '2022-02-25', null,
-   'wishlist', null, 9.99, 'EUR', null, null,
+   '2026-09-11', null, null,
    now() - interval '4 days', now() - interval '4 days')
 on conflict (id) do update set
   title = excluded.title, category = excluded.category, manufacturer = excluded.manufacturer,
-  release_date = excluded.release_date, description = excluded.description, status = excluded.status,
-  collection_date = excluded.collection_date, value = excluded.value, currency = excluded.currency,
-  condition = excluded.condition, notes = excluded.notes;
+  release_date = excluded.release_date, description = excluded.description,
+  collection_date = excluded.collection_date, condition = excluded.condition, notes = excluded.notes;
 
 -- ---------------------------------------------------------------------
 -- Tags

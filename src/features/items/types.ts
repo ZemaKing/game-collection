@@ -6,8 +6,6 @@ export type ItemType =
   | 'figure'
   | 'stuff'
 
-export type ItemStatus = 'owned' | 'wishlist'
-
 export type ItemCondition = 'sealed' | 'mint' | 'good' | 'fair' | 'poor'
 
 export interface Platform {
@@ -31,10 +29,7 @@ export interface AllItemRow {
   platform_id: string | null
   region: string | null
   release_date: string | null
-  status: ItemStatus
   collection_date: string | null
-  value: number | null
-  currency: string
   condition: ItemCondition | null
   notes: string | null
   description: string | null

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
-import { formatCurrency } from '@/features/items/format'
+import { CONDITION_LABEL_KEYS, ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import type { AllItemRow } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
 
@@ -15,16 +14,12 @@ interface ItemCardProps {
 const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg'
 
-function StatusPill({ status }: { status: AllItemRow['status'] }) {
+function ConditionBadge({ condition }: { condition: AllItemRow['condition'] }) {
   const { t } = useLocale()
-  const isOwned = status === 'owned'
+  if (!condition) return null
   return (
-    <span
-      className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-        isOwned ? 'bg-success-bg text-success' : 'bg-wishlist-bg text-wishlist'
-      }`}
-    >
-      {t(isOwned ? 'status.owned' : 'status.wishlist')}
+    <span className="inline-flex shrink-0 items-center rounded-full bg-card-hover px-2 py-0.5 text-xs font-medium text-muted">
+      {t(CONDITION_LABEL_KEYS[condition])}
     </span>
   )
 }
@@ -58,12 +53,12 @@ function CoverPlaceholder({
 }
 
 export function ItemCard({ item, platformName, view, showTypeBadge = false }: ItemCardProps) {
-  const { t, locale } = useLocale()
+  const { t } = useLocale()
   const to = `/${ITEM_TYPE_ROUTES[item.item_type]}/${item.id}`
+  const releaseYear = item.release_date ? new Date(item.release_date).getFullYear() : null
 
   if (view === 'list') {
     const typeLabel = showTypeBadge ? t(ITEM_TYPE_META[item.item_type].labelKey) : null
-    const releaseYear = item.release_date ? new Date(item.release_date).getFullYear() : null
 
     return (
       <Link
@@ -87,13 +82,8 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
           <span className="w-10 text-xs text-muted">{releaseYear ?? '—'}</span>
         </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-1">
-          <StatusPill status={item.status} />
-          {item.value != null && (
-            <span className="text-xs text-muted">
-              {formatCurrency(item.value, item.currency, locale)}
-            </span>
-          )}
+        <div className="flex shrink-0 items-center">
+          <ConditionBadge condition={item.condition} />
         </div>
       </Link>
     )
@@ -121,12 +111,8 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
         <p className="line-clamp-2 text-sm font-semibold text-text">{item.title}</p>
         {item.subtitle && <p className="truncate text-xs text-muted">{item.subtitle}</p>}
         <div className="mt-1 flex items-center justify-between gap-2">
-          <StatusPill status={item.status} />
-          {item.value != null && (
-            <span className="text-xs font-medium text-muted">
-              {formatCurrency(item.value, item.currency, locale)}
-            </span>
-          )}
+          <ConditionBadge condition={item.condition} />
+          {releaseYear && <span className="text-xs text-muted">{releaseYear}</span>}
         </div>
       </div>
     </Link>

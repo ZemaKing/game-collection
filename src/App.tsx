@@ -6,6 +6,8 @@ import ComingSoonPage from '@/pages/ComingSoonPage'
 import DashboardPage from '@/pages/DashboardPage'
 import FiguresPage from '@/pages/FiguresPage'
 import GamesPage from '@/pages/GamesPage'
+import PlatformPage from '@/pages/PlatformPage'
+import RecentlyAddedPage from '@/pages/RecentlyAddedPage'
 import SpecialEditionsPage from '@/pages/SpecialEditionsPage'
 import SteelbooksPage from '@/pages/SteelbooksPage'
 import StuffPage from '@/pages/StuffPage'
@@ -22,6 +24,8 @@ function App() {
         <Route path="artbooks" element={<ArtbooksPage />} />
         <Route path="figures" element={<FiguresPage />} />
         <Route path="stuff" element={<StuffPage />} />
+        <Route path="platforms/:slug" element={<PlatformPage />} />
+        <Route path="recently-added" element={<RecentlyAddedPage />} />
         <Route path="*" element={<ComingSoonPage />} />
       </Route>
     </Routes>

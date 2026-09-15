@@ -13,8 +13,8 @@
   --color-accent-fg: var(--app-accent-fg);
   --color-success: var(--app-success);
   --color-success-bg: var(--app-success-bg);
-  --color-wishlist: var(--app-wishlist);
-  --color-wishlist-bg: var(--app-wishlist-bg);
+  --color-danger: var(--app-danger);
+  --color-danger-bg: var(--app-danger-bg);
 }
 
 :root {
@@ -30,8 +30,8 @@
   --app-accent-fg: #ffffff;
   --app-success: #16a34a;
   --app-success-bg: #dcfce7;
-  --app-wishlist: #e11d48;
-  --app-wishlist-bg: #ffe4e6;
+  --app-danger: #e11d48;
+  --app-danger-bg: #ffe4e6;
 }
 
 .dark {
@@ -47,8 +47,8 @@
   --app-accent-fg: #ffffff;
   --app-success: #22c55e;
   --app-success-bg: rgba(34, 197, 94, 0.15);
-  --app-wishlist: #f43f5e;
-  --app-wishlist-bg: rgba(244, 63, 94, 0.15);
+  --app-danger: #f43f5e;
+  --app-danger-bg: rgba(244, 63, 94, 0.15);
 }
 
 * {

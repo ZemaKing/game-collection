@@ -1,8 +1,9 @@
+import { Gamepad2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { ITEM_TYPE_META } from '@/features/items/constants'
 import { fetchPlatforms } from '@/features/items/api'
 import { useItemListing } from '@/features/items/useItemListing'
-import { useListingPrefs } from '@/features/items/useListingPrefs'
+import { useListingPrefs, type ListingPrefs } from '@/features/items/useListingPrefs'
 import { ItemCard } from '@/features/items/components/ItemCard'
 import { ItemListingToolbar } from '@/features/items/components/ItemListingToolbar'
 import type { ItemType, Platform } from '@/features/items/types'
@@ -11,18 +12,26 @@ import { useLocale } from '@/hooks/useLocale'
 const PAGE_SIZE = 20
 
 interface ItemListingPageProps {
-  /** Locks the listing to one item type (Games, Artbooks, ...). Omit for All Items. */
+  /** Locks the listing to one item type (Games, Artbooks, ...). Omit for All Items / platform pages. */
   itemType?: ItemType
+  /** Locks the listing to one platform (mixed item types). Omit for All Items / type pages. */
+  platform?: Platform
 }
 
-export function ItemListingPage({ itemType }: ItemListingPageProps) {
+export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
   const { t } = useLocale()
-  const storageKey = `listing.${itemType ?? 'all'}`
-  const { prefs, setPrefs } = useListingPrefs(storageKey, itemType)
+  const storageKey = platform ? `listing.platform.${platform.slug}` : `listing.${itemType ?? 'all'}`
+
+  const overrides: Partial<ListingPrefs> = {}
+  if (itemType) overrides.itemType = itemType
+  if (platform) overrides.platformId = platform.id
+  const { prefs, setPrefs } = useListingPrefs(storageKey, overrides)
+
   const { items, totalCount, setPage, loading, error, hasMore } = useItemListing(
     prefs,
     PAGE_SIZE,
     itemType,
+    platform?.id,
   )
 
   const [platforms, setPlatforms] = useState<Platform[]>([])
@@ -42,18 +51,21 @@ export function ItemListingPage({ itemType }: ItemListingPageProps) {
 
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
 
-  const meta = itemType ? ITEM_TYPE_META[itemType] : null
-  const TitleIcon = meta?.icon
-  const titleKey = meta?.labelKey ?? 'nav.allItems'
+  const typeMeta = itemType ? ITEM_TYPE_META[itemType] : null
+  const TitleIcon = platform ? Gamepad2 : typeMeta?.icon
+  const titleText = platform ? platform.name : t(typeMeta?.labelKey ?? 'nav.allItems')
+  const showTypeBadge = !itemType
 
   return (
     <div className="flex flex-col gap-4">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold text-text">
           {TitleIcon && <TitleIcon size={22} className="text-muted" />}
-          {t(titleKey)}
+          {titleText}
         </h1>
-        <p className="mt-1 text-sm text-muted">{t('listing.itemsCount', { count: String(totalCount) })}</p>
+        <p className="mt-1 text-sm text-muted">
+          {t('listing.itemsCount', { count: String(totalCount) })}
+        </p>
       </div>
 
       <ItemListingToolbar
@@ -61,10 +73,11 @@ export function ItemListingPage({ itemType }: ItemListingPageProps) {
         prefs={prefs}
         setPrefs={setPrefs}
         showTypeFilter={!itemType}
+        showPlatformFilter={!platform}
       />
 
       {error && (
-        <p className="rounded-lg border border-wishlist bg-wishlist-bg px-4 py-3 text-sm text-wishlist">
+        <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
           {t('listing.error', { message: error })}
         </p>
       )}
@@ -88,7 +101,7 @@ export function ItemListingPage({ itemType }: ItemListingPageProps) {
             item={item}
             platformName={item.platform_id ? (platformById.get(item.platform_id) ?? null) : null}
             view={prefs.view}
-            showTypeBadge={!itemType}
+            showTypeBadge={showTypeBadge}
           />
         ))}
       </div>

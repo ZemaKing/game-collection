@@ -8,7 +8,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import type { TranslationKey } from '@/lib/i18n'
-import type { ItemType } from '@/features/items/types'
+import type { ItemCondition, ItemType } from '@/features/items/types'
 
 export const ITEM_TYPES: ItemType[] = [
   'game',
@@ -39,4 +39,12 @@ export const ITEM_TYPE_ROUTES: Record<ItemType, string> = {
   artbook: 'artbooks',
   figure: 'figures',
   stuff: 'stuff',
+}
+
+export const CONDITION_LABEL_KEYS: Record<ItemCondition, TranslationKey> = {
+  sealed: 'condition.sealed',
+  mint: 'condition.mint',
+  good: 'condition.good',
+  fair: 'condition.fair',
+  poor: 'condition.poor',
 }

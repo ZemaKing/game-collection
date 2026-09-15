@@ -1,18 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ITEM_TYPES, ITEM_TYPE_META } from '@/features/items/constants'
-import { formatCurrency, formatRelativeTime } from '@/features/items/format'
+import { formatRelativeTime } from '@/features/items/format'
 import type { DashboardSummary, GenreSummaryRow } from '@/features/items/api'
 import type { AllItemRow } from '@/features/items/types'
-import type { ListingPrefs } from '@/features/items/useListingPrefs'
 import { useLocale } from '@/hooks/useLocale'
 
 interface SummaryPanelProps {
   summary: DashboardSummary
   genres: GenreSummaryRow[]
   recentItems: AllItemRow[]
-  prefs: ListingPrefs
-  setPrefs: (partial: Partial<ListingPrefs>) => void
   compact?: boolean
 }
 
@@ -25,14 +22,7 @@ function StatTile({ label, value }: { label: string; value: string | number }) {
   )
 }
 
-export function SummaryPanel({
-  summary,
-  genres,
-  recentItems,
-  prefs,
-  setPrefs,
-  compact = false,
-}: SummaryPanelProps) {
+export function SummaryPanel({ summary, genres, recentItems, compact = false }: SummaryPanelProps) {
   const { t, locale } = useLocale()
   const [showAllGenres, setShowAllGenres] = useState(false)
   const visibleGenres = showAllGenres ? genres : genres.slice(0, 5)
@@ -51,12 +41,6 @@ export function SummaryPanel({
             />
           </div>
         ))}
-        <div className="w-28 shrink-0">
-          <StatTile
-            label={t('dashboard.summary.estValue')}
-            value={formatCurrency(summary.estimatedValue, 'EUR', locale)}
-          />
-        </div>
       </div>
     )
   }
@@ -67,10 +51,6 @@ export function SummaryPanel({
         <h2 className="mb-2 text-sm font-semibold text-text">{t('dashboard.summary.title')}</h2>
         <div className="grid grid-cols-2 gap-2">
           <StatTile label={t('dashboard.summary.totalItems')} value={summary.totalItems} />
-          <StatTile
-            label={t('dashboard.summary.estValue')}
-            value={formatCurrency(summary.estimatedValue, 'EUR', locale)}
-          />
           {ITEM_TYPES.map((type) => (
             <StatTile
               key={type}
@@ -78,34 +58,6 @@ export function SummaryPanel({
               value={summary.countsByType[type]}
             />
           ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="mb-2 text-sm font-semibold text-text">{t('dashboard.quickFilters')}</h2>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setPrefs({ status: 'owned' })}
-            className={`rounded-full border px-3 py-1.5 text-sm font-medium ${
-              prefs.status === 'owned'
-                ? 'border-success bg-success-bg text-success'
-                : 'border-border bg-surface text-text hover:bg-card-hover'
-            }`}
-          >
-            {t('status.owned')} ({summary.ownedCount})
-          </button>
-          <button
-            type="button"
-            onClick={() => setPrefs({ status: 'wishlist' })}
-            className={`rounded-full border px-3 py-1.5 text-sm font-medium ${
-              prefs.status === 'wishlist'
-                ? 'border-wishlist bg-wishlist-bg text-wishlist'
-                : 'border-border bg-surface text-text hover:bg-card-hover'
-            }`}
-          >
-            {t('status.wishlist')} ({summary.wishlistCount})
-          </button>
         </div>
       </section>
 

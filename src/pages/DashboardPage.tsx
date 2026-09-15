@@ -66,14 +66,7 @@ function DashboardPage() {
 
       {summary && (
         <div className="lg:hidden">
-          <SummaryPanel
-            compact
-            summary={summary}
-            genres={genres}
-            recentItems={recentItems}
-            prefs={prefs}
-            setPrefs={setPrefs}
-          />
+          <SummaryPanel compact summary={summary} genres={genres} recentItems={recentItems} />
         </div>
       )}
 
@@ -84,7 +77,7 @@ function DashboardPage() {
           </p>
 
           {error && (
-            <p className="rounded-lg border border-wishlist bg-wishlist-bg px-4 py-3 text-sm text-wishlist">
+            <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
               {t('listing.error', { message: error })}
             </p>
           )}
@@ -128,13 +121,7 @@ function DashboardPage() {
 
         {summary && (
           <div className="hidden lg:block">
-            <SummaryPanel
-              summary={summary}
-              genres={genres}
-              recentItems={recentItems}
-              prefs={prefs}
-              setPrefs={setPrefs}
-            />
+            <SummaryPanel summary={summary} genres={genres} recentItems={recentItems} />
           </div>
         )}
       </div>

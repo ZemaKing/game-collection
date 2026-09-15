@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabaseClient'
 import { ITEM_TYPES } from '@/features/items/constants'
-import type { AllItemRow, ItemStatus, ItemType, Platform } from '@/features/items/types'
+import type { AllItemRow, ItemType, Platform } from '@/features/items/types'
 
 export async function fetchPlatforms(): Promise<Platform[]> {
   const { data, error } = await supabase.from('platforms').select('id, name, slug').order('name')
@@ -8,26 +8,18 @@ export async function fetchPlatforms(): Promise<Platform[]> {
   return data
 }
 
-export type SortKey = 'recently_added' | 'title' | 'release_date' | 'value' | 'last_updated'
+export type SortKey = 'recently_added' | 'title' | 'release_date' | 'last_updated'
 
 const SORT_COLUMNS: Record<SortKey, { column: string; ascending: boolean }> = {
   recently_added: { column: 'created_at', ascending: false },
   title: { column: 'title', ascending: true },
   release_date: { column: 'release_date', ascending: false },
-  value: { column: 'value', ascending: false },
   last_updated: { column: 'updated_at', ascending: false },
 }
 
-export const SORT_KEYS: SortKey[] = [
-  'recently_added',
-  'title',
-  'release_date',
-  'value',
-  'last_updated',
-]
+export const SORT_KEYS: SortKey[] = ['recently_added', 'title', 'release_date', 'last_updated']
 
 export interface FetchItemsParams {
-  status: ItemStatus | 'all'
   itemType: ItemType | 'all'
   platformId: string | 'all'
   sort: SortKey
@@ -41,7 +33,6 @@ export interface FetchItemsResult {
 }
 
 export async function fetchItems({
-  status,
   itemType,
   platformId,
   sort,
@@ -50,7 +41,6 @@ export async function fetchItems({
 }: FetchItemsParams): Promise<FetchItemsResult> {
   const { column, ascending } = SORT_COLUMNS[sort]
   let query = supabase.from('all_items').select('*', { count: 'exact' })
-  if (status !== 'all') query = query.eq('status', status)
   if (itemType !== 'all') query = query.eq('item_type', itemType)
   if (platformId !== 'all') query = query.eq('platform_id', platformId)
 
@@ -67,39 +57,24 @@ export async function fetchItems({
 export interface DashboardSummary {
   totalItems: number
   countsByType: Record<ItemType, number>
-  ownedCount: number
-  wishlistCount: number
-  estimatedValue: number
 }
 
 export async function fetchDashboardSummary(): Promise<DashboardSummary> {
-  const { data, error } = await supabase.from('all_items').select('item_type, status, value')
+  const { data, error } = await supabase.from('all_items').select('item_type')
   if (error) throw error
 
   const countsByType = Object.fromEntries(ITEM_TYPES.map((type) => [type, 0])) as Record<
     ItemType,
     number
   >
-  let ownedCount = 0
-  let wishlistCount = 0
-  let estimatedValue = 0
 
   for (const row of data ?? []) {
     countsByType[row.item_type as ItemType] += 1
-    if (row.status === 'owned') {
-      ownedCount += 1
-      estimatedValue += row.value ?? 0
-    } else {
-      wishlistCount += 1
-    }
   }
 
   return {
     totalItems: (data ?? []).length,
     countsByType,
-    ownedCount,
-    wishlistCount,
-    estimatedValue,
   }
 }
 

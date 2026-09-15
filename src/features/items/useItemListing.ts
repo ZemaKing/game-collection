@@ -5,16 +5,23 @@ import type { AllItemRow, ItemType } from '@/features/items/types'
 
 /**
  * Paginated, filtered fetch against the `all_items` view. `fixedItemType`
- * overrides `prefs.itemType` for single-type listing pages (Games,
- * Artbooks, ...) where the type isn't user-selectable.
+ * and `fixedPlatformId` override the matching `prefs` field for listing
+ * pages where that filter isn't user-selectable (single-type pages,
+ * per-platform pages).
  */
-export function useItemListing(prefs: ListingPrefs, pageSize: number, fixedItemType?: ItemType) {
+export function useItemListing(
+  prefs: ListingPrefs,
+  pageSize: number,
+  fixedItemType?: ItemType,
+  fixedPlatformId?: string,
+) {
   const [items, setItems] = useState<AllItemRow[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [page, setPage] = useState(0)
 
   const effectiveItemType = fixedItemType ?? prefs.itemType
-  const filterKey = `${prefs.status}|${effectiveItemType}|${prefs.platformId}|${prefs.sort}`
+  const effectivePlatformId = fixedPlatformId ?? prefs.platformId
+  const filterKey = `${effectiveItemType}|${effectivePlatformId}|${prefs.sort}`
   const [lastFilterKey, setLastFilterKey] = useState(filterKey)
   if (filterKey !== lastFilterKey) {
     // Filters/sort changed: reset pagination during render rather than in an
@@ -31,9 +38,8 @@ export function useItemListing(prefs: ListingPrefs, pageSize: number, fixedItemT
   useEffect(() => {
     let cancelled = false
     fetchItems({
-      status: prefs.status,
       itemType: effectiveItemType,
-      platformId: prefs.platformId,
+      platformId: effectivePlatformId,
       sort: prefs.sort,
       page,
       pageSize,

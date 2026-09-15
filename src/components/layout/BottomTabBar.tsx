@@ -1,4 +1,4 @@
-import { Heart, Home, Plus, Search, User } from 'lucide-react'
+import { Clock, Home, Plus, Search, User } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useLocale } from '@/hooks/useLocale'
 import type { TranslationKey } from '@/lib/i18n'
@@ -6,7 +6,7 @@ import type { TranslationKey } from '@/lib/i18n'
 const tabs = [
   { labelKey: 'bottomTab.home', to: '/', icon: Home },
   { labelKey: 'bottomTab.search', to: '/search', icon: Search },
-  { labelKey: 'bottomTab.wishlist', to: '/wishlist', icon: Heart },
+  { labelKey: 'bottomTab.recentlyAdded', to: '/recently-added', icon: Clock },
   { labelKey: 'bottomTab.profile', to: '/profile', icon: User },
 ] satisfies { labelKey: TranslationKey; to: string; icon: typeof Home }[]
 

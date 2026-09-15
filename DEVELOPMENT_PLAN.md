@@ -10,11 +10,12 @@ This file is the live progress tracker for the game-collection site. Update chec
 - Desktop, Tablet, and Mobile must use device-appropriate interaction patterns; they must not be simple scaled copies.
 - Preserve the visual language established by the approved game-collection mockups.
 - Public visitors can browse the collection. Only the authenticated owner can create, update, or delete data.
-- Traded/Sold screens, bulk actions, and import/export are intentionally excluded.
+- This is a personal collection tracker: every item is simply owned. There is no Wishlist/ownership-status distinction and no pricing/value tracking anywhere in the app.
+- Traded/Sold screens, Wishlist, pricing, bulk actions, and import/export are intentionally excluded.
 
 ## Project Status
 
-Current Phase: Phase 9 — Platform, Wishlist & Recently Added Views  
+Current Phase: Phase 9 — Platform & Recently Added Views  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -27,7 +28,7 @@ MVP Status: In Progress
 - [x] Phase 6 — Dashboard & Collection Summary
 - [x] Phase 7 — All Items & Type Listing Pages
 - [x] Phase 8 — Grid and List Views
-- [ ] Phase 9 — Platform, Wishlist & Recently Added Views
+- [ ] Phase 9 — Platform & Recently Added Views
 - [ ] Phase 10 — Global Search
 - [ ] Phase 11 — Advanced Filters & Sort
 - [ ] Phase 12 — Item Detail Pages
@@ -36,7 +37,7 @@ MVP Status: In Progress
 - [ ] Phase 15 — Authentication
 - [ ] Phase 16 — Add/Edit Item CRUD
 - [ ] Phase 17 — Image Management CRUD
-- [ ] Phase 18 — Delete & Ownership Status Management
+- [ ] Phase 18 — Delete Management
 - [ ] Phase 19 — Duplicate Detection & Unsaved Changes Guard
 - [ ] Phase 20 — Completeness Calculation
 - [ ] Phase 21 — RAWG/IGDB Autofill for Games
@@ -188,7 +189,7 @@ All six item tables, lookups, relationships, unified view, and RLS are live.
 ### Tasks
 
 - [x] Write migrations for `games`, `special_editions`, `steelbooks`, `artbooks`, `figures`, `stuff`
-- [x] Add shared ownership fields (`status`, collection date, value, condition, notes) where applicable
+- [x] Add shared ownership fields (collection date, condition, notes) where applicable — `status`/`value`/`currency` were added here and dropped in Phase 9 (no Wishlist or pricing in this app; see that phase)
 - [x] Write migrations for `platforms`, `genres`, `tags`, and required join tables
 - [x] Write migration for shared `item_images` table (`item_type`, `item_id`, position, cover flag, alt text)
 - [x] Create `item_relationships` table for parent/child and related collection items
@@ -234,9 +235,8 @@ Realistic, reusable sample data across all item types and planned UI states.
 
 ### Tasks
 
-- [x] Seed platforms, genres, tags, statuses, conditions, and representative values
+- [x] Seed platforms, genres, tags, and conditions
 - [x] Seed several rows for each of the six item types
-- [x] Seed Owned and Wishlist examples
 - [x] Seed special-edition contents and cross-item relationships
 - [x] Seed cover images and gallery images
 - [x] Seed records that exercise search, filters, duplicate detection, completeness, and recent activity
@@ -272,8 +272,8 @@ Build the primary dashboard from live unified collection data.
 - [x] Build responsive dashboard route
 - [x] Query paginated `all_items` data
 - [x] Build collection summary totals by item type
-- [x] Build quick filters, genre summary, and recently added panel
-- [x] Connect platform/type/ownership/status controls
+- [x] Build genre summary and recently added panel
+- [x] Connect platform/type filter controls
 - [x] Persist selected sort and view preferences locally until Settings exists
 
 ### UI / UX
@@ -373,45 +373,42 @@ Make the existing Grid/List toggle fully functional for every listing surface.
 
 ---
 
-## Phase 9 — Platform, Wishlist & Recently Added Views
+## Phase 9 — Platform & Recently Added Views
 
 ### Goal
 
-Complete sidebar destinations for platform, Wishlist, and recent collection activity.
+Complete sidebar destinations for platform and recent collection activity.
 
 ### Tasks
 
-- [ ] Build platform-filtered routes for PS5, PS4, Steam, and Epic Games
-- [ ] Build `WishlistPage` with priority, notes, target price, and ownership action where data exists
-- [ ] Add `Move to Collection` flow
-- [ ] Build `RecentlyAddedPage` as a chronological activity/list view
-- [ ] Include created, updated, status-changed, and image-updated activity where audit data permits
-- [ ] Remove Traded/Sold as a standalone screen and navigation destination
+- [x] Build platform-filtered routes for PS5, PS4, Steam, and Epic Games
+- [x] Build `RecentlyAddedPage` as a chronological activity/list view
+- [x] Include created activity derived from `created_at` (documented subset — no separate audit table; see below)
+- [x] Remove Traded/Sold as a standalone screen and navigation destination
+- [x] Remove Wishlist as a standalone screen and navigation destination — this is an owned-only personal collection tracker (see Working Rules); dropped the `status` column, `item_status` enum, and `value`/`currency` fields added in Phase 4, and the Wishlist nav/bottom-tab entries added in Phase 2
 
 ### Database / Supabase
 
-- [ ] Add Wishlist-specific optional fields if needed
-- [ ] Add lightweight activity/audit table or derive a documented subset from timestamps
+- [x] Drop `status`/`value`/`currency` from all six item tables and the `item_status` enum; recreate `all_items` without them (migration `20260915130000_drop_status_and_pricing.sql`)
+- [x] Derive Recently Added from `created_at` only, documented in code — a real audit table is unnecessary while no CRUD exists yet (Phases 16-18); revisit once edits are possible
 
 ### UI / UX
 
-- [ ] Wishlist has dedicated Desktop, Tablet, and Mobile layouts
-- [ ] Recently Added uses readable date grouping and activity labels
-- [ ] Mobile actions use menus or sheets rather than hover-only controls
+- [x] Recently Added uses readable date grouping (Today / Yesterday / full date) and activity labels
+- [x] Mobile actions use menus or sheets rather than hover-only controls — N/A this phase: no owner actions are rendered pre-Phase 15, consistent with Phase 6
 
 ### Testing & Verification
 
-- [ ] Platform filters return correct items
-- [ ] Moving Wishlist item to Owned updates all relevant summaries
-- [ ] Activity order and date grouping are correct
+- [x] Platform filters return correct items
+- [x] Activity order and date grouping are correct
 
 ### Definition of Done
 
-- [ ] Platform, Wishlist, and Recently Added destinations are complete and responsive
+- [x] Platform and Recently Added destinations are complete and responsive
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
@@ -455,12 +452,12 @@ Provide a complete, reusable filtering and sorting experience.
 
 ### Tasks
 
-- [ ] Filter by platform, item type, ownership, status, genre, release year, collection date, condition, value range, and tags
+- [ ] Filter by platform, item type, genre, release year, collection date, condition, and tags
 - [ ] Support multi-select where appropriate
 - [ ] Add active-filter chips and count
 - [ ] Add `Clear All`, cancel, and apply behavior
 - [ ] Synchronize applicable filters with URL query parameters
-- [ ] Support sort by recently added, title, release date, value, and last updated
+- [ ] Support sort by recently added, title, release date, and last updated
 
 ### UI / UX
 
@@ -495,8 +492,8 @@ Create complete read-only detail experiences for every item type.
 
 - [ ] Build typed item-detail route and data loader
 - [ ] Build shared detail shell plus type-specific field sections
-- [ ] Show ownership, dates, value, condition, identifiers, description, notes, tags, and metadata where applicable
-- [ ] Add favorite/Wishlist and owner-only Edit/Delete controls
+- [ ] Show dates, condition, identifiers, description, notes, tags, and metadata where applicable
+- [ ] Add owner-only Edit/Delete controls
 - [ ] Add gallery thumbnail strip
 - [ ] Add missing-item and invalid-route behavior
 
@@ -504,7 +501,7 @@ Create complete read-only detail experiences for every item type.
 
 - [ ] Desktop uses cover, metadata, description, and collection-info panels
 - [ ] Tablet reorganizes content without hiding primary data
-- [ ] Mobile prioritizes cover, title, status, essential metadata, and expandable description
+- [ ] Mobile prioritizes cover, title, essential metadata, and expandable description
 
 ### Testing & Verification
 
@@ -701,18 +698,17 @@ Add owner-only upload, reorder, cover selection, replacement, and deletion.
 
 ---
 
-## Phase 18 — Delete & Ownership Status Management
+## Phase 18 — Delete Management
 
 ### Goal
 
-Safely delete items and move them between Owned and Wishlist.
+Safely delete items.
 
 ### Tasks
 
 - [ ] Add reusable delete confirmation
 - [ ] Explain related images/relationships affected by deletion
 - [ ] Delete item and associated data safely
-- [ ] Implement Owned ↔ Wishlist transitions
 - [ ] Update dashboard counts, listing caches, and activity after mutation
 - [ ] Provide success/error feedback and sensible redirect
 
@@ -720,11 +716,10 @@ Safely delete items and move them between Owned and Wishlist.
 
 - [ ] Cancel leaves data unchanged
 - [ ] Confirm removes only the intended record and dependent resources
-- [ ] Status transitions preserve item data
 
 ### Definition of Done
 
-- [ ] Delete and ownership transitions are safe, responsive, and permission-protected
+- [ ] Delete is safe, responsive, and permission-protected
 
 ### Out of Scope
 
@@ -842,7 +837,7 @@ Make every screen understandable and recoverable when content or network state i
 
 - [ ] Create shared skeleton components for dashboard, cards, rows, details, galleries, stats, and forms
 - [ ] Design first-collection and empty-category states
-- [ ] Design empty Wishlist and Recently Added states
+- [ ] Design empty Recently Added state
 - [ ] Design search no-results and filtered-zero-results states
 - [ ] Add broken-image fallback
 - [ ] Add API, save, upload, auth-expired, and offline errors with retry/recovery actions
@@ -915,11 +910,10 @@ Turn collection data into useful, readable insights.
 ### Tasks
 
 - [ ] Build statistics route and query layer
-- [ ] Show total items and estimated value
-- [ ] Show breakdowns by type, platform, ownership, genre, and condition
-- [ ] Show additions over time and most valuable items
+- [ ] Show total items
+- [ ] Show breakdowns by type, platform, genre, and condition
+- [ ] Show additions over time
 - [ ] Show completeness distribution
-- [ ] Respect value-visibility preference
 
 ### UI / UX
 
@@ -947,11 +941,10 @@ Centralize display and collection preferences.
 ### Tasks
 
 - [ ] Build Settings route
-- [ ] Add currency (EUR/USD/RSD) and formatting preference
 - [ ] Add default Grid/List view and sort order
 - [ ] Add preferred platforms and theme preference
 - [ ] Add language-ready structure if localization is planned
-- [ ] Add image-loading and estimated-value visibility preferences
+- [ ] Add image-loading preference
 - [ ] Persist public-safe preferences locally and account-specific preferences remotely if justified
 
 ### Testing & Verification
@@ -979,7 +972,7 @@ Complete the Profile destination already represented in mobile navigation.
 
 - [ ] Build profile/collection overview route
 - [ ] Show avatar, collection name, collection-since date, and high-level stats
-- [ ] Link to Wishlist, Recently Added, Statistics, and Settings
+- [ ] Link to Recently Added, Statistics, and Settings
 - [ ] Distinguish public collection overview from owner-only account actions
 - [ ] Add logout action for authenticated owner
 
@@ -1008,7 +1001,7 @@ Perform a deliberate three-device review of every implemented screen and state.
 ### Tasks
 
 - [ ] Create route/state/device verification matrix
-- [ ] Review Dashboard, All Items, six type pages, platforms, Wishlist, Recently Added, Search, Filters, Details, relationships, Gallery, CRUD, Stats, Settings, and Profile
+- [ ] Review Dashboard, All Items, six type pages, platforms, Recently Added, Search, Filters, Details, relationships, Gallery, CRUD, Stats, Settings, and Profile
 - [ ] Review Grid/List, empty/loading/error/no-results, duplicate warning, and unsaved changes
 - [ ] Fix overflow, density, tap targets, sticky controls, safe areas, and virtual-keyboard issues
 - [ ] Confirm no feature depends exclusively on hover
@@ -1130,6 +1123,8 @@ Protect the complete product with a maintainable automated test suite.
 The following functionality is intentionally not planned unless the product direction changes:
 
 - Traded / Sold standalone screen or workflow
+- Wishlist / ownership-status tracking
+- Pricing and value tracking
 - Bulk selection and bulk actions
 - Import / Export collection
 
@@ -1139,11 +1134,9 @@ Promote an item below to a numbered phase only after explicit approval:
 
 - [ ] Sharing a public item or filtered collection link
 - [ ] Barcode scanning
-- [ ] Purchase history and price tracking
 - [ ] Cloud backup beyond the primary database
 - [ ] Localization beyond language-ready architecture
 - [ ] PWA/offline browsing
-- [ ] Notifications for Wishlist availability or price changes
 
 ## Final Completion Checklist
 

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { SORT_KEYS, type SortKey } from '@/features/items/api'
 import { ITEM_TYPES, ITEM_TYPE_META } from '@/features/items/constants'
 import type { ListingPrefs } from '@/features/items/useListingPrefs'
-import type { ItemStatus, Platform } from '@/features/items/types'
+import type { Platform } from '@/features/items/types'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,17 +13,10 @@ import {
 import { useLocale } from '@/hooks/useLocale'
 import type { TranslationKey } from '@/lib/i18n'
 
-const STATUS_LABEL_KEYS: Record<ItemStatus | 'all', TranslationKey> = {
-  owned: 'status.owned',
-  wishlist: 'status.wishlist',
-  all: 'status.all',
-}
-
 const SORT_LABEL_KEYS: Record<SortKey, TranslationKey> = {
   recently_added: 'sort.recently_added',
   title: 'sort.title',
   release_date: 'sort.release_date',
-  value: 'sort.value',
   last_updated: 'sort.last_updated',
 }
 
@@ -50,6 +43,8 @@ interface ItemListingToolbarProps {
   setPrefs: (partial: Partial<ListingPrefs>) => void
   /** Hide the item-type dropdown on single-type listing pages. */
   showTypeFilter?: boolean
+  /** Hide the platform dropdown on per-platform listing pages. */
+  showPlatformFilter?: boolean
 }
 
 export function ItemListingToolbar({
@@ -57,6 +52,7 @@ export function ItemListingToolbar({
   prefs,
   setPrefs,
   showTypeFilter = true,
+  showPlatformFilter = true,
 }: ItemListingToolbarProps) {
   const { t } = useLocale()
 
@@ -70,18 +66,23 @@ export function ItemListingToolbar({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <FilterDropdown label={platformLabel}>
-        <DropdownMenuItem onSelect={() => setPrefs({ platformId: 'all' })}>
-          <span className="flex-1">{t('filter.allPlatforms')}</span>
-          {prefs.platformId === 'all' && <Check size={16} />}
-        </DropdownMenuItem>
-        {platforms.map((platform) => (
-          <DropdownMenuItem key={platform.id} onSelect={() => setPrefs({ platformId: platform.id })}>
-            <span className="flex-1">{platform.name}</span>
-            {prefs.platformId === platform.id && <Check size={16} />}
+      {showPlatformFilter && (
+        <FilterDropdown label={platformLabel}>
+          <DropdownMenuItem onSelect={() => setPrefs({ platformId: 'all' })}>
+            <span className="flex-1">{t('filter.allPlatforms')}</span>
+            {prefs.platformId === 'all' && <Check size={16} />}
           </DropdownMenuItem>
-        ))}
-      </FilterDropdown>
+          {platforms.map((platform) => (
+            <DropdownMenuItem
+              key={platform.id}
+              onSelect={() => setPrefs({ platformId: platform.id })}
+            >
+              <span className="flex-1">{platform.name}</span>
+              {prefs.platformId === platform.id && <Check size={16} />}
+            </DropdownMenuItem>
+          ))}
+        </FilterDropdown>
+      )}
 
       {showTypeFilter && (
         <FilterDropdown label={typeLabel}>
@@ -97,21 +98,6 @@ export function ItemListingToolbar({
           ))}
         </FilterDropdown>
       )}
-
-      <div className="inline-flex items-center gap-1 rounded-full border border-border bg-surface p-1">
-        {(['owned', 'wishlist', 'all'] as const).map((status) => (
-          <button
-            key={status}
-            type="button"
-            onClick={() => setPrefs({ status })}
-            className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-              prefs.status === status ? 'bg-accent text-accent-fg' : 'text-muted hover:text-text'
-            }`}
-          >
-            {t(STATUS_LABEL_KEYS[status])}
-          </button>
-        ))}
-      </div>
 
       <div className="ml-auto flex items-center gap-2">
         <FilterDropdown label={`${t('sort.label')}: ${t(SORT_LABEL_KEYS[prefs.sort])}`}>

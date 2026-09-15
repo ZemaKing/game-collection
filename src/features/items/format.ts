@@ -1,13 +1,5 @@
 import type { Locale } from '@/lib/i18n'
 
-export function formatCurrency(value: number, currency = 'EUR', locale: Locale = 'en'): string {
-  return new Intl.NumberFormat(locale === 'sr' ? 'sr-RS' : 'en-US', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-  }).format(value)
-}
-
 const RELATIVE_UNITS: { limit: number; divisor: number; unit: Intl.RelativeTimeFormatUnit }[] = [
   { limit: 60, divisor: 1, unit: 'minute' },
   { limit: 60 * 24, divisor: 60, unit: 'hour' },

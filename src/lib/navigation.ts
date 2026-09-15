@@ -1,11 +1,9 @@
 import {
-  ArrowLeftRight,
   Archive,
   BookOpen,
   Boxes,
   Clock,
   Gamepad2,
-  Heart,
   Joystick,
   LayoutDashboard,
   LayoutGrid,
@@ -32,8 +30,8 @@ export const primaryNavItems: NavItem[] = [
   { labelKey: 'nav.stuff', to: '/stuff', icon: Boxes },
 ]
 
-// Stub list for Phase 2; real platforms are fetched from Supabase from Phase 8 onward.
-// Platform names are proper nouns and are not translated.
+// Platform names are proper nouns and are not translated. Slugs must match
+// the `platforms.slug` seed values so `/platforms/:slug` resolves them.
 export const platformNavItems: { label: string; to: string; icon: LucideIcon }[] = [
   { label: 'PlayStation 5', to: '/platforms/playstation-5', icon: Joystick },
   { label: 'PlayStation 4', to: '/platforms/playstation-4', icon: Joystick },
@@ -42,7 +40,5 @@ export const platformNavItems: { label: string; to: string; icon: LucideIcon }[]
 ]
 
 export const collectionNavItems: NavItem[] = [
-  { labelKey: 'nav.wishlist', to: '/wishlist', icon: Heart },
-  { labelKey: 'nav.tradedSold', to: '/traded-sold', icon: ArrowLeftRight },
   { labelKey: 'nav.recentlyAdded', to: '/recently-added', icon: Clock },
 ]
