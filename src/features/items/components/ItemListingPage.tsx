@@ -7,7 +7,7 @@ import {
   fetchTags,
   type Tag,
 } from '@/features/items/api'
-import { ITEM_TYPE_META } from '@/features/items/constants'
+import { ITEM_TYPE_META, PLATFORM_ICONS } from '@/features/items/constants'
 import { useFilters } from '@/features/items/useFilters'
 import { useItemListing } from '@/features/items/useItemListing'
 import { useListingPrefs } from '@/features/items/useListingPrefs'
@@ -64,7 +64,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
 
   const meta = itemType ? ITEM_TYPE_META[itemType] : null
-  const TitleIcon = platform ? Gamepad2 : meta?.icon
+  const TitleIcon = platform ? (PLATFORM_ICONS[platform.slug] ?? Gamepad2) : meta?.icon
   const titleText = platform ? platform.name : t(meta?.labelKey ?? 'nav.allItems')
   const showTypeBadge = !itemType
   const showGenreFilter = !itemType || itemType === 'game'

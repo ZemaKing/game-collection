@@ -1,4 +1,5 @@
 import { Gamepad2, Plus } from 'lucide-react'
+import type { ComponentType } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useLocale } from '@/hooks/useLocale'
 import {
@@ -14,7 +15,7 @@ function NavRow({
 }: {
   label: string
   to: string
-  icon: typeof Gamepad2
+  icon: ComponentType<{ size?: number; className?: string }>
 }) {
   return (
     <NavLink

@@ -7,6 +7,15 @@ import {
   Star,
   type LucideIcon,
 } from 'lucide-react'
+import type { ReactElement } from 'react'
+import {
+  EpicGamesIcon,
+  PlayStation4Icon,
+  PlayStation5Icon,
+  SteamIcon,
+  XboxIcon,
+  type PlatformIconProps,
+} from '@/components/icons/PlatformIcons'
 import type { TranslationKey } from '@/lib/i18n'
 import type { ItemCondition, ItemType } from '@/features/items/types'
 
@@ -50,3 +59,12 @@ export const CONDITION_LABEL_KEYS: Record<ItemCondition, TranslationKey> = {
 }
 
 export const ITEM_CONDITIONS: ItemCondition[] = ['sealed', 'mint', 'good', 'fair', 'poor']
+
+/** Brand glyphs keyed by `platforms.slug`, used in the sidebar and platform pages. */
+export const PLATFORM_ICONS: Record<string, (props: PlatformIconProps) => ReactElement> = {
+  'playstation-5': PlayStation5Icon,
+  'playstation-4': PlayStation4Icon,
+  steam: SteamIcon,
+  'epic-games': EpicGamesIcon,
+  xbox: XboxIcon,
+}

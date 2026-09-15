@@ -4,14 +4,23 @@ import {
   Boxes,
   Clock,
   Gamepad2,
-  Joystick,
   LayoutDashboard,
   LayoutGrid,
   PersonStanding,
   Star,
   type LucideIcon,
 } from 'lucide-react'
+import type { ComponentType } from 'react'
+import {
+  EpicGamesIcon,
+  PlayStation4Icon,
+  PlayStation5Icon,
+  SteamIcon,
+  XboxIcon,
+} from '@/components/icons/PlatformIcons'
 import type { TranslationKey } from '@/lib/i18n'
+
+type IconComponent = ComponentType<{ size?: number; className?: string }>
 
 export interface NavItem {
   labelKey: TranslationKey
@@ -32,11 +41,12 @@ export const primaryNavItems: NavItem[] = [
 
 // Platform names are proper nouns and are not translated. Slugs must match
 // the `platforms.slug` seed values so `/platforms/:slug` resolves them.
-export const platformNavItems: { label: string; to: string; icon: LucideIcon }[] = [
-  { label: 'PlayStation 5', to: '/platforms/playstation-5', icon: Joystick },
-  { label: 'PlayStation 4', to: '/platforms/playstation-4', icon: Joystick },
-  { label: 'Steam', to: '/platforms/steam', icon: Joystick },
-  { label: 'Epic Games', to: '/platforms/epic-games', icon: Joystick },
+export const platformNavItems: { label: string; to: string; icon: IconComponent }[] = [
+  { label: 'PlayStation 5', to: '/platforms/playstation-5', icon: PlayStation5Icon },
+  { label: 'PlayStation 4', to: '/platforms/playstation-4', icon: PlayStation4Icon },
+  { label: 'Steam', to: '/platforms/steam', icon: SteamIcon },
+  { label: 'Epic Games', to: '/platforms/epic-games', icon: EpicGamesIcon },
+  { label: 'Xbox', to: '/platforms/xbox', icon: XboxIcon },
 ]
 
 export const collectionNavItems: NavItem[] = [

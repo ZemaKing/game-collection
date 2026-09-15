@@ -20,7 +20,8 @@ insert into public.platforms (id, name, slug) values
   ('00000000-0000-4000-8000-000000000001', 'PlayStation 5', 'playstation-5'),
   ('00000000-0000-4000-8000-000000000002', 'PlayStation 4', 'playstation-4'),
   ('00000000-0000-4000-8000-000000000003', 'Steam', 'steam'),
-  ('00000000-0000-4000-8000-000000000004', 'Epic Games', 'epic-games')
+  ('00000000-0000-4000-8000-000000000004', 'Epic Games', 'epic-games'),
+  ('00000000-0000-4000-8000-000000000005', 'Xbox', 'xbox')
 on conflict (id) do update set name = excluded.name, slug = excluded.slug;
 
 insert into public.genres (id, name, slug) values

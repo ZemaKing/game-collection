@@ -381,7 +381,7 @@ Complete sidebar destinations for platform and recent collection activity.
 
 ### Tasks
 
-- [x] Build platform-filtered routes for PS5, PS4, Steam, and Epic Games
+- [x] Build platform-filtered routes for PS5, PS4, Steam, Epic Games, and Xbox (Xbox added post-hoc, same phase)
 - [x] Build `RecentlyAddedPage` as a chronological activity/list view
 - [x] Include created activity derived from `created_at` (documented subset — no separate audit table; see below)
 - [x] Remove Traded/Sold as a standalone screen and navigation destination
