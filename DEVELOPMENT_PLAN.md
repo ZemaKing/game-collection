@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 9 — Platform & Recently Added Views  
+Current Phase: Phase 11 — Advanced Filters & Sort  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -29,7 +29,7 @@ MVP Status: In Progress
 - [x] Phase 7 — All Items & Type Listing Pages
 - [x] Phase 8 — Grid and List Views
 - [ ] Phase 9 — Platform & Recently Added Views
-- [ ] Phase 10 — Global Search
+- [x] Phase 10 — Global Search
 - [ ] Phase 11 — Advanced Filters & Sort
 - [ ] Phase 12 — Item Detail Pages
 - [ ] Phase 13 — Special Edition Details & Item Relationships
@@ -420,27 +420,27 @@ Search the whole collection quickly across all item types.
 
 ### Tasks
 
-- [ ] Implement normalized search over title, edition, platform, developer/publisher/manufacturer, genre, and tags
-- [ ] Build grouped search results by item type
-- [ ] Build recent searches with clear/remove actions
-- [ ] Add keyboard shortcut and keyboard navigation on Desktop
-- [ ] Build mobile full-screen search overlay
-- [ ] Highlight matched text where useful
-- [ ] Add clear, loading, no-results, and error behavior
+- [x] Implement normalized search over title, edition, platform, developer/publisher/manufacturer, genre, and tags
+- [x] Build grouped search results by item type
+- [x] Build recent searches with clear/remove actions
+- [x] Add keyboard shortcut and keyboard navigation on Desktop
+- [x] Build mobile full-screen search overlay
+- [x] Highlight matched text where useful
+- [x] Add clear, loading, no-results, and error behavior
 
 ### Testing & Verification
 
-- [ ] Search is debounced and stale responses cannot overwrite newer results
-- [ ] Keyboard, touch, and browser-back behavior work
-- [ ] Special characters and empty queries are handled safely
+- [x] Search is debounced and stale responses cannot overwrite newer results
+- [x] Keyboard, touch, and browser-back behavior work
+- [x] Special characters and empty queries are handled safely
 
 ### Definition of Done
 
-- [ ] Global Search works across all collection types on Desktop, Tablet, and Mobile
+- [x] Global Search works across all collection types on Desktop, Tablet, and Mobile
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

@@ -1,10 +1,25 @@
 import { Search } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { LocaleToggle } from '@/components/LocaleToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { SearchDialog } from '@/features/search/components/SearchDialog'
 import { useLocale } from '@/hooks/useLocale'
 
 export function Topbar() {
   const { t } = useLocale()
+  const [searchOpen, setSearchOpen] = useState(false)
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setSearchOpen(true)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-3 md:px-6">
@@ -15,22 +30,24 @@ export function Topbar() {
         />
         <input
           type="search"
-          disabled
+          readOnly
+          onClick={() => setSearchOpen(true)}
+          onFocus={() => setSearchOpen(true)}
           placeholder={t('topbar.searchPlaceholder')}
-          className="w-full rounded-full border border-border bg-bg py-2 pr-16 pl-9 text-sm text-text placeholder:text-muted focus:outline-none disabled:cursor-not-allowed"
+          className="w-full cursor-pointer rounded-full border border-border bg-bg py-2 pr-16 pl-9 text-sm text-text placeholder:text-muted focus:outline-none"
         />
         <kbd className="absolute top-1/2 right-3 -translate-y-1/2 rounded border border-border px-1.5 py-0.5 text-xs text-muted">
           Ctrl K
         </kbd>
       </div>
 
-      <button
-        type="button"
+      <Link
+        to="/search"
         aria-label={t('topbar.search')}
         className="flex size-10 items-center justify-center rounded-full border border-border bg-bg text-text sm:hidden"
       >
         <Search size={18} />
-      </button>
+      </Link>
 
       <div className="ml-auto flex items-center gap-3">
         <LocaleToggle />
@@ -42,6 +59,8 @@ export function Topbar() {
           C
         </div>
       </div>
+
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   )
 }

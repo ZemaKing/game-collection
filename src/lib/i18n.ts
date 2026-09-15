@@ -67,6 +67,12 @@ const translations = {
     'dashboard.recentlyAdded': 'Nedavno dodato',
     'dashboard.viewAll': 'Prikaži sve',
     'dashboard.noRecentItems': 'Još nema dodatih stavki.',
+    'search.dialogTitle': 'Pretraga kolekcije',
+    'search.clear': 'Obriši pretragu',
+    'search.recentSearches': 'Nedavne pretrage',
+    'search.clearAll': 'Obriši sve',
+    'search.removeRecent': 'Ukloni pretragu',
+    'search.noResults': 'Nema rezultata za „{query}“.',
   },
   en: {
     'sidebar.title': 'MY COLLECTION',
@@ -129,6 +135,12 @@ const translations = {
     'dashboard.recentlyAdded': 'Recently Added',
     'dashboard.viewAll': 'View All',
     'dashboard.noRecentItems': 'No items added yet.',
+    'search.dialogTitle': 'Search the collection',
+    'search.clear': 'Clear search',
+    'search.recentSearches': 'Recent Searches',
+    'search.clearAll': 'Clear All',
+    'search.removeRecent': 'Remove search',
+    'search.noResults': 'No results for "{query}".',
   },
 } as const satisfies Record<Locale, Record<string, string>>
 
