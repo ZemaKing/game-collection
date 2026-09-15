@@ -14,7 +14,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 4 — Core Database Schema & RLS  
+Current Phase: Phase 7 — All Items & Type Listing Pages  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -24,7 +24,7 @@ MVP Status: In Progress
 - [x] Phase 3 — Supabase Project Setup
 - [ ] Phase 4 — Core Database Schema & RLS
 - [ ] Phase 5 — Seed / Sample Data
-- [ ] Phase 6 — Dashboard & Collection Summary
+- [x] Phase 6 — Dashboard & Collection Summary
 - [ ] Phase 7 — All Items & Type Listing Pages
 - [ ] Phase 8 — Grid and List Views
 - [ ] Phase 9 — Platform, Wishlist & Recently Added Views
@@ -269,33 +269,33 @@ Build the primary dashboard from live unified collection data.
 
 ### Tasks
 
-- [ ] Build responsive dashboard route
-- [ ] Query paginated `all_items` data
-- [ ] Build collection summary totals by item type
-- [ ] Build quick filters, genre summary, and recently added panel
-- [ ] Connect platform/type/ownership/status controls
-- [ ] Persist selected sort and view preferences locally until Settings exists
+- [x] Build responsive dashboard route
+- [x] Query paginated `all_items` data
+- [x] Build collection summary totals by item type
+- [x] Build quick filters, genre summary, and recently added panel
+- [x] Connect platform/type/ownership/status controls
+- [x] Persist selected sort and view preferences locally until Settings exists
 
 ### UI / UX
 
-- [ ] Match approved Desktop dashboard composition
-- [ ] Tablet uses collapsed icon sidebar and compact summary treatment
-- [ ] Mobile uses bottom navigation, compact filters, and card grid
-- [ ] Hide owner-only Add/Edit actions for public visitors
+- [x] Match approved Desktop dashboard composition
+- [x] Tablet uses collapsed icon sidebar and compact summary treatment
+- [x] Mobile uses bottom navigation, compact filters, and card grid
+- [x] Hide owner-only Add/Edit actions for public visitors
 
 ### Testing & Verification
 
-- [ ] Summary counts match database results
-- [ ] Filters and sorting update results correctly
-- [ ] Verify Desktop, Tablet, and Mobile layouts
+- [x] Summary counts match database results
+- [x] Filters and sorting update results correctly
+- [x] Verify Desktop, Tablet, and Mobile layouts
 
 ### Definition of Done
 
-- [ ] Dashboard renders live collection data and matches approved responsive mockups
+- [x] Dashboard renders live collection data and matches approved responsive mockups
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
