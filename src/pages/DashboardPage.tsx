@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
-import { DashboardToolbar } from '@/features/dashboard/DashboardToolbar'
 import { SummaryPanel } from '@/features/dashboard/SummaryPanel'
-import { useDashboardPrefs } from '@/features/dashboard/useDashboardPrefs'
 import {
   fetchDashboardSummary,
   fetchGenreSummary,
-  fetchItems,
   fetchPlatforms,
   fetchRecentlyAdded,
   type DashboardSummary,
   type GenreSummaryRow,
 } from '@/features/items/api'
 import { ItemCard } from '@/features/items/components/ItemCard'
+import { ItemListingToolbar } from '@/features/items/components/ItemListingToolbar'
+import { useItemListing } from '@/features/items/useItemListing'
+import { useListingPrefs } from '@/features/items/useListingPrefs'
 import type { AllItemRow, Platform } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
 
@@ -19,30 +19,13 @@ const PAGE_SIZE = 15
 
 function DashboardPage() {
   const { t } = useLocale()
-  const { prefs, setPrefs } = useDashboardPrefs()
+  const { prefs, setPrefs } = useListingPrefs('dashboard.prefs')
+  const { items, totalCount, setPage, loading, error, hasMore } = useItemListing(prefs, PAGE_SIZE)
 
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [summary, setSummary] = useState<DashboardSummary | null>(null)
   const [genres, setGenres] = useState<GenreSummaryRow[]>([])
   const [recentItems, setRecentItems] = useState<AllItemRow[]>([])
-
-  const [items, setItems] = useState<AllItemRow[]>([])
-  const [totalCount, setTotalCount] = useState(0)
-  const [page, setPage] = useState(0)
-
-  const filterKey = `${prefs.status}|${prefs.itemType}|${prefs.platformId}|${prefs.sort}`
-  const [lastFilterKey, setLastFilterKey] = useState(filterKey)
-  if (filterKey !== lastFilterKey) {
-    // Filters/sort changed: reset pagination during render rather than in an
-    // effect (see https://react.dev/learn/you-might-not-need-an-effect).
-    setLastFilterKey(filterKey)
-    setPage(0)
-  }
-
-  const paramsKey = `${filterKey}|${page}`
-  const [fetchState, setFetchState] = useState<
-    { key: string; status: 'loaded' | 'error'; message?: string } | null
-  >(null)
 
   // Sidebar/summary data is independent of the grid's filters, so it loads once.
   useEffect(() => {
@@ -68,42 +51,7 @@ function DashboardPage() {
     }
   }, [])
 
-  useEffect(() => {
-    let cancelled = false
-    fetchItems({
-      status: prefs.status,
-      itemType: prefs.itemType,
-      platformId: prefs.platformId,
-      sort: prefs.sort,
-      page,
-      pageSize: PAGE_SIZE,
-    })
-      .then(({ rows, count }) => {
-        if (cancelled) return
-        setItems((prev) => (page === 0 ? rows : [...prev, ...rows]))
-        setTotalCount(count)
-        setFetchState({ key: paramsKey, status: 'loaded' })
-      })
-      .catch((error: Error) => {
-        if (cancelled) return
-        setFetchState({ key: paramsKey, status: 'error', message: error.message })
-      })
-    return () => {
-      cancelled = true
-    }
-    // paramsKey encodes every dependency below; re-run whenever it changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paramsKey])
-
-  const itemsLoading = fetchState?.key !== paramsKey
-  const itemsError =
-    fetchState?.key === paramsKey && fetchState.status === 'error'
-      ? (fetchState.message ?? null)
-      : null
-
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
-
-  const hasMore = items.length < totalCount
 
   return (
     <div className="flex flex-col gap-6">
@@ -113,7 +61,7 @@ function DashboardPage() {
       </div>
 
       {platforms.length > 0 && (
-        <DashboardToolbar platforms={platforms} prefs={prefs} setPrefs={setPrefs} />
+        <ItemListingToolbar platforms={platforms} prefs={prefs} setPrefs={setPrefs} />
       )}
 
       {summary && (
@@ -132,18 +80,18 @@ function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-4">
           <p className="text-sm text-muted">
-            {t('dashboard.itemsFound', { count: String(totalCount) })}
+            {t('listing.itemsCount', { count: String(totalCount) })}
           </p>
 
-          {itemsError && (
+          {error && (
             <p className="rounded-lg border border-wishlist bg-wishlist-bg px-4 py-3 text-sm text-wishlist">
-              {t('dashboard.error', { message: itemsError })}
+              {t('listing.error', { message: error })}
             </p>
           )}
 
-          {!itemsError && items.length === 0 && !itemsLoading && (
+          {!error && items.length === 0 && !loading && (
             <p className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted">
-              {t('dashboard.empty')}
+              {t('listing.empty')}
             </p>
           )}
 
@@ -160,21 +108,20 @@ function DashboardPage() {
                 item={item}
                 platformName={item.platform_id ? (platformById.get(item.platform_id) ?? null) : null}
                 view={prefs.view}
+                showTypeBadge={prefs.itemType === 'all'}
               />
             ))}
           </div>
 
-          {itemsLoading && (
-            <p className="text-center text-sm text-muted">{t('dashboard.loading')}</p>
-          )}
+          {loading && <p className="text-center text-sm text-muted">{t('listing.loading')}</p>}
 
-          {hasMore && !itemsLoading && (
+          {hasMore && !loading && (
             <button
               type="button"
               onClick={() => setPage((p) => p + 1)}
               className="self-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-card-hover"
             >
-              {t('dashboard.loadMore')}
+              {t('listing.loadMore')}
             </button>
           )}
         </div>

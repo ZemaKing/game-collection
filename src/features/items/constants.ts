@@ -30,3 +30,13 @@ export const ITEM_TYPE_META: Record<
   figure: { icon: PersonStanding, labelKey: 'nav.figures' },
   stuff: { icon: Boxes, labelKey: 'nav.stuff' },
 }
+
+/** URL path segments, matching the sidebar links in `lib/navigation.ts`. */
+export const ITEM_TYPE_ROUTES: Record<ItemType, string> = {
+  game: 'games',
+  special_edition: 'special-editions',
+  steelbook: 'steelbooks',
+  artbook: 'artbooks',
+  figure: 'figures',
+  stuff: 'stuff',
+}

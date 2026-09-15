@@ -2,8 +2,8 @@ import { Check, ChevronDown, LayoutGrid, List as ListIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { SORT_KEYS, type SortKey } from '@/features/items/api'
 import { ITEM_TYPES, ITEM_TYPE_META } from '@/features/items/constants'
-import type { DashboardPrefs } from '@/features/dashboard/useDashboardPrefs'
-import type { Platform, ItemStatus } from '@/features/items/types'
+import type { ListingPrefs } from '@/features/items/useListingPrefs'
+import type { ItemStatus, Platform } from '@/features/items/types'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,13 +27,7 @@ const SORT_LABEL_KEYS: Record<SortKey, TranslationKey> = {
   last_updated: 'sort.last_updated',
 }
 
-function FilterDropdown({
-  label,
-  children,
-}: {
-  label: string
-  children: ReactNode
-}) {
+function FilterDropdown({ label, children }: { label: string; children: ReactNode }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -50,13 +44,20 @@ function FilterDropdown({
   )
 }
 
-interface DashboardToolbarProps {
+interface ItemListingToolbarProps {
   platforms: Platform[]
-  prefs: DashboardPrefs
-  setPrefs: (partial: Partial<DashboardPrefs>) => void
+  prefs: ListingPrefs
+  setPrefs: (partial: Partial<ListingPrefs>) => void
+  /** Hide the item-type dropdown on single-type listing pages. */
+  showTypeFilter?: boolean
 }
 
-export function DashboardToolbar({ platforms, prefs, setPrefs }: DashboardToolbarProps) {
+export function ItemListingToolbar({
+  platforms,
+  prefs,
+  setPrefs,
+  showTypeFilter = true,
+}: ItemListingToolbarProps) {
   const { t } = useLocale()
 
   const platformLabel =
@@ -82,18 +83,20 @@ export function DashboardToolbar({ platforms, prefs, setPrefs }: DashboardToolba
         ))}
       </FilterDropdown>
 
-      <FilterDropdown label={typeLabel}>
-        <DropdownMenuItem onSelect={() => setPrefs({ itemType: 'all' })}>
-          <span className="flex-1">{t('filter.allTypes')}</span>
-          {prefs.itemType === 'all' && <Check size={16} />}
-        </DropdownMenuItem>
-        {ITEM_TYPES.map((type) => (
-          <DropdownMenuItem key={type} onSelect={() => setPrefs({ itemType: type })}>
-            <span className="flex-1">{t(ITEM_TYPE_META[type].labelKey)}</span>
-            {prefs.itemType === type && <Check size={16} />}
+      {showTypeFilter && (
+        <FilterDropdown label={typeLabel}>
+          <DropdownMenuItem onSelect={() => setPrefs({ itemType: 'all' })}>
+            <span className="flex-1">{t('filter.allTypes')}</span>
+            {prefs.itemType === 'all' && <Check size={16} />}
           </DropdownMenuItem>
-        ))}
-      </FilterDropdown>
+          {ITEM_TYPES.map((type) => (
+            <DropdownMenuItem key={type} onSelect={() => setPrefs({ itemType: type })}>
+              <span className="flex-1">{t(ITEM_TYPE_META[type].labelKey)}</span>
+              {prefs.itemType === type && <Check size={16} />}
+            </DropdownMenuItem>
+          ))}
+        </FilterDropdown>
+      )}
 
       <div className="inline-flex items-center gap-1 rounded-full border border-border bg-surface p-1">
         {(['owned', 'wishlist', 'all'] as const).map((status) => (
@@ -102,9 +105,7 @@ export function DashboardToolbar({ platforms, prefs, setPrefs }: DashboardToolba
             type="button"
             onClick={() => setPrefs({ status })}
             className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-              prefs.status === status
-                ? 'bg-accent text-accent-fg'
-                : 'text-muted hover:text-text'
+              prefs.status === status ? 'bg-accent text-accent-fg' : 'text-muted hover:text-text'
             }`}
           >
             {t(STATUS_LABEL_KEYS[status])}

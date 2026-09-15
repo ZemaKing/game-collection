@@ -4,15 +4,15 @@ import { ITEM_TYPES, ITEM_TYPE_META } from '@/features/items/constants'
 import { formatCurrency, formatRelativeTime } from '@/features/items/format'
 import type { DashboardSummary, GenreSummaryRow } from '@/features/items/api'
 import type { AllItemRow } from '@/features/items/types'
-import type { DashboardPrefs } from '@/features/dashboard/useDashboardPrefs'
+import type { ListingPrefs } from '@/features/items/useListingPrefs'
 import { useLocale } from '@/hooks/useLocale'
 
 interface SummaryPanelProps {
   summary: DashboardSummary
   genres: GenreSummaryRow[]
   recentItems: AllItemRow[]
-  prefs: DashboardPrefs
-  setPrefs: (partial: Partial<DashboardPrefs>) => void
+  prefs: ListingPrefs
+  setPrefs: (partial: Partial<ListingPrefs>) => void
   compact?: boolean
 }
 

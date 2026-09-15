@@ -14,7 +14,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 7 — All Items & Type Listing Pages  
+Current Phase: Phase 8 — Grid and List Views  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -25,7 +25,7 @@ MVP Status: In Progress
 - [ ] Phase 4 — Core Database Schema & RLS
 - [ ] Phase 5 — Seed / Sample Data
 - [x] Phase 6 — Dashboard & Collection Summary
-- [ ] Phase 7 — All Items & Type Listing Pages
+- [x] Phase 7 — All Items & Type Listing Pages
 - [ ] Phase 8 — Grid and List Views
 - [ ] Phase 9 — Platform, Wishlist & Recently Added Views
 - [ ] Phase 10 — Global Search
@@ -307,33 +307,33 @@ Provide a unified collection and dedicated pages for all six item types.
 
 ### Tasks
 
-- [ ] Build `AllItemsPage`
-- [ ] Build Games, Special Editions, Steelbooks, Artbooks, Figures, and Stuff pages
-- [ ] Reuse normalized card/list components with type-specific metadata
-- [ ] Add pagination or incremental loading
-- [ ] Add item-type labels/icons on mixed All Items results
-- [ ] Connect item cards/rows to detail routes
+- [x] Build `AllItemsPage`
+- [x] Build Games, Special Editions, Steelbooks, Artbooks, Figures, and Stuff pages
+- [x] Reuse normalized card/list components with type-specific metadata
+- [x] Add pagination or incremental loading
+- [x] Add item-type labels/icons on mixed All Items results
+- [x] Connect item cards/rows to detail routes
 
 ### UI / UX
 
-- [ ] Mixed collection remains visually consistent without hiding item type
-- [ ] Desktop uses full toolbar and dense content area
-- [ ] Tablet uses compact toolbar and collapsible navigation
-- [ ] Mobile uses stacked controls and touch-friendly cards/list rows
+- [x] Mixed collection remains visually consistent without hiding item type
+- [x] Desktop uses full toolbar and dense content area
+- [x] Tablet uses compact toolbar and collapsible navigation
+- [x] Mobile uses stacked controls and touch-friendly cards/list rows
 
 ### Testing & Verification
 
-- [ ] Each page returns only expected types
-- [ ] All Items correctly mixes and labels all types
-- [ ] Deep links and browser navigation work
+- [x] Each page returns only expected types
+- [x] All Items correctly mixes and labels all types
+- [x] Deep links and browser navigation work
 
 ### Definition of Done
 
-- [ ] All unified and type-specific collection routes work at all three device sizes
+- [x] All unified and type-specific collection routes work at all three device sizes
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
