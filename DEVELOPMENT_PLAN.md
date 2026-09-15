@@ -14,7 +14,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 8 — Grid and List Views  
+Current Phase: Phase 9 — Platform, Wishlist & Recently Added Views  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -26,7 +26,7 @@ MVP Status: In Progress
 - [ ] Phase 5 — Seed / Sample Data
 - [x] Phase 6 — Dashboard & Collection Summary
 - [x] Phase 7 — All Items & Type Listing Pages
-- [ ] Phase 8 — Grid and List Views
+- [x] Phase 8 — Grid and List Views
 - [ ] Phase 9 — Platform, Wishlist & Recently Added Views
 - [ ] Phase 10 — Global Search
 - [ ] Phase 11 — Advanced Filters & Sort
@@ -345,31 +345,31 @@ Make the existing Grid/List toggle fully functional for every listing surface.
 
 ### Tasks
 
-- [ ] Build reusable responsive grid cards
-- [ ] Build reusable desktop/tablet list rows
-- [ ] Define compact mobile list rows rather than shrinking the desktop table
-- [ ] Keep filters, sort, pagination, and selection state when switching views
-- [ ] Persist view preference per listing or globally
-- [ ] Define visible metadata and actions for each item type in both views
+- [x] Build reusable responsive grid cards
+- [x] Build reusable desktop/tablet list rows
+- [x] Define compact mobile list rows rather than shrinking the desktop table
+- [x] Keep filters, sort, pagination, and selection state when switching views
+- [x] Persist view preference per listing or globally
+- [x] Define visible metadata and actions for each item type in both views
 
 ### UI / UX
 
-- [ ] Grid and List match the approved visual system
-- [ ] Long titles and missing images degrade gracefully
-- [ ] Hover actions have keyboard and touch equivalents
+- [x] Grid and List match the approved visual system
+- [x] Long titles and missing images degrade gracefully
+- [x] Hover actions have keyboard and touch equivalents
 
 ### Testing & Verification
 
-- [ ] View switching does not refetch unnecessarily or lose state
-- [ ] Verify representative item types in both views on all devices
+- [x] View switching does not refetch unnecessarily or lose state
+- [x] Verify representative item types in both views on all devices
 
 ### Definition of Done
 
-- [ ] Every collection listing has production-ready Grid and List modes
+- [x] Every collection listing has production-ready Grid and List modes
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

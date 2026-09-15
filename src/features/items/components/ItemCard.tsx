@@ -12,6 +12,9 @@ interface ItemCardProps {
   showTypeBadge?: boolean
 }
 
+const FOCUS_RING =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg'
+
 function StatusPill({ status }: { status: AllItemRow['status'] }) {
   const { t } = useLocale()
   const isOwned = status === 'owned'
@@ -60,18 +63,30 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
 
   if (view === 'list') {
     const typeLabel = showTypeBadge ? t(ITEM_TYPE_META[item.item_type].labelKey) : null
+    const releaseYear = item.release_date ? new Date(item.release_date).getFullYear() : null
+
     return (
       <Link
         to={to}
-        className="flex items-center gap-3 rounded-lg border border-border bg-card p-2.5 hover:bg-card-hover"
+        className={`flex items-center gap-3 rounded-lg border border-border bg-card p-2.5 hover:bg-card-hover ${FOCUS_RING}`}
       >
-        <CoverPlaceholder item={item} className="size-14 rounded-md" />
+        <CoverPlaceholder item={item} className="size-14 rounded-md md:size-16" />
+
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-text">{item.title}</p>
-          <p className="truncate text-xs text-muted">
+          {/* Mobile: one compact combined line. Desktop/tablet: subtitle only, the rest moves into dedicated columns below. */}
+          <p className="truncate text-xs text-muted md:hidden">
             {[typeLabel, platformName, item.subtitle].filter(Boolean).join(' · ') || ' '}
           </p>
+          <p className="hidden truncate text-xs text-muted md:block">{item.subtitle || ' '}</p>
         </div>
+
+        <div className="hidden shrink-0 items-center gap-4 md:flex">
+          {showTypeBadge && <TypeBadge item={item} />}
+          <span className="w-28 truncate text-xs text-muted">{platformName ?? '—'}</span>
+          <span className="w-10 text-xs text-muted">{releaseYear ?? '—'}</span>
+        </div>
+
         <div className="flex shrink-0 flex-col items-end gap-1">
           <StatusPill status={item.status} />
           {item.value != null && (
@@ -87,7 +102,7 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
   return (
     <Link
       to={to}
-      className="block overflow-hidden rounded-xl border border-border bg-card hover:border-accent"
+      className={`block overflow-hidden rounded-xl border border-border bg-card hover:border-accent ${FOCUS_RING}`}
     >
       <div className="relative">
         <CoverPlaceholder item={item} className="aspect-[3/4] w-full" />
