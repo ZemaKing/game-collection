@@ -48,3 +48,5 @@ export const CONDITION_LABEL_KEYS: Record<ItemCondition, TranslationKey> = {
   fair: 'condition.fair',
   poor: 'condition.poor',
 }
+
+export const ITEM_CONDITIONS: ItemCondition[] = ['sealed', 'mint', 'good', 'fair', 'poor']

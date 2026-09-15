@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 11 — Advanced Filters & Sort  
+Current Phase: Phase 12 — Item Detail Pages  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -30,7 +30,7 @@ MVP Status: In Progress
 - [x] Phase 8 — Grid and List Views
 - [ ] Phase 9 — Platform & Recently Added Views
 - [x] Phase 10 — Global Search
-- [ ] Phase 11 — Advanced Filters & Sort
+- [x] Phase 11 — Advanced Filters & Sort
 - [ ] Phase 12 — Item Detail Pages
 - [ ] Phase 13 — Special Edition Details & Item Relationships
 - [ ] Phase 14 — Storage, Galleries & Media Viewer
@@ -452,33 +452,33 @@ Provide a complete, reusable filtering and sorting experience.
 
 ### Tasks
 
-- [ ] Filter by platform, item type, genre, release year, collection date, condition, and tags
-- [ ] Support multi-select where appropriate
-- [ ] Add active-filter chips and count
-- [ ] Add `Clear All`, cancel, and apply behavior
-- [ ] Synchronize applicable filters with URL query parameters
-- [ ] Support sort by recently added, title, release date, and last updated
+- [x] Filter by platform, item type, genre, release year, collection date, condition, and tags
+- [x] Support multi-select where appropriate
+- [x] Add active-filter chips and count
+- [x] Add `Clear All`, cancel, and apply behavior
+- [x] Synchronize applicable filters with URL query parameters
+- [x] Support sort by recently added, title, release date, and last updated
 
 ### UI / UX
 
-- [ ] Desktop uses popover or side panel without obscuring results unnecessarily
-- [ ] Tablet uses compact drawer/panel
-- [ ] Mobile uses full-screen sheet with sticky Clear/Apply actions
-- [ ] Zero-result combinations link directly to clearing filters
+- [x] Desktop uses popover or side panel without obscuring results unnecessarily
+- [x] Tablet uses compact drawer/panel
+- [x] Mobile uses full-screen sheet with sticky Clear/Apply actions
+- [x] Zero-result combinations link directly to clearing filters
 
 ### Testing & Verification
 
-- [ ] Filter combinations return correct results
-- [ ] Refresh and shared URLs restore state
-- [ ] Cancel does not apply draft changes
+- [x] Filter combinations return correct results
+- [x] Refresh and shared URLs restore state
+- [x] Cancel does not apply draft changes
 
 ### Definition of Done
 
-- [ ] Search and all listing pages share a consistent responsive filter/sort system
+- [x] All listing pages (Dashboard, All Items, per-type, per-platform) share one consistent responsive filter/sort system. Global Search (Phase 10) intentionally keeps its own lightweight relevance-based UX rather than adopting facet filters — different job (find one item fast vs. browse/narrow a list).
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

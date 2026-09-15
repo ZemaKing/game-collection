@@ -1,30 +1,39 @@
 import { useEffect, useMemo, useState } from 'react'
 import { SummaryPanel } from '@/features/dashboard/SummaryPanel'
 import {
+  fetchAvailableYears,
   fetchDashboardSummary,
   fetchGenreSummary,
+  fetchGenres,
   fetchPlatforms,
   fetchRecentlyAdded,
+  fetchTags,
   type DashboardSummary,
   type GenreSummaryRow,
+  type Tag,
 } from '@/features/items/api'
 import { ItemCard } from '@/features/items/components/ItemCard'
 import { ItemListingToolbar } from '@/features/items/components/ItemListingToolbar'
+import { useFilters } from '@/features/items/useFilters'
 import { useItemListing } from '@/features/items/useItemListing'
 import { useListingPrefs } from '@/features/items/useListingPrefs'
-import type { AllItemRow, Platform } from '@/features/items/types'
+import type { AllItemRow, Genre, Platform } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
 
 const PAGE_SIZE = 15
 
 function DashboardPage() {
   const { t } = useLocale()
-  const { prefs, setPrefs } = useListingPrefs('dashboard.prefs')
-  const { items, totalCount, setPage, loading, error, hasMore } = useItemListing(prefs, PAGE_SIZE)
+  const { view, setView } = useListingPrefs('dashboard.view')
+  const { filters, setFilters, clearAll } = useFilters()
+  const { items, totalCount, setPage, loading, error, hasMore } = useItemListing(filters, PAGE_SIZE)
 
   const [platforms, setPlatforms] = useState<Platform[]>([])
+  const [genres, setGenres] = useState<Genre[]>([])
+  const [tags, setTags] = useState<Tag[]>([])
+  const [years, setYears] = useState<number[]>([])
   const [summary, setSummary] = useState<DashboardSummary | null>(null)
-  const [genres, setGenres] = useState<GenreSummaryRow[]>([])
+  const [genreSummary, setGenreSummary] = useState<GenreSummaryRow[]>([])
   const [recentItems, setRecentItems] = useState<AllItemRow[]>([])
 
   // Sidebar/summary data is independent of the grid's filters, so it loads once.
@@ -32,15 +41,21 @@ function DashboardPage() {
     let cancelled = false
     Promise.all([
       fetchPlatforms(),
+      fetchGenres(),
+      fetchTags(),
+      fetchAvailableYears(),
       fetchDashboardSummary(),
       fetchGenreSummary(),
       fetchRecentlyAdded(5),
     ])
-      .then(([platformsData, summaryData, genresData, recentData]) => {
+      .then(([platformsData, genresData, tagsData, yearsData, summaryData, genreSummaryData, recentData]) => {
         if (cancelled) return
         setPlatforms(platformsData)
-        setSummary(summaryData)
         setGenres(genresData)
+        setTags(tagsData)
+        setYears(yearsData)
+        setSummary(summaryData)
+        setGenreSummary(genreSummaryData)
         setRecentItems(recentData)
       })
       .catch(() => {
@@ -52,6 +67,15 @@ function DashboardPage() {
   }, [])
 
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
+  const hasActiveFilters =
+    filters.itemTypes.length > 0 ||
+    filters.platformIds.length > 0 ||
+    filters.genreIds.length > 0 ||
+    filters.tagIds.length > 0 ||
+    filters.years.length > 0 ||
+    filters.conditions.length > 0 ||
+    filters.collectionDateFrom !== null ||
+    filters.collectionDateTo !== null
 
   return (
     <div className="flex flex-col gap-6">
@@ -61,12 +85,22 @@ function DashboardPage() {
       </div>
 
       {platforms.length > 0 && (
-        <ItemListingToolbar platforms={platforms} prefs={prefs} setPrefs={setPrefs} />
+        <ItemListingToolbar
+          filters={filters}
+          setFilters={setFilters}
+          clearAll={clearAll}
+          view={view}
+          setView={setView}
+          platforms={platforms}
+          genres={genres}
+          tags={tags}
+          years={years}
+        />
       )}
 
       {summary && (
         <div className="lg:hidden">
-          <SummaryPanel compact summary={summary} genres={genres} recentItems={recentItems} />
+          <SummaryPanel compact summary={summary} genres={genreSummary} recentItems={recentItems} />
         </div>
       )}
 
@@ -83,14 +117,23 @@ function DashboardPage() {
           )}
 
           {!error && items.length === 0 && !loading && (
-            <p className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted">
+            <p className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted">
               {t('listing.empty')}
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={clearAll}
+                  className="font-medium text-accent hover:text-accent-hover"
+                >
+                  {t('listing.clearFilters')}
+                </button>
+              )}
             </p>
           )}
 
           <div
             className={
-              prefs.view === 'grid'
+              view === 'grid'
                 ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-3 2xl:grid-cols-4'
                 : 'flex flex-col gap-2'
             }
@@ -100,8 +143,8 @@ function DashboardPage() {
                 key={item.id}
                 item={item}
                 platformName={item.platform_id ? (platformById.get(item.platform_id) ?? null) : null}
-                view={prefs.view}
-                showTypeBadge={prefs.itemType === 'all'}
+                view={view}
+                showTypeBadge={filters.itemTypes.length !== 1}
               />
             ))}
           </div>
@@ -121,7 +164,7 @@ function DashboardPage() {
 
         {summary && (
           <div className="hidden lg:block">
-            <SummaryPanel summary={summary} genres={genres} recentItems={recentItems} />
+            <SummaryPanel summary={summary} genres={genreSummary} recentItems={recentItems} />
           </div>
         )}
       </div>

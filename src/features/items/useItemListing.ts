@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 import { fetchItems } from '@/features/items/api'
-import type { ListingPrefs } from '@/features/items/useListingPrefs'
+import type { Filters } from '@/features/items/useFilters'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 
 /**
  * Paginated, filtered fetch against the `all_items` view. `fixedItemType`
- * and `fixedPlatformId` override the matching `prefs` field for listing
- * pages where that filter isn't user-selectable (single-type pages,
- * per-platform pages).
+ * and `fixedPlatformId` override the matching `filters` field for listing
+ * pages where that facet isn't user-selectable (single-type pages,
+ * per-platform pages) — the filter sheet hides those facets entirely in
+ * that case, so this just makes the constraint authoritative regardless of
+ * URL tampering.
  */
 export function useItemListing(
-  prefs: ListingPrefs,
+  filters: Filters,
   pageSize: number,
   fixedItemType?: ItemType,
   fixedPlatformId?: string,
@@ -19,9 +21,20 @@ export function useItemListing(
   const [totalCount, setTotalCount] = useState(0)
   const [page, setPage] = useState(0)
 
-  const effectiveItemType = fixedItemType ?? prefs.itemType
-  const effectivePlatformId = fixedPlatformId ?? prefs.platformId
-  const filterKey = `${effectiveItemType}|${effectivePlatformId}|${prefs.sort}`
+  const effectiveItemTypes = fixedItemType ? [fixedItemType] : filters.itemTypes
+  const effectivePlatformIds = fixedPlatformId ? [fixedPlatformId] : filters.platformIds
+  const filterKey = [
+    effectiveItemTypes.join(''),
+    effectivePlatformIds.join(''),
+    filters.genreIds.join(''),
+    filters.tagIds.join(''),
+    filters.years.join(''),
+    filters.conditions.join(''),
+    filters.collectionDateFrom,
+    filters.collectionDateTo,
+    filters.sort,
+  ].join('|')
+
   const [lastFilterKey, setLastFilterKey] = useState(filterKey)
   if (filterKey !== lastFilterKey) {
     // Filters/sort changed: reset pagination during render rather than in an
@@ -38,9 +51,15 @@ export function useItemListing(
   useEffect(() => {
     let cancelled = false
     fetchItems({
-      itemType: effectiveItemType,
-      platformId: effectivePlatformId,
-      sort: prefs.sort,
+      itemTypes: effectiveItemTypes,
+      platformIds: effectivePlatformIds,
+      genreIds: filters.genreIds,
+      tagIds: filters.tagIds,
+      years: filters.years,
+      conditions: filters.conditions,
+      collectionDateFrom: filters.collectionDateFrom,
+      collectionDateTo: filters.collectionDateTo,
+      sort: filters.sort,
       page,
       pageSize,
     })

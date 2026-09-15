@@ -1,53 +1,31 @@
 import { useEffect, useState } from 'react'
-import type { SortKey } from '@/features/items/api'
-import type { ItemType } from '@/features/items/types'
 
 export type ViewMode = 'grid' | 'list'
 
-export interface ListingPrefs {
-  view: ViewMode
-  sort: SortKey
-  itemType: ItemType | 'all'
-  platformId: string | 'all'
-}
+const DEFAULT_VIEW: ViewMode = 'grid'
 
-const DEFAULT_PREFS: ListingPrefs = {
-  view: 'grid',
-  sort: 'recently_added',
-  itemType: 'all',
-  platformId: 'all',
-}
-
-function getStoredPrefs(storageKey: string, defaults: ListingPrefs): ListingPrefs {
+function getStoredView(storageKey: string): ViewMode {
   try {
     const stored = window.localStorage.getItem(storageKey)
-    if (!stored) return defaults
-    return { ...defaults, ...JSON.parse(stored) }
+    return stored === 'grid' || stored === 'list' ? stored : DEFAULT_VIEW
   } catch {
-    return defaults
+    return DEFAULT_VIEW
   }
 }
 
 /**
- * Persists grid/list view, sort, and filter selections to localStorage under
+ * Persists the grid/list view preference to localStorage under
  * `storageKey`, so each listing surface (dashboard, All Items, per-type
- * pages, per-platform pages) remembers its own choices independently until
- * Settings (Phase 25) centralizes preferences.
+ * pages, per-platform pages) remembers its own choice independently until
+ * Settings (Phase 25) centralizes preferences. Filter/sort state lives in
+ * the URL instead (see `useFilters`), not here.
  */
-export function useListingPrefs(storageKey: string, fixedOverrides?: Partial<ListingPrefs>) {
-  const defaults: ListingPrefs = fixedOverrides
-    ? { ...DEFAULT_PREFS, ...fixedOverrides }
-    : DEFAULT_PREFS
-
-  const [prefs, setPrefsState] = useState<ListingPrefs>(() => getStoredPrefs(storageKey, defaults))
+export function useListingPrefs(storageKey: string) {
+  const [view, setView] = useState<ViewMode>(() => getStoredView(storageKey))
 
   useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(prefs))
-  }, [storageKey, prefs])
+    window.localStorage.setItem(storageKey, view)
+  }, [storageKey, view])
 
-  function setPrefs(partial: Partial<ListingPrefs>) {
-    setPrefsState((prev) => ({ ...prev, ...partial }))
-  }
-
-  return { prefs, setPrefs }
+  return { view, setView }
 }

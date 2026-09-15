@@ -83,7 +83,19 @@ function RecentlyAddedPage() {
 
   useEffect(() => {
     let cancelled = false
-    fetchItems({ itemType: 'all', platformId: 'all', sort: 'recently_added', page, pageSize: PAGE_SIZE })
+    fetchItems({
+      itemTypes: [],
+      platformIds: [],
+      genreIds: [],
+      tagIds: [],
+      years: [],
+      conditions: [],
+      collectionDateFrom: null,
+      collectionDateTo: null,
+      sort: 'recently_added',
+      page,
+      pageSize: PAGE_SIZE,
+    })
       .then(({ rows, count }) => {
         if (cancelled) return
         setItems((prev) => (page === 0 ? rows : [...prev, ...rows]))
