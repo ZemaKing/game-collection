@@ -187,28 +187,28 @@ All six item tables, lookups, relationships, unified view, and RLS are live.
 
 ### Tasks
 
-- [ ] Write migrations for `games`, `special_editions`, `steelbooks`, `artbooks`, `figures`, `stuff`
-- [ ] Add shared ownership fields (`status`, collection date, value, condition, notes) where applicable
-- [ ] Write migrations for `platforms`, `genres`, `tags`, and required join tables
-- [ ] Write migration for shared `item_images` table (`item_type`, `item_id`, position, cover flag, alt text)
-- [ ] Create `item_relationships` table for parent/child and related collection items
-- [ ] Create `all_items` UNION ALL view with a normalized result shape
-- [ ] Add indexes for search, filters, dates, status, type, and platform
-- [ ] Add `updated_at` triggers on mutable tables
-- [ ] Check migrations into `supabase/migrations/`
+- [x] Write migrations for `games`, `special_editions`, `steelbooks`, `artbooks`, `figures`, `stuff`
+- [x] Add shared ownership fields (`status`, collection date, value, condition, notes) where applicable
+- [x] Write migrations for `platforms`, `genres`, `tags`, and required join tables
+- [x] Write migration for shared `item_images` table (`item_type`, `item_id`, position, cover flag, alt text)
+- [x] Create `item_relationships` table for parent/child and related collection items
+- [x] Create `all_items` UNION ALL view with a normalized result shape
+- [x] Add indexes for search, filters, dates, status, type, and platform
+- [x] Add `updated_at` triggers on mutable tables
+- [x] Check migrations into `supabase/migrations/`
 
 ### Database / Supabase
 
-- [ ] All six item tables and lookup/join tables created
-- [ ] `item_images`, `item_relationships`, and `all_items` created
-- [ ] RLS enabled on every real table
-- [ ] Public SELECT policies enabled
-- [ ] Authenticated-owner INSERT/UPDATE/DELETE policies enabled
+- [x] All six item tables and lookup/join tables created
+- [x] `item_images`, `item_relationships`, and `all_items` created
+- [x] RLS enabled on every real table
+- [x] Public SELECT policies enabled
+- [x] Authenticated-owner INSERT/UPDATE/DELETE policies enabled
 
 ### Testing & Verification
 
-- [ ] Anonymous SELECT succeeds on all public data
-- [ ] Anonymous writes are rejected
+- [x] Anonymous SELECT succeeds on all public data
+- [x] Anonymous writes are rejected
 - [ ] Authenticated owner CRUD succeeds
 - [ ] Relationship constraints prevent invalid or orphaned references
 
