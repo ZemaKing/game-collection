@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 15 — Authentication  
+Current Phase: Phase 16 — Add/Edit Item CRUD  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -34,7 +34,7 @@ MVP Status: In Progress
 - [x] Phase 12 — Item Detail Pages
 - [x] Phase 13 — Special Edition Details & Item Relationships
 - [x] Phase 14 — Storage, Galleries & Media Viewer
-- [ ] Phase 15 — Authentication
+- [x] Phase 15 — Authentication
 - [ ] Phase 16 — Add/Edit Item CRUD
 - [ ] Phase 17 — Image Management CRUD
 - [ ] Phase 18 — Delete Management
@@ -598,7 +598,7 @@ Public browsing with secure owner-only administration.
 
 ### Tasks
 
-- [ ] Configure Supabase Auth for a single owner/admin account — email auth is enabled by default; the actual account still needs to be created via the Supabase Dashboard (Authentication → Users → Add User) or `supabase auth` CLI. No public sign-up form exists in the app (intentionally — single-owner site), so this is a manual one-time step outside the codebase, same as every other live-project action so far
+- [x] Configure Supabase Auth for a single owner/admin account — owner account created via the Supabase Dashboard; no public sign-up form exists in the app (intentionally — single-owner site)
 - [x] Build login/logout flow and session restoration (`AuthProvider` mirrors `supabase.auth` session state via `getSession()` + `onAuthStateChange`; session persistence/refresh is supabase-js's default client behavior)
 - [x] Protect Add/Edit/Delete routes and controls (`RequireAuth` route guard; applied to `/items/new`, the only such route that exists yet — Phase 16-18 will add the rest under the same guard; the Sidebar/bottom-tab "Add New Item" stub is now hidden unless signed in)
 - [x] Keep all read-only routes public (unchanged — `RequireAuth` wraps only `/items/new`)
@@ -607,16 +607,16 @@ Public browsing with secure owner-only administration.
 ### Testing & Verification
 
 - [x] Anonymous visitor can browse but cannot write (write UI is hidden; RLS backs this up independently, verified since Phase 4/14)
-- [ ] Owner can authenticate and access CRUD — blocked on the manual account-creation step above; re-verify (successful login, protected route access, sign out) once that account exists
-- [x] Client UI and RLS independently enforce permissions (`RequireAuth`/hidden buttons at the UI layer, `to authenticated` RLS policies at the DB layer — verified anonymous-side: wrong credentials show an error and stay on `/login`, direct navigation to the protected route redirects, no add-item affordance renders anywhere)
+- [x] Owner can authenticate and access CRUD — owner confirmed signing in shows the account dropdown with Sign Out, and `/items/new` renders the protected placeholder instead of redirecting
+- [x] Client UI and RLS independently enforce permissions (`RequireAuth`/hidden buttons at the UI layer, `to authenticated` RLS policies at the DB layer — verified both anonymous- and owner-side)
 
 ### Definition of Done
 
-- [ ] Authentication and authorization are secure and predictable — code complete and verified on the anonymous side; reopen once the owner account exists and a real sign-in pass is confirmed
+- [x] Authentication and authorization are secure and predictable
 
 ### Phase Status
 
-- [ ] Phase Complete — reopen once the owner account is created and login/logout/protected-route access is verified end to end
+- [x] Phase Complete
 
 ---
 
