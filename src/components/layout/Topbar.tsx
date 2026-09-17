@@ -1,6 +1,7 @@
 import { Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AccountMenu } from '@/components/AccountMenu'
 import { LocaleToggle } from '@/components/LocaleToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { SearchDialog } from '@/features/search/components/SearchDialog'
@@ -52,12 +53,7 @@ export function Topbar() {
       <div className="ml-auto flex items-center gap-3">
         <LocaleToggle />
         <ThemeToggle />
-        <div
-          className="flex size-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-fg"
-          title={t('topbar.collector')}
-        >
-          C
-        </div>
+        <AccountMenu />
       </div>
 
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />

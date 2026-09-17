@@ -598,25 +598,25 @@ Public browsing with secure owner-only administration.
 
 ### Tasks
 
-- [ ] Configure Supabase Auth for a single owner/admin account
-- [ ] Build login/logout flow and session restoration
-- [ ] Protect Add/Edit/Delete routes and controls
-- [ ] Keep all read-only routes public
-- [ ] Handle expired sessions and unauthorized deep links
+- [ ] Configure Supabase Auth for a single owner/admin account — email auth is enabled by default; the actual account still needs to be created via the Supabase Dashboard (Authentication → Users → Add User) or `supabase auth` CLI. No public sign-up form exists in the app (intentionally — single-owner site), so this is a manual one-time step outside the codebase, same as every other live-project action so far
+- [x] Build login/logout flow and session restoration (`AuthProvider` mirrors `supabase.auth` session state via `getSession()` + `onAuthStateChange`; session persistence/refresh is supabase-js's default client behavior)
+- [x] Protect Add/Edit/Delete routes and controls (`RequireAuth` route guard; applied to `/items/new`, the only such route that exists yet — Phase 16-18 will add the rest under the same guard; the Sidebar/bottom-tab "Add New Item" stub is now hidden unless signed in)
+- [x] Keep all read-only routes public (unchanged — `RequireAuth` wraps only `/items/new`)
+- [x] Handle expired sessions and unauthorized deep links (`RequireAuth` redirects to `/login` with the intended destination preserved in router state; verified a direct visit to `/items/new` while logged out redirects correctly)
 
 ### Testing & Verification
 
-- [ ] Anonymous visitor can browse but cannot write
-- [ ] Owner can authenticate and access CRUD
-- [ ] Client UI and RLS independently enforce permissions
+- [x] Anonymous visitor can browse but cannot write (write UI is hidden; RLS backs this up independently, verified since Phase 4/14)
+- [ ] Owner can authenticate and access CRUD — blocked on the manual account-creation step above; re-verify (successful login, protected route access, sign out) once that account exists
+- [x] Client UI and RLS independently enforce permissions (`RequireAuth`/hidden buttons at the UI layer, `to authenticated` RLS policies at the DB layer — verified anonymous-side: wrong credentials show an error and stay on `/login`, direct navigation to the protected route redirects, no add-item affordance renders anywhere)
 
 ### Definition of Done
 
-- [ ] Authentication and authorization are secure and predictable
+- [ ] Authentication and authorization are secure and predictable — code complete and verified on the anonymous side; reopen once the owner account exists and a real sign-in pass is confirmed
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [ ] Phase Complete — reopen once the owner account is created and login/logout/protected-route access is verified end to end
 
 ---
 

@@ -1,6 +1,7 @@
 import { Gamepad2, Plus } from 'lucide-react'
 import type { ComponentType } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 import {
   collectionNavItems,
@@ -46,6 +47,7 @@ function SectionLabel({ children }: { children: string }) {
 
 export function Sidebar() {
   const { t } = useLocale()
+  const { user } = useAuth()
 
   return (
     <aside className="hidden w-20 shrink-0 flex-col border-r border-border bg-surface p-3 md:flex xl:w-64">
@@ -80,14 +82,16 @@ export function Sidebar() {
         </div>
       </nav>
 
-      <button
-        type="button"
-        title={t('sidebar.addNewItem')}
-        className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
-      >
-        <Plus size={18} />
-        <span className="hidden xl:inline">{t('sidebar.addNewItem')}</span>
-      </button>
+      {user && (
+        <Link
+          to="/items/new"
+          title={t('sidebar.addNewItem')}
+          className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
+        >
+          <Plus size={18} />
+          <span className="hidden xl:inline">{t('sidebar.addNewItem')}</span>
+        </Link>
+      )}
     </aside>
   )
 }

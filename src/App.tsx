@@ -1,5 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
+import { RequireAuth } from '@/features/auth/RequireAuth'
+import AddItemPage from '@/pages/AddItemPage'
 import AllItemsPage from '@/pages/AllItemsPage'
 import ArtbookDetailPage from '@/pages/ArtbookDetailPage'
 import ArtbooksPage from '@/pages/ArtbooksPage'
@@ -9,6 +11,7 @@ import FigureDetailPage from '@/pages/FigureDetailPage'
 import FiguresPage from '@/pages/FiguresPage'
 import GameDetailPage from '@/pages/GameDetailPage'
 import GamesPage from '@/pages/GamesPage'
+import LoginPage from '@/pages/LoginPage'
 import PlatformPage from '@/pages/PlatformPage'
 import RecentlyAddedPage from '@/pages/RecentlyAddedPage'
 import SearchPage from '@/pages/SearchPage'
@@ -25,6 +28,14 @@ function App() {
       <Route element={<AppShell />}>
         <Route index element={<DashboardPage />} />
         <Route path="items" element={<AllItemsPage />} />
+        <Route
+          path="items/new"
+          element={
+            <RequireAuth>
+              <AddItemPage />
+            </RequireAuth>
+          }
+        />
         <Route path="games" element={<GamesPage />} />
         <Route path="games/:id" element={<GameDetailPage />} />
         <Route path="special-editions" element={<SpecialEditionsPage />} />
@@ -40,6 +51,7 @@ function App() {
         <Route path="platforms/:slug" element={<PlatformPage />} />
         <Route path="recently-added" element={<RecentlyAddedPage />} />
         <Route path="search" element={<SearchPage />} />
+        <Route path="login" element={<LoginPage />} />
         <Route path="*" element={<ComingSoonPage />} />
       </Route>
     </Routes>

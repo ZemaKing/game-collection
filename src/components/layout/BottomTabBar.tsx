@@ -1,5 +1,6 @@
 import { Clock, Home, Plus, Search, User } from 'lucide-react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 import type { TranslationKey } from '@/lib/i18n'
 
@@ -12,19 +13,22 @@ const tabs = [
 
 export function BottomTabBar() {
   const { t } = useLocale()
+  const { user } = useAuth()
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-border bg-surface px-2 py-2 md:hidden">
       <TabLink {...tabs[0]} />
       <TabLink {...tabs[1]} />
 
-      <button
-        type="button"
-        aria-label={t('bottomTab.addNewItem')}
-        className="-mt-6 flex size-12 items-center justify-center rounded-full bg-accent text-accent-fg shadow-lg"
-      >
-        <Plus size={22} />
-      </button>
+      {user && (
+        <Link
+          to="/items/new"
+          aria-label={t('bottomTab.addNewItem')}
+          className="-mt-6 flex size-12 items-center justify-center rounded-full bg-accent text-accent-fg shadow-lg"
+        >
+          <Plus size={22} />
+        </Link>
+      )}
 
       <TabLink {...tabs[2]} />
       <TabLink {...tabs[3]} />
