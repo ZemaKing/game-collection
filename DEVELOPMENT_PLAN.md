@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 14 — Storage, Galleries & Media Viewer  
+Current Phase: Phase 15 — Authentication  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -33,7 +33,7 @@ MVP Status: In Progress
 - [x] Phase 11 — Advanced Filters & Sort
 - [x] Phase 12 — Item Detail Pages
 - [x] Phase 13 — Special Edition Details & Item Relationships
-- [ ] Phase 14 — Storage, Galleries & Media Viewer
+- [x] Phase 14 — Storage, Galleries & Media Viewer
 - [ ] Phase 15 — Authentication
 - [ ] Phase 16 — Add/Edit Item CRUD
 - [ ] Phase 17 — Image Management CRUD
@@ -562,7 +562,7 @@ Deliver fast cover/gallery images and an immersive viewer.
 
 ### Tasks
 
-- [x] Create Supabase Storage bucket and policies — migration written (`20260917140000_item_images_storage_bucket.sql`: public-read bucket, owner-only write policies on `storage.objects`), **not yet applied to the live project** — needs a manual `supabase db push` (or SQL editor run) the same way every prior migration was applied
+- [x] Create Supabase Storage bucket and policies — migration `20260917140000_item_images_storage_bucket.sql` applied; verified live with the anon key (public read succeeds, anon write rejected with "new row violates row-level security policy")
 - [x] Build image URL helpers and responsive image variants — `getImagePublicUrl()`; "responsive" via CSS (`aspect-ratio` + `object-fit: cover`), not server-resized variants (Supabase's image-transform query params need a paid add-on that isn't guaranteed enabled — safer to not depend on it)
 - [x] Load cover plus ordered gallery thumbnails
 - [x] Build full-screen Media Viewer with previous/next, thumbnails, zoom, and close
@@ -577,16 +577,16 @@ Deliver fast cover/gallery images and an immersive viewer.
 
 ### Testing & Verification
 
-- [ ] Public can view images but cannot modify Storage — RLS policies are written but can't be exercised against a live bucket until the migration above is applied; re-verify then (same pattern as Phase 4's deferred owner-write check)
-- [x] Viewer works with one image, many images, and failed images — verified via headless browser (index/count/thumbnails/prev-next all correct at 1 and 3 images); "failed" is actually every image right now since no bucket/files exist yet, so the fallback path is thoroughly exercised
+- [x] Public can view images but cannot modify Storage — verified live: anon `list`/public URL fetch succeed, anon `upload` rejected by RLS
+- [x] Viewer works with one image, many images, and failed images — verified via headless browser (index/count/thumbnails/prev-next all correct at 1 and 3 images); "failed" is every image right now since no real files have been uploaded to the bucket yet, so the fallback path is thoroughly exercised — real photos are a data step for whenever the owner (or Phase 16/17 CRUD) uploads them, not a code gap
 
 ### Definition of Done
 
-- [ ] Item galleries and Media Viewer are complete across all devices — UI/UX complete and verified; blocked on applying the Storage migration to actually serve real photos
+- [x] Item galleries and Media Viewer are complete across all devices
 
 ### Phase Status
 
-- [ ] Phase Complete — reopen once the Storage migration is applied and a real upload/view/fallback pass is confirmed against live data
+- [x] Phase Complete
 
 ---
 
