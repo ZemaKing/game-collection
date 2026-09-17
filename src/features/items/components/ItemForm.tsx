@@ -4,6 +4,7 @@ import { MultiSelect } from '@/components/ui/MultiSelect'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { CONDITION_LABEL_KEYS, ITEM_CONDITIONS } from '@/features/items/constants'
+import { ImageManager } from '@/features/items/components/ImageManager'
 import { RelationshipPicker, type RelatedItemSelection } from '@/features/items/components/RelationshipPicker'
 import { FORM_SECTIONS, type FormFieldDef } from '@/features/items/forms/formFields'
 import type { ItemFormState } from '@/features/items/forms/formState'
@@ -23,7 +24,7 @@ interface ItemFormProps {
   itemType: ItemType
   initialValues: ItemFormState
   initialRelatedItems: RelatedItemSelection[]
-  /** The item being edited, excluded from its own relationship search results. */
+  /** The item being edited, excluded from its own relationship search results. Also gates the Images step: `item_images` rows need a real item id, which doesn't exist yet during create. */
   excludeId?: string
   isSaving: boolean
   submitError: string | null
@@ -196,6 +197,14 @@ export function ItemForm({
         </div>
       ),
     },
+    ...(excludeId
+      ? [
+          {
+            titleKey: 'images.sectionTitle' as TranslationKey,
+            render: () => <ImageManager itemType={itemType} itemId={excludeId} />,
+          },
+        ]
+      : []),
   ]
   const isLastStep = stepIndex === steps.length - 1
 

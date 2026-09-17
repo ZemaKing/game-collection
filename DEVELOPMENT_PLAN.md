@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 17 — Image Management CRUD  
+Current Phase: Phase 18 — Delete Management  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -36,7 +36,7 @@ MVP Status: In Progress
 - [x] Phase 14 — Storage, Galleries & Media Viewer
 - [x] Phase 15 — Authentication
 - [x] Phase 16 — Add/Edit Item CRUD
-- [ ] Phase 17 — Image Management CRUD
+- [x] Phase 17 — Image Management CRUD
 - [ ] Phase 18 — Delete Management
 - [ ] Phase 19 — Duplicate Detection & Unsaved Changes Guard
 - [ ] Phase 20 — Completeness Calculation
@@ -667,34 +667,38 @@ Add owner-only upload, reorder, cover selection, replacement, and deletion.
 
 ### Tasks
 
-- [ ] Upload one or multiple images with progress
-- [ ] Validate file type, file size, and image count
-- [ ] Reorder gallery images
-- [ ] Set any image as cover
-- [ ] Replace an existing image
-- [ ] Delete an image with confirmation
-- [ ] Add/edit alt text
-- [ ] Roll back database/storage changes on partial failure
+- [x] Upload one or multiple images with progress — per-file Queued/Uploading/Done/Failed status (`useItemImages.ts` upload queue), not byte-level percentage: `@supabase/storage-js` has no `onUploadProgress` hook, and a hand-rolled `XMLHttpRequest` against the Storage REST endpoint was judged not worth the added complexity for a single-owner app (confirmed with the owner during planning)
+- [x] Validate file type, file size, and image count (`imageApi.ts` `validateFiles()` mirrors the bucket's own limits — MIME allowlist, 10 MB, and a client-chosen cap of 20 images/item — client-side, before any network call)
+- [x] Reorder gallery images (hand-rolled Up/Down buttons per image, no drag-and-drop library — confirmed with the owner during planning; `reorderItemImages()` persists the full new position order)
+- [x] Set any image as cover (`setCoverImage()` unsets the old cover before setting the new one — required by the `item_images_one_cover_per_item` partial unique index)
+- [x] Replace an existing image (`replaceItemImageFile()` uploads the new file, updates the row, then deletes the old object only after the DB update succeeds)
+- [x] Delete an image with confirmation (`ConfirmDialog.tsx`, new reusable Radix-Dialog-based component — also intended for Phase 18's delete-item confirmation)
+- [x] Add/edit alt text (`updateImageAltText()`, saved on blur)
+- [x] Roll back database/storage changes on partial failure — manual compensating actions per mutation (matches the codebase's existing no-transaction, sequential-`await` style in `useSaveItem.ts`; no Postgres RPC/transaction used): a failed DB insert after a successful upload deletes the just-uploaded object, and a failed replace-update deletes the newly-uploaded object rather than the original
 
 ### UI / UX
 
-- [ ] Desktop supports drag-and-drop plus file picker
-- [ ] Tablet/mobile support picker, camera/gallery source where available, and touch reordering
-- [ ] Destructive actions require explicit confirmation
+- [x] Desktop supports drag-and-drop plus file picker (`ImageManager.tsx` drop zone + hidden file input, both feeding the same `addFiles()`)
+- [x] Tablet/mobile support picker, camera/gallery source where available, and touch reordering — same file input/dropzone (native HTML5 drag events don't fire on touch, so touch users use the picker), reordering via the same Up/Down buttons (touch-friendly tap targets, no drag gesture)
+- [x] Destructive actions require explicit confirmation (image delete goes through `ConfirmDialog`)
 
 ### Testing & Verification
 
-- [ ] Storage and database remain synchronized
-- [ ] Unauthorized uploads and deletes fail
-- [ ] Cover fallback remains valid after deletion
+- [x] Storage and database remain synchronized — verified live: replace leaves exactly one object per row, delete removes both the object and the row
+- [x] Unauthorized uploads and deletes fail — verified live: signed-out visit to `/games/:id/edit` redirects to `/login`; the Images step only renders inside the already `RequireAuth`-guarded edit route (no separate route added — the Images step is gated by `ItemForm`'s `excludeId` prop, only passed by `EditItemPage`, never by the create flow)
+- [x] Cover fallback remains valid after deletion — verified live: deleting the current cover image with another image present promotes the remaining lowest-position image to cover
 
 ### Definition of Done
 
-- [ ] Owner can fully manage item images without orphaned files or rows
+- [x] Owner can fully manage item images without orphaned files or rows — verified live end-to-end via a headless-browser pass: upload (valid + multi-file), reject invalid type, set cover, reorder, replace, alt text, delete-with-cover-fallback, and persistence across reload all confirmed with screenshots; `npm run build` and `npm run lint` pass
+
+### Out of Scope
+
+The Images step only exists once an item has a real id (create flow has none yet — `item_images` rows require it), so it's edit-only, matching the "inline in edit form" entry point confirmed with the owner during planning. Storage cleanup when an *item* itself is deleted is Phase 18's responsibility (no FK cascade exists from item tables to `item_images`, by design since Phase 4 — polymorphic references are trigger-validated, not FK-constrained).
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
