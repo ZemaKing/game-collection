@@ -23,12 +23,12 @@ MVP Status: In Progress
 - [x] Phase 1 — Project Foundation
 - [x] Phase 2 — Design System & Application Shell
 - [x] Phase 3 — Supabase Project Setup
-- [ ] Phase 4 — Core Database Schema & RLS
-- [ ] Phase 5 — Seed / Sample Data
+- [x] Phase 4 — Core Database Schema & RLS
+- [x] Phase 5 — Seed / Sample Data
 - [x] Phase 6 — Dashboard & Collection Summary
 - [x] Phase 7 — All Items & Type Listing Pages
 - [x] Phase 8 — Grid and List Views
-- [ ] Phase 9 — Platform & Recently Added Views
+- [x] Phase 9 — Platform & Recently Added Views
 - [x] Phase 10 — Global Search
 - [x] Phase 11 — Advanced Filters & Sort
 - [x] Phase 12 — Item Detail Pages
@@ -210,12 +210,12 @@ All six item tables, lookups, relationships, unified view, and RLS are live.
 
 - [x] Anonymous SELECT succeeds on all public data
 - [x] Anonymous writes are rejected
-- [ ] Authenticated owner CRUD succeeds
-- [ ] Relationship constraints prevent invalid or orphaned references
+- [x] Authenticated owner CRUD succeeds — verified live via `scripts/verify-phase4-rls.mjs`: owner sign-in, INSERT, UPDATE, and DELETE on `games` all succeeded (9/9 checks passed)
+- [x] Relationship constraints prevent invalid or orphaned references — verified live: self-reference rejected by `item_relationships_no_self_reference`, dangling reference rejected by `validate_item_relationships_reference` trigger, duplicate rejected by `item_relationships_unique_link`
 
 ### Definition of Done
 
-- [ ] Schema supports all planned collection, search, filtering, CRUD, gallery, and relationship flows
+- [x] Schema supports all planned collection, search, filtering, CRUD, gallery, and relationship flows
 
 ### Out of Scope
 
@@ -223,7 +223,7 @@ Auth user creation, UI, production data entry.
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
@@ -239,21 +239,21 @@ Realistic, reusable sample data across all item types and planned UI states.
 - [x] Seed several rows for each of the six item types
 - [x] Seed special-edition contents and cross-item relationships
 - [x] Seed cover images and gallery images
-- [x] Seed records that exercise search, filters, duplicate detection, completeness, and recent activity
+- [x] Seed records that exercise search, filters, duplicate detection, completeness, and recent activity — added a `created_at = now()` row (`Stray`) so Recently Added's "Today" bucket has data; prior rows only covered Yesterday and older
 - [x] Make `supabase/seed.sql` idempotent
 
 ### Testing & Verification
 
 - [x] Verify table counts and normalized `all_items` output
-- [ ] Verify every listing/detail/state mockup has representative data
+- [x] Verify every listing/detail/state mockup has representative data — spot-checked live against dev: Dashboard, Recently Added ("Today"/Yesterday/older groups), All Items, all six type pages, platform pages (PS5/PS4/Steam/Epic populated, Xbox empty-state), search, filters, special-edition Base Game/Contents detail, and missing-image fallback all render correctly
 
 ### Definition of Done
 
-- [ ] Dev data supports every MVP screen without hard-coded page content
+- [x] Dev data supports every MVP screen without hard-coded page content
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

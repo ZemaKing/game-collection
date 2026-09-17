@@ -101,7 +101,13 @@ values
    'US', '711719574011', '2022-11-09', null,
    '2026-09-14', null,
    'Near-duplicate of the PS5 copy (no diacritic, PS4 version) - for duplicate-detection testing.',
-   now() - interval '1 days', now() - interval '1 days')
+   now() - interval '1 days', now() - interval '1 days'),
+
+  ('00000000-0000-4000-8000-000000001009', 'Stray',
+   '00000000-0000-4000-8000-000000000003', 'BlueTwelve Studio', 'Annapurna Interactive',
+   null, null, '2022-07-19', null,
+   now()::date, null, null,
+   now(), now())
 on conflict (id) do update set
   title = excluded.title, platform_id = excluded.platform_id, developer = excluded.developer,
   publisher = excluded.publisher, region = excluded.region, barcode = excluded.barcode,
