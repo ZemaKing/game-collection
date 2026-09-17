@@ -114,6 +114,12 @@ const translations = {
     'detail.relatedItems': 'Povezane stavke',
     'detail.baseGame': 'Osnovna igra',
     'detail.contents': 'Sadržaj izdanja',
+    'viewer.imageCount': '{current} / {total}',
+    'viewer.close': 'Zatvori',
+    'viewer.previous': 'Prethodna slika',
+    'viewer.next': 'Sledeća slika',
+    'viewer.zoomIn': 'Uvećaj',
+    'viewer.zoomOut': 'Umanji',
   },
   en: {
     'sidebar.title': 'MY COLLECTION',
@@ -223,6 +229,12 @@ const translations = {
     'detail.relatedItems': 'Related Items',
     'detail.baseGame': 'Base Game',
     'detail.contents': 'Contents',
+    'viewer.imageCount': '{current} / {total}',
+    'viewer.close': 'Close',
+    'viewer.previous': 'Previous image',
+    'viewer.next': 'Next image',
+    'viewer.zoomIn': 'Zoom in',
+    'viewer.zoomOut': 'Zoom out',
   },
 } as const satisfies Record<Locale, Record<string, string>>
 

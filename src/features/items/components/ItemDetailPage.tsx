@@ -1,10 +1,10 @@
-import { Image as ImageIcon } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchPlatforms } from '@/features/items/api'
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
-import { CoverPlaceholder } from '@/features/items/components/CoverPlaceholder'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
+import { ItemImage } from '@/features/items/components/ItemImage'
+import { MediaViewer } from '@/features/items/components/MediaViewer'
 import { RelatedItemsSection } from '@/features/items/components/RelatedItemsSection'
 import { useItemDetail } from '@/features/items/useItemDetail'
 import { useItemRelationships } from '@/features/items/useItemRelationships'
@@ -79,6 +79,8 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   const state = useItemDetail(itemType, id)
   const relationships = useItemRelationships(itemType, id)
   const [platforms, setPlatforms] = useState<Platform[]>([])
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -118,14 +120,41 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
     .map((field) => ({ ...field, text: field.value(detail, t, locale) }))
     .filter((field) => field.text !== null)
 
+  const coverIndex = Math.max(
+    images.findIndex((image) => image.is_cover),
+    0,
+  )
+  const coverImage = images[coverIndex] ?? null
+
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
       <div className="flex flex-col gap-3 lg:w-72 lg:shrink-0 xl:w-80">
-        <CoverPlaceholder
-          itemType={itemType}
-          className="aspect-[3/4] w-full rounded-xl"
-          iconSize={64}
-        />
+        {coverImage ? (
+          <button
+            type="button"
+            onClick={() => {
+              setViewerIndex(coverIndex)
+              setViewerOpen(true)
+            }}
+            className="cursor-zoom-in rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            <ItemImage
+              storagePath={coverImage.storage_path}
+              itemType={itemType}
+              alt={coverImage.alt_text ?? detail.title}
+              className="aspect-[3/4] w-full rounded-xl"
+              iconSize={64}
+            />
+          </button>
+        ) : (
+          <ItemImage
+            storagePath={null}
+            itemType={itemType}
+            alt={detail.title}
+            className="aspect-[3/4] w-full rounded-xl"
+            iconSize={64}
+          />
+        )}
 
         <section>
           <h2 className="mb-2 text-sm font-semibold text-text">{t('detail.gallery')}</h2>
@@ -133,14 +162,23 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
             <p className="text-sm text-muted">{t('detail.noImages')}</p>
           ) : (
             <div className="grid grid-cols-4 gap-2 lg:grid-cols-3">
-              {images.map((image) => (
-                <div
+              {images.map((image, i) => (
+                <button
                   key={image.id}
-                  className="flex aspect-square items-center justify-center rounded-lg bg-card-hover text-muted"
-                  title={image.alt_text ?? undefined}
+                  type="button"
+                  onClick={() => {
+                    setViewerIndex(i)
+                    setViewerOpen(true)
+                  }}
+                  className="overflow-hidden rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
-                  <ImageIcon size={18} strokeWidth={1.5} />
-                </div>
+                  <ItemImage
+                    storagePath={image.storage_path}
+                    itemType={itemType}
+                    alt={image.alt_text ?? detail.title}
+                    className="aspect-square w-full"
+                  />
+                </button>
               ))}
             </div>
           )}
@@ -233,6 +271,15 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
           />
         )}
       </div>
+
+      <MediaViewer
+        images={images}
+        itemType={itemType}
+        itemTitle={detail.title}
+        open={viewerOpen}
+        initialIndex={viewerIndex}
+        onOpenChange={setViewerOpen}
+      />
     </div>
   )
 }

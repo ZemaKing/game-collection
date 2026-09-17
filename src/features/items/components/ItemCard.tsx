@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { CONDITION_LABEL_KEYS, ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
-import { CoverPlaceholder } from '@/features/items/components/CoverPlaceholder'
+import { ItemImage } from '@/features/items/components/ItemImage'
 import type { AllItemRow } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
 
@@ -49,7 +49,12 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
         to={to}
         className={`flex items-center gap-3 rounded-lg border border-border bg-card p-2.5 hover:bg-card-hover ${FOCUS_RING}`}
       >
-        <CoverPlaceholder itemType={item.item_type} className="size-14 rounded-md md:size-16" />
+        <ItemImage
+          storagePath={item.cover_image_path}
+          itemType={item.item_type}
+          alt={item.title}
+          className="size-14 rounded-md md:size-16"
+        />
 
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-text">{item.title}</p>
@@ -79,7 +84,12 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
       className={`block overflow-hidden rounded-xl border border-border bg-card hover:border-accent ${FOCUS_RING}`}
     >
       <div className="relative">
-        <CoverPlaceholder itemType={item.item_type} className="aspect-[3/4] w-full" />
+        <ItemImage
+          storagePath={item.cover_image_path}
+          itemType={item.item_type}
+          alt={item.title}
+          className="aspect-[3/4] w-full"
+        />
         {(platformName || showTypeBadge) && (
           <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1">
             {platformName ? (
