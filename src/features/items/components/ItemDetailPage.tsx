@@ -1,11 +1,14 @@
 import { Image as ImageIcon } from 'lucide-react'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { fetchPlatforms } from '@/features/items/api'
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import { CoverPlaceholder } from '@/features/items/components/CoverPlaceholder'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
+import { RelatedItemsSection } from '@/features/items/components/RelatedItemsSection'
 import { useItemDetail } from '@/features/items/useItemDetail'
-import type { ItemType } from '@/features/items/types'
+import { useItemRelationships } from '@/features/items/useItemRelationships'
+import type { ItemType, Platform } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
 
 interface ItemDetailPageProps {
@@ -74,6 +77,24 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   const { id } = useParams<{ id: string }>()
   const { t, locale } = useLocale()
   const state = useItemDetail(itemType, id)
+  const relationships = useItemRelationships(itemType, id)
+  const [platforms, setPlatforms] = useState<Platform[]>([])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchPlatforms()
+      .then((data) => {
+        if (!cancelled) setPlatforms(data)
+      })
+      .catch(() => {
+        // Only used to resolve related items' platform badges; non-critical.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
 
   if (state.status === 'loading') {
     return <p className="text-center text-sm text-muted">{t('listing.loading')}</p>
@@ -189,6 +210,27 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
               ))}
             </div>
           </section>
+        )}
+
+        {itemType === 'special_edition' ? (
+          <>
+            <RelatedItemsSection
+              titleKey="detail.baseGame"
+              items={relationships.parents}
+              platformById={platformById}
+            />
+            <RelatedItemsSection
+              titleKey="detail.contents"
+              items={relationships.children}
+              platformById={platformById}
+            />
+          </>
+        ) : (
+          <RelatedItemsSection
+            titleKey="detail.relatedItems"
+            items={[...relationships.parents, ...relationships.children]}
+            platformById={platformById}
+          />
         )}
       </div>
     </div>

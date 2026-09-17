@@ -80,15 +80,21 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
     >
       <div className="relative">
         <CoverPlaceholder itemType={item.item_type} className="aspect-[3/4] w-full" />
-        {platformName && (
-          <span className="absolute top-2 left-2 rounded-md bg-surface/90 px-1.5 py-0.5 text-xs font-medium text-text shadow-sm backdrop-blur">
-            {platformName}
-          </span>
-        )}
-        {showTypeBadge && (
-          <span className="absolute top-2 right-2">
-            <TypeBadge item={item} />
-          </span>
+        {(platformName || showTypeBadge) && (
+          <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1">
+            {platformName ? (
+              <span className="min-w-0 truncate rounded-md bg-surface/90 px-1.5 py-0.5 text-xs font-medium text-text shadow-sm backdrop-blur">
+                {platformName}
+              </span>
+            ) : (
+              <span />
+            )}
+            {showTypeBadge && (
+              <span className="shrink-0">
+                <TypeBadge item={item} />
+              </span>
+            )}
+          </div>
         )}
       </div>
       <div className="flex flex-col gap-1.5 p-3">

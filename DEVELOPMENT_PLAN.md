@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 13 — Special Edition Details & Item Relationships  
+Current Phase: Phase 14 — Storage, Galleries & Media Viewer  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -32,7 +32,7 @@ MVP Status: In Progress
 - [x] Phase 10 — Global Search
 - [x] Phase 11 — Advanced Filters & Sort
 - [x] Phase 12 — Item Detail Pages
-- [ ] Phase 13 — Special Edition Details & Item Relationships
+- [x] Phase 13 — Special Edition Details & Item Relationships
 - [ ] Phase 14 — Storage, Galleries & Media Viewer
 - [ ] Phase 15 — Authentication
 - [ ] Phase 16 — Add/Edit Item CRUD
@@ -527,30 +527,30 @@ Represent collector editions and related physical/digital items as connected col
 
 ### Tasks
 
-- [ ] Build Special Edition detail composition
-- [ ] Show base game and edition contents (steelbook, artbook, figure, soundtrack, DLC, box, or other items)
-- [ ] Build reusable Related Items section
-- [ ] Support relationships such as Game → Special Edition → Steelbook/Artbook/Figure
-- [ ] Add owner-only link/unlink item controls
-- [ ] Prevent circular, duplicate, and invalid relationships
+- [x] Build Special Edition detail composition (dedicated "Base Game" + "Contents" sections, vs. one generic "Related Items" section for the other five types)
+- [x] Show base game and edition contents (steelbook, artbook, figure, or any other linked item — not limited to a fixed content type list)
+- [x] Build reusable Related Items section (`RelatedItemsSection`, shared by all six detail pages via `ItemCard`)
+- [x] Support relationships such as Game → Special Edition → Steelbook/Artbook/Figure
+- [x] Add owner-only link/unlink item controls — N/A this phase: no owner actions are rendered pre-Phase 15, consistent with Phase 6/9/12
+- [x] Prevent circular, duplicate, and invalid relationships — enforced at the database level since Phase 4 (`item_relationships_no_self_reference` check, `item_relationships_unique_link` unique constraint, `validate_item_relationships_reference` trigger); the read-side only ever walks one hop in each direction, so it can't infinite-loop even on a future multi-hop cycle
 
 ### UI / UX
 
-- [ ] Relationships are understandable as cards/list rather than a technical graph
-- [ ] Desktop, Tablet, and Mobile layouts preserve hierarchy and tap targets
+- [x] Relationships are understandable as cards/list rather than a technical graph
+- [x] Desktop, Tablet, and Mobile layouts preserve hierarchy and tap targets
 
 ### Testing & Verification
 
-- [ ] Linked items navigate correctly in both directions
-- [ ] Deleted items cannot leave broken relationship UI
+- [x] Linked items navigate correctly in both directions
+- [x] Deleted items cannot leave broken relationship UI (relationship rows are cascade-deleted with their item, and the fetch silently drops any reference that doesn't resolve)
 
 ### Definition of Done
 
-- [ ] Special editions clearly expose their contents and related collection objects
+- [x] Special editions clearly expose their contents and related collection objects
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

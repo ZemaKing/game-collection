@@ -111,6 +111,9 @@ const translations = {
     'detail.height': 'Visina',
     'detail.category': 'Kategorija',
     'detail.region': 'Region',
+    'detail.relatedItems': 'Povezane stavke',
+    'detail.baseGame': 'Osnovna igra',
+    'detail.contents': 'Sadržaj izdanja',
   },
   en: {
     'sidebar.title': 'MY COLLECTION',
@@ -217,6 +220,9 @@ const translations = {
     'detail.height': 'Height',
     'detail.category': 'Category',
     'detail.region': 'Region',
+    'detail.relatedItems': 'Related Items',
+    'detail.baseGame': 'Base Game',
+    'detail.contents': 'Contents',
   },
 } as const satisfies Record<Locale, Record<string, string>>
 
