@@ -50,6 +50,16 @@ export const ITEM_TYPE_ROUTES: Record<ItemType, string> = {
   stuff: 'stuff',
 }
 
+/** Table names in `supabase/migrations`, used by write paths (`useSaveItem`). */
+export const ITEM_TABLE_NAMES: Record<ItemType, string> = {
+  game: 'games',
+  special_edition: 'special_editions',
+  steelbook: 'steelbooks',
+  artbook: 'artbooks',
+  figure: 'figures',
+  stuff: 'stuff',
+}
+
 export const CONDITION_LABEL_KEYS: Record<ItemCondition, TranslationKey> = {
   sealed: 'condition.sealed',
   mint: 'condition.mint',

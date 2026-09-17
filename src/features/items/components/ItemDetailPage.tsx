@@ -1,3 +1,4 @@
+import { Pencil } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchPlatforms } from '@/features/items/api'
@@ -9,6 +10,7 @@ import { RelatedItemsSection } from '@/features/items/components/RelatedItemsSec
 import { useItemDetail } from '@/features/items/useItemDetail'
 import { useItemRelationships } from '@/features/items/useItemRelationships'
 import type { ItemType, Platform } from '@/features/items/types'
+import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 
 interface ItemDetailPageProps {
@@ -76,6 +78,7 @@ function ExpandableDescription({ text }: { text: string }) {
 export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   const { id } = useParams<{ id: string }>()
   const { t, locale } = useLocale()
+  const { user } = useAuth()
   const state = useItemDetail(itemType, id)
   const relationships = useItemRelationships(itemType, id)
   const [platforms, setPlatforms] = useState<Platform[]>([])
@@ -186,11 +189,20 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-6">
-        <header>
+        <header className="flex items-start justify-between gap-3">
           <h1 className="flex items-center gap-2 text-2xl font-bold text-text">
             <meta.icon size={22} className="shrink-0 text-muted" />
             {detail.title}
           </h1>
+          {user && (
+            <Link
+              to={`/${ITEM_TYPE_ROUTES[itemType]}/${id}/edit`}
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text hover:bg-card-hover"
+            >
+              <Pencil size={14} />
+              {t('form.edit')}
+            </Link>
+          )}
         </header>
 
         {fields.length > 0 && (

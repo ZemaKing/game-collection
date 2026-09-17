@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 16 — Add/Edit Item CRUD  
+Current Phase: Phase 17 — Image Management CRUD  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -35,7 +35,7 @@ MVP Status: In Progress
 - [x] Phase 13 — Special Edition Details & Item Relationships
 - [x] Phase 14 — Storage, Galleries & Media Viewer
 - [x] Phase 15 — Authentication
-- [ ] Phase 16 — Add/Edit Item CRUD
+- [x] Phase 16 — Add/Edit Item CRUD
 - [ ] Phase 17 — Image Management CRUD
 - [ ] Phase 18 — Delete Management
 - [ ] Phase 19 — Duplicate Detection & Unsaved Changes Guard
@@ -628,34 +628,34 @@ Create and update all six item types with responsive, validated forms.
 
 ### Tasks
 
-- [ ] Build type selector for Game, Special Edition, Steelbook, Artbook, Figure, and Stuff
-- [ ] Build shared fields and per-type form schemas
-- [ ] Implement create and edit mutations
-- [ ] Validate required fields, dates, numeric values, and conditional fields
-- [ ] Add tags, genres, platform, status, condition, and relationship inputs
-- [ ] Preserve draft values when moving between steps
-- [ ] Show clear saving, success, and failure feedback
+- [x] Build type selector for Game, Special Edition, Steelbook, Artbook, Figure, and Stuff (`TypeSelector.tsx`, shown at `/items/new` before a type is chosen)
+- [x] Build shared fields and per-type form schemas (`forms/formFields.ts` `FORM_SECTIONS`, `forms/schemas.ts` zod schemas — hand-rolled `useState` + `safeParse`, matching the `recipe-collection` sibling project's pattern rather than adding react-hook-form)
+- [x] Implement create and edit mutations (`forms/useSaveItem.ts`; `AddItemPage.tsx` / `EditItemPage.tsx`)
+- [x] Validate required fields, dates, numeric values, and conditional fields (zod schemas per type; `title` required, numeric fields mirror DB `check` constraints)
+- [x] Add tags, genres, platform, condition, and relationship inputs — `status` intentionally excluded (removed in Phase 9; no Wishlist/pricing in this app, see Working Rules); genres are games-only, matching the existing `game_genres` schema (no new join table added)
+- [x] Preserve draft values when moving between steps (`ItemForm.tsx` — one `useState` instance drives every step/section; nothing resets on step change)
+- [x] Show clear saving, success, and failure feedback (submit button shows a saving label and disables; failures render an inline error banner; success navigates to the item's detail page)
 
 ### UI / UX
 
-- [ ] Desktop uses modal or wide panel consistent with mockups
-- [ ] Tablet uses compact step/panel layout
-- [ ] Mobile uses full-screen multi-step flow with sticky actions
-- [ ] Forms remain usable with the virtual keyboard open
+- [x] Desktop uses modal or wide panel consistent with mockups — implemented as a full-page route styled as a wide panel rather than a JS overlay-modal (confirmed with the owner during planning; no changes needed to the existing Sidebar/BottomTabBar `/items/new` links)
+- [x] Tablet uses compact step/panel layout
+- [x] Mobile uses full-screen multi-step flow with sticky actions (progress bar + Back/Next/Save sticky bottom bar)
+- [x] Forms remain usable with the virtual keyboard open
 
 ### Testing & Verification
 
-- [ ] Create and edit each item type
-- [ ] Validation blocks invalid submission and focuses the first error
-- [ ] Public visitor cannot access form routes or mutations
+- [x] Create and edit each item type — verified live by the owner across all six types
+- [x] Validation blocks invalid submission and focuses the first error
+- [x] Public visitor cannot access form routes or mutations — verified anonymous visits to `/items/new` redirect to `/login`; RLS already enforced independently since Phase 4/15
 
 ### Definition of Done
 
-- [ ] Owner can reliably create and edit every item type on every device
+- [x] Owner can reliably create and edit every item type on every device
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
