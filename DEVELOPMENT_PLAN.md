@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 12 — Item Detail Pages  
+Current Phase: Phase 13 — Special Edition Details & Item Relationships  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -31,7 +31,7 @@ MVP Status: In Progress
 - [ ] Phase 9 — Platform & Recently Added Views
 - [x] Phase 10 — Global Search
 - [x] Phase 11 — Advanced Filters & Sort
-- [ ] Phase 12 — Item Detail Pages
+- [x] Phase 12 — Item Detail Pages
 - [ ] Phase 13 — Special Edition Details & Item Relationships
 - [ ] Phase 14 — Storage, Galleries & Media Viewer
 - [ ] Phase 15 — Authentication
@@ -490,32 +490,32 @@ Create complete read-only detail experiences for every item type.
 
 ### Tasks
 
-- [ ] Build typed item-detail route and data loader
-- [ ] Build shared detail shell plus type-specific field sections
-- [ ] Show dates, condition, identifiers, description, notes, tags, and metadata where applicable
-- [ ] Add owner-only Edit/Delete controls
-- [ ] Add gallery thumbnail strip
-- [ ] Add missing-item and invalid-route behavior
+- [x] Build typed item-detail route and data loader (`games/:id`, `special-editions/:id`, `steelbooks/:id`, `artbooks/:id`, `figures/:id`, `stuff/:id`, each querying its own table — not the normalized `all_items` view — for full type-specific columns)
+- [x] Build shared detail shell plus type-specific field sections (`DETAIL_FIELDS` config per item type)
+- [x] Show dates, condition, identifiers, description, notes, tags, and metadata where applicable
+- [x] Add owner-only Edit/Delete controls — N/A this phase: no owner actions are rendered pre-Phase 15, consistent with Phase 6/9
+- [x] Add gallery thumbnail strip
+- [x] Add missing-item and invalid-route behavior (nonexistent id and malformed/non-UUID id both resolve to the same not-found state)
 
 ### UI / UX
 
-- [ ] Desktop uses cover, metadata, description, and collection-info panels
-- [ ] Tablet reorganizes content without hiding primary data
-- [ ] Mobile prioritizes cover, title, essential metadata, and expandable description
+- [x] Desktop uses cover, metadata, description, and collection-info panels
+- [x] Tablet reorganizes content without hiding primary data (single-column stack with a 2-column metadata grid, vs. mobile's single-column metadata list)
+- [x] Mobile prioritizes cover, title, essential metadata, and expandable description (Read More/Read Less only rendered when the description actually overflows 3 lines)
 
 ### Testing & Verification
 
-- [ ] All six item types render their correct fields
-- [ ] Public/owner permissions render correct actions
-- [ ] Direct navigation and refresh work
+- [x] All six item types render their correct fields
+- [x] Public/owner permissions render correct actions
+- [x] Direct navigation and refresh work
 
 ### Definition of Done
 
-- [ ] Every collection item has a complete responsive detail page
+- [x] Every collection item has a complete responsive detail page
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

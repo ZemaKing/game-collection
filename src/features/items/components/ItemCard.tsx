@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { CONDITION_LABEL_KEYS, ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
+import { CoverPlaceholder } from '@/features/items/components/CoverPlaceholder'
 import type { AllItemRow } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
 
@@ -35,23 +36,6 @@ function TypeBadge({ item }: { item: AllItemRow }) {
   )
 }
 
-function CoverPlaceholder({
-  item,
-  className = '',
-}: {
-  item: AllItemRow
-  className?: string
-}) {
-  const Icon = ITEM_TYPE_META[item.item_type].icon
-  return (
-    <div
-      className={`flex shrink-0 items-center justify-center bg-card-hover text-muted ${className}`}
-    >
-      <Icon size={28} strokeWidth={1.5} />
-    </div>
-  )
-}
-
 export function ItemCard({ item, platformName, view, showTypeBadge = false }: ItemCardProps) {
   const { t } = useLocale()
   const to = `/${ITEM_TYPE_ROUTES[item.item_type]}/${item.id}`
@@ -65,7 +49,7 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
         to={to}
         className={`flex items-center gap-3 rounded-lg border border-border bg-card p-2.5 hover:bg-card-hover ${FOCUS_RING}`}
       >
-        <CoverPlaceholder item={item} className="size-14 rounded-md md:size-16" />
+        <CoverPlaceholder itemType={item.item_type} className="size-14 rounded-md md:size-16" />
 
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-text">{item.title}</p>
@@ -95,7 +79,7 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
       className={`block overflow-hidden rounded-xl border border-border bg-card hover:border-accent ${FOCUS_RING}`}
     >
       <div className="relative">
-        <CoverPlaceholder item={item} className="aspect-[3/4] w-full" />
+        <CoverPlaceholder itemType={item.item_type} className="aspect-[3/4] w-full" />
         {platformName && (
           <span className="absolute top-2 left-2 rounded-md bg-surface/90 px-1.5 py-0.5 text-xs font-medium text-text shadow-sm backdrop-blur">
             {platformName}

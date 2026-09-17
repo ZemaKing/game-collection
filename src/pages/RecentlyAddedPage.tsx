@@ -24,7 +24,9 @@ interface DateGroup {
 function groupByDay(items: AllItemRow[], t: (key: TranslationKey) => string, locale: Locale) {
   const now = new Date()
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const dateFormatter = new Intl.DateTimeFormat(locale === 'sr' ? 'sr-RS' : 'en-US', {
+  // 'sr' alone defaults to Cyrillic in Intl; the rest of the app's Serbian
+  // text is Latin script, so it's pinned to 'sr-Latn-RS' (see format.ts).
+  const dateFormatter = new Intl.DateTimeFormat(locale === 'sr' ? 'sr-Latn-RS' : 'en-US', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
