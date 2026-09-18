@@ -40,6 +40,21 @@ export const ITEM_TYPE_META: Record<
   stuff: { icon: Boxes, labelKey: 'nav.stuff' },
 }
 
+/**
+ * One accent color per item type, shared by the sidebar, stat tiles, item
+ * cards, filters and the type picker so a given type reads the same
+ * everywhere. `icon` colors the glyph; `badge` is the tinted pill background
+ * used on cards/checkmarks (kept low-opacity so it holds up in both themes).
+ */
+export const ITEM_TYPE_COLORS: Record<ItemType, { icon: string; badge: string }> = {
+  game: { icon: 'text-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300' },
+  special_edition: { icon: 'text-amber-400', badge: 'bg-amber-500/15 text-amber-300' },
+  steelbook: { icon: 'text-violet-400', badge: 'bg-violet-500/15 text-violet-300' },
+  artbook: { icon: 'text-orange-400', badge: 'bg-orange-500/15 text-orange-300' },
+  figure: { icon: 'text-rose-400', badge: 'bg-rose-500/15 text-rose-300' },
+  stuff: { icon: 'text-slate-400', badge: 'bg-slate-500/15 text-slate-300' },
+}
+
 /** URL path segments, matching the sidebar links in `lib/navigation.ts`. */
 export const ITEM_TYPE_ROUTES: Record<ItemType, string> = {
   game: 'games',
@@ -77,4 +92,13 @@ export const PLATFORM_ICONS: Record<string, (props: PlatformIconProps) => ReactE
   steam: SteamIcon,
   'epic-games': EpicGamesIcon,
   xbox: XboxIcon,
+}
+
+/** Short badge labels keyed by `platforms.slug`, used on item card overlays. */
+export const PLATFORM_SHORT_LABELS: Record<string, string> = {
+  'playstation-5': 'PS5',
+  'playstation-4': 'PS4',
+  steam: 'Steam',
+  'epic-games': 'Epic',
+  xbox: 'Xbox',
 }

@@ -2,6 +2,8 @@ import * as RadixDialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { NavLink } from 'react-router-dom'
+import { ITEM_TYPE_COLORS } from '@/features/items/constants'
+import type { ItemType } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
 import {
   collectionNavItems,
@@ -18,13 +20,16 @@ function NavRow({
   label,
   to,
   icon: Icon,
+  itemType,
   onNavigate,
 }: {
   label: string
   to: string
   icon: ComponentType<{ size?: number; className?: string }>
+  itemType?: ItemType
   onNavigate: () => void
 }) {
+  const iconColor = itemType ? ITEM_TYPE_COLORS[itemType].icon : ''
   return (
     <NavLink
       to={to}
@@ -36,8 +41,12 @@ function NavRow({
         }`
       }
     >
-      <Icon size={18} className="shrink-0" />
-      {label}
+      {({ isActive }) => (
+        <>
+          <Icon size={18} className={`shrink-0 ${!isActive && iconColor}`} />
+          {label}
+        </>
+      )}
     </NavLink>
   )
 }
@@ -74,6 +83,7 @@ export function MobileNavSheet({ open, onOpenChange }: MobileNavSheetProps) {
                   to={item.to}
                   icon={item.icon}
                   label={t(item.labelKey)}
+                  itemType={item.itemType}
                   onNavigate={close}
                 />
               ))}

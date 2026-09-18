@@ -66,7 +66,7 @@ function DashboardPage() {
     }
   }, [])
 
-  const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
+  const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p])), [platforms])
   const hasActiveFilters =
     filters.itemTypes.length > 0 ||
     filters.platformIds.length > 0 ||
@@ -142,7 +142,8 @@ function DashboardPage() {
               <ItemCard
                 key={item.id}
                 item={item}
-                platformName={item.platform_id ? (platformById.get(item.platform_id) ?? null) : null}
+                platformName={item.platform_id ? (platformById.get(item.platform_id)?.name ?? null) : null}
+                platformSlug={item.platform_id ? (platformById.get(item.platform_id)?.slug ?? null) : null}
                 view={view}
                 showTypeBadge={filters.itemTypes.length !== 1}
               />

@@ -1,6 +1,8 @@
 import { Gamepad2, Plus } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import { ITEM_TYPE_COLORS } from '@/features/items/constants'
+import type { ItemType } from '@/features/items/types'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 import {
@@ -13,11 +15,14 @@ function NavRow({
   label,
   to,
   icon: Icon,
+  itemType,
 }: {
   label: string
   to: string
   icon: ComponentType<{ size?: number; className?: string }>
+  itemType?: ItemType
 }) {
+  const iconColor = itemType ? ITEM_TYPE_COLORS[itemType].icon : ''
   return (
     <NavLink
       to={to}
@@ -31,8 +36,12 @@ function NavRow({
       }
       title={label}
     >
-      <Icon size={18} className="shrink-0" />
-      <span className="hidden xl:inline">{label}</span>
+      {({ isActive }) => (
+        <>
+          <Icon size={18} className={`shrink-0 ${!isActive && iconColor}`} />
+          <span className="hidden xl:inline">{label}</span>
+        </>
+      )}
     </NavLink>
   )
 }
@@ -63,7 +72,13 @@ export function Sidebar() {
       <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
         <div className="flex flex-col gap-1">
           {primaryNavItems.map((item) => (
-            <NavRow key={item.to} to={item.to} icon={item.icon} label={t(item.labelKey)} />
+            <NavRow
+              key={item.to}
+              to={item.to}
+              icon={item.icon}
+              label={t(item.labelKey)}
+              itemType={item.itemType}
+            />
           ))}
         </div>
 

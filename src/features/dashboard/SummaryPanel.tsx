@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { LayoutGrid } from 'lucide-react'
+import { useState, type ComponentType } from 'react'
 import { Link } from 'react-router-dom'
-import { ITEM_TYPES, ITEM_TYPE_META } from '@/features/items/constants'
+import { ITEM_TYPES, ITEM_TYPE_COLORS, ITEM_TYPE_META } from '@/features/items/constants'
 import { formatRelativeTime } from '@/features/items/format'
 import type { DashboardSummary, GenreSummaryRow } from '@/features/items/api'
 import type { AllItemRow } from '@/features/items/types'
@@ -13,9 +14,28 @@ interface SummaryPanelProps {
   compact?: boolean
 }
 
-function StatTile({ label, value }: { label: string; value: string | number }) {
+interface StatTileProps {
+  label: string
+  value: string | number
+  icon: ComponentType<{ size?: number; className?: string }>
+  iconColor: string
+  compact?: boolean
+}
+
+function StatTile({ label, value, icon: Icon, iconColor, compact = false }: StatTileProps) {
+  if (compact) {
+    return (
+      <div className="flex min-w-0 grow basis-[22%] flex-col items-start gap-1 rounded-lg border border-border bg-surface px-2 py-2">
+        <Icon size={15} className={`shrink-0 ${iconColor}`} />
+        <p className="text-sm leading-none font-bold text-text">{value}</p>
+        <p className="w-full truncate text-[10px] leading-none text-muted">{label}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="rounded-lg border border-border bg-surface p-3">
+      <Icon size={16} className={`mb-1 ${iconColor}`} />
       <p className="text-xl font-bold text-text">{value}</p>
       <p className="text-xs text-muted">{label}</p>
     </div>
@@ -29,17 +49,23 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
 
   if (compact) {
     return (
-      <div className="flex gap-3 overflow-x-auto pb-1">
-        <div className="w-28 shrink-0">
-          <StatTile label={t('dashboard.summary.totalItems')} value={summary.totalItems} />
-        </div>
+      <div className="flex flex-wrap gap-1.5">
+        <StatTile
+          compact
+          icon={LayoutGrid}
+          iconColor="text-accent"
+          label={t('dashboard.summary.totalItems')}
+          value={summary.totalItems}
+        />
         {ITEM_TYPES.map((type) => (
-          <div key={type} className="w-28 shrink-0">
-            <StatTile
-              label={t(ITEM_TYPE_META[type].labelKey)}
-              value={summary.countsByType[type]}
-            />
-          </div>
+          <StatTile
+            key={type}
+            compact
+            icon={ITEM_TYPE_META[type].icon}
+            iconColor={ITEM_TYPE_COLORS[type].icon}
+            label={t(ITEM_TYPE_META[type].labelKey)}
+            value={summary.countsByType[type]}
+          />
         ))}
       </div>
     )
@@ -50,10 +76,17 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
       <section>
         <h2 className="mb-2 text-sm font-semibold text-text">{t('dashboard.summary.title')}</h2>
         <div className="grid grid-cols-2 gap-2">
-          <StatTile label={t('dashboard.summary.totalItems')} value={summary.totalItems} />
+          <StatTile
+            icon={LayoutGrid}
+            iconColor="text-accent"
+            label={t('dashboard.summary.totalItems')}
+            value={summary.totalItems}
+          />
           {ITEM_TYPES.map((type) => (
             <StatTile
               key={type}
+              icon={ITEM_TYPE_META[type].icon}
+              iconColor={ITEM_TYPE_COLORS[type].icon}
               label={t(ITEM_TYPE_META[type].labelKey)}
               value={summary.countsByType[type]}
             />

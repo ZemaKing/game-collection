@@ -1,7 +1,13 @@
 import * as RadixDialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
-import { ITEM_CONDITIONS, ITEM_TYPES, ITEM_TYPE_META, CONDITION_LABEL_KEYS } from '@/features/items/constants'
+import { useState, type ComponentType, type ReactNode } from 'react'
+import {
+  ITEM_CONDITIONS,
+  ITEM_TYPES,
+  ITEM_TYPE_COLORS,
+  ITEM_TYPE_META,
+  CONDITION_LABEL_KEYS,
+} from '@/features/items/constants'
 import type { Genre, Platform } from '@/features/items/types'
 import type { Tag } from '@/features/items/api'
 import { DEFAULT_FILTERS, type Filters } from '@/features/items/useFilters'
@@ -15,10 +21,14 @@ function CheckboxRow({
   label,
   checked,
   onChange,
+  icon: Icon,
+  iconColor,
 }: {
   label: string
   checked: boolean
   onChange: () => void
+  icon?: ComponentType<{ size?: number; className?: string }>
+  iconColor?: string
 }) {
   return (
     <label className="flex cursor-pointer items-center gap-2.5 rounded-md px-1 py-1.5 text-sm text-text hover:bg-card-hover">
@@ -28,6 +38,7 @@ function CheckboxRow({
         onChange={onChange}
         className="size-4 shrink-0 rounded border-border accent-accent"
       />
+      {Icon && <Icon size={15} className={`shrink-0 ${iconColor}`} />}
       {label}
     </label>
   )
@@ -115,6 +126,8 @@ export function FilterSheet({
                     <CheckboxRow
                       key={type}
                       label={t(ITEM_TYPE_META[type].labelKey)}
+                      icon={ITEM_TYPE_META[type].icon}
+                      iconColor={ITEM_TYPE_COLORS[type].icon}
                       checked={draft.itemTypes.includes(type)}
                       onChange={() => setDraft((d) => ({ ...d, itemTypes: toggleValue(d.itemTypes, type) }))}
                     />

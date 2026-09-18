@@ -1,14 +1,31 @@
+import { MoreVertical, Pencil } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { calculateCompleteness, completenessFactsFromRow } from '@/features/items/completeness'
-import { CONDITION_LABEL_KEYS, ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
+import {
+  CONDITION_LABEL_KEYS,
+  ITEM_TYPE_COLORS,
+  ITEM_TYPE_META,
+  ITEM_TYPE_ROUTES,
+  PLATFORM_ICONS,
+  PLATFORM_SHORT_LABELS,
+} from '@/features/items/constants'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import type { AllItemRow } from '@/features/items/types'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/DropdownMenu'
+import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 
 interface ItemCardProps {
   item: AllItemRow
   platformName: string | null
+  /** Slug of the item's platform, used to render the branded badge on grid cards. */
+  platformSlug?: string | null
   view: 'grid' | 'list'
   /** Show an item-type icon/label badge — used on mixed (All Items) results. */
   showTypeBadge?: boolean
@@ -29,18 +46,53 @@ function ConditionBadge({ condition }: { condition: AllItemRow['condition'] }) {
 
 function TypeBadge({ item }: { item: AllItemRow }) {
   const { t } = useLocale()
-  const Icon = ITEM_TYPE_META[item.item_type].icon
+  const meta = ITEM_TYPE_META[item.item_type]
+  const Icon = meta.icon
   return (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-surface/90 px-1.5 py-0.5 text-xs font-medium text-text shadow-sm backdrop-blur">
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium ${ITEM_TYPE_COLORS[item.item_type].badge}`}
+    >
       <Icon size={12} />
-      {t(ITEM_TYPE_META[item.item_type].labelKey)}
+      {t(meta.labelKey)}
     </span>
   )
 }
 
-export function ItemCard({ item, platformName, view, showTypeBadge = false }: ItemCardProps) {
+/** Same type glyph as `TypeBadge`, but with a solid backing so it stays legible over busy cover art. */
+function TypeOverlayBadge({ item }: { item: AllItemRow }) {
   const { t } = useLocale()
+  const meta = ITEM_TYPE_META[item.item_type]
+  const Icon = meta.icon
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-black/70 px-1.5 py-0.5 text-xs font-medium text-white">
+      <Icon size={12} className={ITEM_TYPE_COLORS[item.item_type].icon} />
+      {t(meta.labelKey)}
+    </span>
+  )
+}
+
+function PlatformBadge({ platformName, platformSlug }: { platformName: string; platformSlug?: string | null }) {
+  const Icon = platformSlug ? PLATFORM_ICONS[platformSlug] : null
+  const label = (platformSlug && PLATFORM_SHORT_LABELS[platformSlug]) || platformName
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-black/70 px-1.5 py-0.5 text-xs font-medium text-white">
+      {Icon && <Icon size={12} />}
+      {label}
+    </span>
+  )
+}
+
+export function ItemCard({
+  item,
+  platformName,
+  platformSlug = null,
+  view,
+  showTypeBadge = false,
+}: ItemCardProps) {
+  const { t } = useLocale()
+  const { user } = useAuth()
   const to = `/${ITEM_TYPE_ROUTES[item.item_type]}/${item.id}`
+  const editTo = `${to}/edit`
   const releaseYear = item.release_date ? new Date(item.release_date).getFullYear() : null
   const completeness = calculateCompleteness(item.item_type, completenessFactsFromRow(item))
 
@@ -83,38 +135,58 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
   }
 
   return (
-    <Link
-      to={to}
-      className={`block overflow-hidden rounded-xl border border-border bg-card hover:border-accent ${FOCUS_RING}`}
-    >
+    <div className="group relative overflow-hidden rounded-xl border border-border bg-card hover:border-accent">
       <div className="relative">
-        <ItemImage
-          storagePath={item.cover_image_path}
-          itemType={item.item_type}
-          alt={item.title}
-          className="aspect-[4/5] w-full"
-        />
-        {showTypeBadge && (
+        <ItemImage storagePath={item.cover_image_path} itemType={item.item_type} alt={item.title} className="aspect-[4/5] w-full" />
+        {platformName && (
+          <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1">
+            <PlatformBadge platformName={platformName} platformSlug={platformSlug} />
+            {showTypeBadge && <TypeOverlayBadge item={item} />}
+          </div>
+        )}
+        {!platformName && showTypeBadge && (
           <div className="absolute inset-x-2 top-2 flex items-start justify-end">
-            <TypeBadge item={item} />
+            <TypeOverlayBadge item={item} />
           </div>
         )}
       </div>
       <div className="flex flex-col gap-1.5 p-3">
-        <p className="line-clamp-2 text-sm font-semibold text-text">{item.title}</p>
-        {(item.subtitle || platformName) && (
+        <div className="flex items-start justify-between gap-1">
+          <p className="line-clamp-2 flex-1 text-sm font-semibold text-text">{item.title}</p>
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t('form.edit')}
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative z-10 -mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-full text-muted hover:bg-card-hover hover:text-text"
+                >
+                  <MoreVertical size={16} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to={editTo} className="flex w-full items-center gap-2">
+                    <Pencil size={14} />
+                    {t('form.edit')}
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+        {(item.subtitle || releaseYear) && (
           <p className="truncate text-xs text-muted">
-            {[platformName, item.subtitle].filter(Boolean).join(' · ')}
+            {[item.subtitle, releaseYear ? String(releaseYear) : null].filter(Boolean).join(' · ')}
           </p>
         )}
-        <div className="mt-1 flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <ConditionBadge condition={item.condition} />
-            <CompletenessBadge percent={completeness.percent} compact />
-          </div>
-          {releaseYear && <span className="shrink-0 text-xs text-muted">{releaseYear}</span>}
+        <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+          <ConditionBadge condition={item.condition} />
+          <CompletenessBadge percent={completeness.percent} compact />
         </div>
       </div>
-    </Link>
+      <Link to={to} aria-label={item.title} className={`absolute inset-0 rounded-xl ${FOCUS_RING}`} />
+    </div>
   )
 }

@@ -74,7 +74,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
     }
   }, [])
 
-  const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
+  const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p])), [platforms])
 
   const meta = itemType ? ITEM_TYPE_META[itemType] : null
   const TitleIcon = platform ? (PLATFORM_ICONS[platform.slug] ?? Gamepad2) : meta?.icon
@@ -163,7 +163,8 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
           <ItemCard
             key={item.id}
             item={item}
-            platformName={item.platform_id ? (platformById.get(item.platform_id) ?? null) : null}
+            platformName={item.platform_id ? (platformById.get(item.platform_id)?.name ?? null) : null}
+            platformSlug={item.platform_id ? (platformById.get(item.platform_id)?.slug ?? null) : null}
             view={view}
             showTypeBadge={showTypeBadge}
           />

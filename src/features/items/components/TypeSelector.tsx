@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ITEM_TYPES, ITEM_TYPE_META } from '@/features/items/constants'
+import { ITEM_TYPES, ITEM_TYPE_COLORS, ITEM_TYPE_META } from '@/features/items/constants'
 import { useLocale } from '@/hooks/useLocale'
 
 /** Step 1 of Add: pick which of the six item types to create (Phase 16 task 1). */
@@ -18,7 +18,7 @@ export function TypeSelector() {
               to={`/items/new?type=${type}`}
               className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-6 text-center transition-colors hover:border-accent hover:bg-card-hover"
             >
-              <meta.icon size={28} className="text-accent" />
+              <meta.icon size={28} className={ITEM_TYPE_COLORS[type].icon} />
               <span className="text-sm font-medium text-text">{t(meta.labelKey)}</span>
             </Link>
           )

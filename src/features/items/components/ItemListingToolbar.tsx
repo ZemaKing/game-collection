@@ -1,7 +1,7 @@
 import { Check, ChevronDown, LayoutGrid, List as ListIcon, SlidersHorizontal, X } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { SORT_KEYS, type SortKey, type Tag } from '@/features/items/api'
-import { CONDITION_LABEL_KEYS, ITEM_TYPE_META } from '@/features/items/constants'
+import { CONDITION_LABEL_KEYS, ITEM_TYPE_COLORS, ITEM_TYPE_META } from '@/features/items/constants'
 import { FilterSheet } from '@/features/items/components/FilterSheet'
 import type { ViewMode } from '@/features/items/useListingPrefs'
 import type { Filters } from '@/features/items/useFilters'
@@ -43,6 +43,7 @@ interface Chip {
   key: string
   label: string
   onRemove: () => void
+  colorClass?: string
 }
 
 interface ItemListingToolbarProps {
@@ -89,6 +90,7 @@ export function ItemListingToolbar({
       key: `type:${type}`,
       label: t(ITEM_TYPE_META[type].labelKey),
       onRemove: () => setFilters({ itemTypes: filters.itemTypes.filter((v) => v !== type) }),
+      colorClass: ITEM_TYPE_COLORS[type].badge,
     })),
     ...(showPlatformFilter ? filters.platformIds : []).map((id) => ({
       key: `platform:${id}`,
@@ -185,7 +187,9 @@ export function ItemListingToolbar({
           {chips.map((chip) => (
             <span
               key={chip.key}
-              className="inline-flex items-center gap-1 rounded-full bg-card-hover px-2.5 py-1 text-xs font-medium text-text"
+              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
+                chip.colorClass ?? 'bg-card-hover text-text'
+              }`}
             >
               {chip.label}
               <button type="button" onClick={chip.onRemove} aria-label={t('filters.removeChip')}>
