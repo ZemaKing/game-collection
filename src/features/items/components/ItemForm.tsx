@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Input } from '@/components/ui/Input'
 import { MultiSelect } from '@/components/ui/MultiSelect'
 import { Select } from '@/components/ui/Select'
@@ -13,7 +14,12 @@ import { useItemLookups } from '@/features/items/forms/useItemLookups'
 import type { ItemType } from '@/features/items/types'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { useLocale } from '@/hooks/useLocale'
+import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard'
 import type { TranslationKey } from '@/lib/i18n'
+
+function sortedIds(items: RelatedItemSelection[]): string[] {
+  return [...items.map((item) => item.itemId)].sort()
+}
 
 export interface ItemFormSubmitResult {
   values: Record<string, unknown> & { tagIds: string[]; genreIds?: string[] }
@@ -63,6 +69,14 @@ export function ItemForm({
   const [relatedItems, setRelatedItems] = useState<RelatedItemSelection[]>(initialRelatedItems)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [stepIndex, setStepIndex] = useState(0)
+
+  const isDirty = useMemo(
+    () =>
+      JSON.stringify(form) !== JSON.stringify(initialValues) ||
+      JSON.stringify(sortedIds(relatedItems)) !== JSON.stringify(sortedIds(initialRelatedItems)),
+    [form, initialValues, relatedItems, initialRelatedItems],
+  )
+  const { isBlocked, guardAction, confirmDiscard, cancelDiscard } = useUnsavedChangesGuard(isDirty)
 
   function setField<K extends keyof ItemFormState>(name: K, value: ItemFormState[K]) {
     setForm((prev) => ({ ...prev, [name]: value }))
@@ -278,7 +292,7 @@ export function ItemForm({
           <>
             <button
               type="button"
-              onClick={() => (stepIndex === 0 ? onCancel() : setStepIndex((i) => i - 1))}
+              onClick={() => (stepIndex === 0 ? guardAction(onCancel) : setStepIndex((i) => i - 1))}
               className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-card-hover"
             >
               {stepIndex === 0 ? t('filters.cancel') : t('form.back')}
@@ -305,7 +319,7 @@ export function ItemForm({
           <>
             <button
               type="button"
-              onClick={onCancel}
+              onClick={() => guardAction(onCancel)}
               className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-card-hover"
             >
               {t('filters.cancel')}
@@ -320,6 +334,16 @@ export function ItemForm({
           </>
         )}
       </div>
+
+      <ConfirmDialog
+        open={isBlocked}
+        onOpenChange={(open) => !open && cancelDiscard()}
+        title={t('form.unsavedChangesTitle')}
+        description={t('form.unsavedChangesBody')}
+        confirmLabel={t('form.discardChanges')}
+        cancelLabel={t('form.keepEditing')}
+        onConfirm={confirmDiscard}
+      />
     </form>
   )
 }

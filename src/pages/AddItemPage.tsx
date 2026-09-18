@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { DuplicateWarningDialog } from '@/features/items/components/DuplicateWarningDialog'
 import { ItemForm, type ItemFormSubmitResult } from '@/features/items/components/ItemForm'
 import { TypeSelector } from '@/features/items/components/TypeSelector'
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES, ITEM_TYPES } from '@/features/items/constants'
+import { findLikelyDuplicates } from '@/features/items/duplicateApi'
 import { EMPTY_ITEM_FORM_STATE } from '@/features/items/forms/formState'
 import { useSaveItem } from '@/features/items/forms/useSaveItem'
-import type { ItemType } from '@/features/items/types'
+import type { AllItemRow, ItemType } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
 
 function isItemType(value: string | null): value is ItemType {
@@ -17,8 +20,11 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
   const navigate = useNavigate()
   const { save, isSaving, error } = useSaveItem(itemType)
   const meta = ITEM_TYPE_META[itemType]
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false)
+  const [duplicates, setDuplicates] = useState<AllItemRow[]>([])
+  const [pendingSubmit, setPendingSubmit] = useState<ItemFormSubmitResult | null>(null)
 
-  async function handleSubmit(result: ItemFormSubmitResult) {
+  async function performSave(result: ItemFormSubmitResult) {
     const id = await save(
       null,
       result.values,
@@ -26,6 +32,23 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
     )
     if (!id) return
     navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${id}`)
+  }
+
+  async function handleSubmit(result: ItemFormSubmitResult) {
+    setCheckingDuplicates(true)
+    try {
+      const matches = await findLikelyDuplicates(itemType, String(result.values.title ?? ''))
+      if (matches.length > 0) {
+        setDuplicates(matches)
+        setPendingSubmit(result)
+        return
+      }
+    } catch {
+      // Duplicate check is a soft warning only; if it fails, don't block saving.
+    } finally {
+      setCheckingDuplicates(false)
+    }
+    await performSave(result)
   }
 
   return (
@@ -38,11 +61,26 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
         itemType={itemType}
         initialValues={EMPTY_ITEM_FORM_STATE}
         initialRelatedItems={[]}
-        isSaving={isSaving}
+        isSaving={isSaving || checkingDuplicates}
         submitError={error}
         submitLabel={t('form.createSubmit')}
         onSubmit={(result) => void handleSubmit(result)}
         onCancel={() => navigate('/items/new')}
+      />
+      <DuplicateWarningDialog
+        open={duplicates.length > 0}
+        itemType={itemType}
+        matches={duplicates}
+        onAddAnyway={() => {
+          const submit = pendingSubmit
+          setDuplicates([])
+          setPendingSubmit(null)
+          if (submit) void performSave(submit)
+        }}
+        onDismiss={() => {
+          setDuplicates([])
+          setPendingSubmit(null)
+        }}
       />
     </div>
   )

@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 19 — Duplicate Detection & Unsaved Changes Guard  
+Current Phase: Phase 20 — Completeness Calculation  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -38,7 +38,7 @@ MVP Status: In Progress
 - [x] Phase 16 — Add/Edit Item CRUD
 - [x] Phase 17 — Image Management CRUD
 - [x] Phase 18 — Delete Management
-- [ ] Phase 19 — Duplicate Detection & Unsaved Changes Guard
+- [x] Phase 19 — Duplicate Detection & Unsaved Changes Guard
 - [ ] Phase 20 — Completeness Calculation
 - [ ] Phase 21 — RAWG/IGDB Autofill for Games
 - [ ] Phase 22 — Empty, Loading, Error & No Results States
@@ -743,32 +743,32 @@ Prevent accidental duplicate records and loss of form edits.
 
 ### Tasks
 
-- [ ] Define type-aware duplicate matching rules
-- [ ] Check likely duplicates during Add flow without blocking legitimate variants
-- [ ] Show duplicate comparison with `View Existing`, `Add Anyway`, and `Update Existing`
-- [ ] Add dirty-form detection
-- [ ] Guard internal navigation, browser back, refresh, and modal close
-- [ ] Show `Keep Editing` and `Discard Changes` choices
+- [x] Define type-aware duplicate matching rules — deliberately title-only, not type-aware: normalized (trimmed, case-insensitive) exact title match within the same item type (`duplicateApi.ts` `findLikelyDuplicates`, using `ilike` with no wildcards). Confirmed with the owner during planning as the simplest rule that still catches the common "already own this" case, over a stricter per-type secondary-key rule (platform/publisher/manufacturer)
+- [x] Check likely duplicates during Add flow without blocking legitimate variants — `AddItemPage.tsx` `CreateItemForm.handleSubmit` calls `findLikelyDuplicates` after validation passes and before saving; a failed duplicate check never blocks the save (soft warning only), and Edit flow doesn't run this check at all
+- [x] Show duplicate comparison with `View Existing`, `Add Anyway`, and `Update Existing` (`DuplicateWarningDialog.tsx`: per-match `View Existing`/`Update Existing` navigate to the existing item's detail/edit route — both abandon the new unsaved form, there's no field-merge logic — plus one dialog-level `Add Anyway` that proceeds with the original save)
+- [x] Add dirty-form detection (`ItemForm.tsx` computes `isDirty` via `JSON.stringify` comparison of current vs. initial form state and related-item ids; shared by both Add and Edit since both render `ItemForm`)
+- [x] Guard internal navigation, browser back, refresh, and modal close — implemented as a lightweight hand-rolled guard (`useUnsavedChangesGuard.ts`), not React Router's `useBlocker`, since the app uses declarative `<BrowserRouter>` and `useBlocker` requires a data router (`createBrowserRouter`); migrating was scoped out during planning. Covers: same-origin `<a>` clicks anywhere in the app (Sidebar, BottomTabBar, Cancel button) via a capture-phase click interceptor, and refresh/tab-close/external nav via `beforeunload`. Does **not** cover the physical browser Back/Forward buttons, or other components' programmatic `navigate()` calls (e.g. selecting a Global Search result) — both accepted as documented limitations of this approach, confirmed with the owner during planning. "Modal close" doesn't apply: Add/Edit are full-page routes, not a JS modal (Phase 16 decision)
+- [x] Show `Keep Editing` and `Discard Changes` choices (`ItemForm.tsx` renders the existing `ConfirmDialog` wired to the guard's `confirmDiscard`/`cancelDiscard`)
 
 ### UI / UX
 
-- [ ] Desktop/Tablet use accessible dialogs
-- [ ] Mobile uses an appropriate modal or bottom sheet
-- [ ] Warning text identifies what will happen without being alarmist
+- [x] Desktop/Tablet use accessible dialogs (both new dialogs reuse the existing Radix-Dialog-based `ConfirmDialog`/`Dialog` primitives already used for image/item delete)
+- [x] Mobile uses an appropriate modal or bottom sheet — reuses the same centered `Dialog` primitive as Phase 17/18's confirm dialogs rather than a distinct bottom sheet, consistent with how those already behave on mobile
+- [x] Warning text identifies what will happen without being alarmist (`form.unsavedChangesBody`, `duplicates.dialogBody` — plain statements of consequence, no scare language)
 
 ### Testing & Verification
 
-- [ ] Exact and fuzzy duplicates are handled according to documented rules
-- [ ] Saved/untouched forms do not trigger the guard
-- [ ] Discard and continue paths work across navigation methods
+- [x] Exact and fuzzy duplicates are handled according to documented rules — verified live by the owner: the rule is exact-title-only (no fuzzy matching in scope), duplicate dialog appears for an exact-title resubmit
+- [x] Saved/untouched forms do not trigger the guard — verified live by the owner: untouched forms navigate away with no prompt
+- [x] Discard and continue paths work across navigation methods — verified live by the owner: Cancel and internal link navigation prompt correctly; browser refresh/tab-close shows the native leave-site prompt
 
 ### Definition of Done
 
-- [ ] CRUD protects against common duplicate and unsaved-work mistakes
+- [x] CRUD protects against common duplicate and unsaved-work mistakes
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
