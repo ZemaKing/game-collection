@@ -167,7 +167,7 @@ export function MediaViewer({
                     setZoomed(false)
                     setIndex(i)
                   }}
-                  className={`size-14 shrink-0 overflow-hidden rounded-lg ring-2 ${
+                  className={`aspect-[4/5] w-14 shrink-0 overflow-hidden rounded-lg ring-2 ${
                     i === index ? 'ring-white' : 'ring-transparent opacity-60 hover:opacity-100'
                   }`}
                 >

@@ -199,7 +199,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
                     storagePath={image.storage_path}
                     itemType={itemType}
                     alt={image.alt_text ?? detail.title}
-                    className="aspect-square w-full"
+                    className="aspect-[4/5] w-full"
                   />
                 </button>
               ))}

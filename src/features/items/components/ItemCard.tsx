@@ -56,7 +56,7 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
           storagePath={item.cover_image_path}
           itemType={item.item_type}
           alt={item.title}
-          className="size-14 rounded-md md:size-16"
+          className="aspect-[4/5] w-14 rounded-md md:w-16"
         />
 
         <div className="min-w-0 flex-1">
