@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
+import { calculateCompleteness, completenessFactsFromRow } from '@/features/items/completeness'
 import { CONDITION_LABEL_KEYS, ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
+import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import type { AllItemRow } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
@@ -40,6 +42,7 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
   const { t } = useLocale()
   const to = `/${ITEM_TYPE_ROUTES[item.item_type]}/${item.id}`
   const releaseYear = item.release_date ? new Date(item.release_date).getFullYear() : null
+  const completeness = calculateCompleteness(item.item_type, completenessFactsFromRow(item))
 
   if (view === 'list') {
     const typeLabel = showTypeBadge ? t(ITEM_TYPE_META[item.item_type].labelKey) : null
@@ -71,7 +74,8 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
           <span className="w-10 text-xs text-muted">{releaseYear ?? '—'}</span>
         </div>
 
-        <div className="flex shrink-0 items-center">
+        <div className="flex shrink-0 items-center gap-3">
+          <CompletenessBadge percent={completeness.percent} compact />
           <ConditionBadge condition={item.condition} />
         </div>
       </Link>
@@ -104,8 +108,11 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
           </p>
         )}
         <div className="mt-1 flex items-center justify-between gap-2">
-          <ConditionBadge condition={item.condition} />
-          {releaseYear && <span className="text-xs text-muted">{releaseYear}</span>}
+          <div className="flex min-w-0 items-center gap-2">
+            <ConditionBadge condition={item.condition} />
+            <CompletenessBadge percent={completeness.percent} compact />
+          </div>
+          {releaseYear && <span className="shrink-0 text-xs text-muted">{releaseYear}</span>}
         </div>
       </div>
     </Link>

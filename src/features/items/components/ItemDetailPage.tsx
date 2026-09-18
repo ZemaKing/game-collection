@@ -3,7 +3,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { fetchPlatforms } from '@/features/items/api'
+import { calculateCompleteness, completenessFactsFromDetail } from '@/features/items/completeness'
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
+import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import { MediaViewer } from '@/features/items/components/MediaViewer'
@@ -134,6 +136,10 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   )
   const coverImage = images[coverIndex] ?? null
   const relationshipCount = relationships.parents.length + relationships.children.length
+  const completeness = calculateCompleteness(
+    itemType,
+    completenessFactsFromDetail(detail, coverImage !== null),
+  )
 
   async function handleDelete() {
     if (!id) return
@@ -229,6 +235,11 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
             </div>
           )}
         </header>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted">{t('completeness.heading')}</span>
+          <CompletenessBadge percent={completeness.percent} />
+        </div>
 
         {deleteError && (
           <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">

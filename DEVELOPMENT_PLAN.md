@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 20 — Completeness Calculation  
+Current Phase: Phase 21 — RAWG/IGDB Autofill for Games  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -39,7 +39,7 @@ MVP Status: In Progress
 - [x] Phase 17 — Image Management CRUD
 - [x] Phase 18 — Delete Management
 - [x] Phase 19 — Duplicate Detection & Unsaved Changes Guard
-- [ ] Phase 20 — Completeness Calculation
+- [x] Phase 20 — Completeness Calculation
 - [ ] Phase 21 — RAWG/IGDB Autofill for Games
 - [ ] Phase 22 — Empty, Loading, Error & No Results States
 - [ ] Phase 23 — Deployment & Production Verification
@@ -780,24 +780,28 @@ Calculate and display collection completeness consistently.
 
 ### Tasks
 
-- [ ] Define required/optional completeness fields per item type
-- [ ] Implement shared deterministic calculation
-- [ ] Recalculate after item, relationship, or image changes
-- [ ] Display percentage/progress on detail and relevant summary surfaces
-- [ ] Document how missing fields affect the result
+- [x] Define required/optional completeness fields per item type (`completeness.ts` `APPLICABLE_FIELDS`: `title` is excluded since it's already required to save an item at all, so it never adds signal; `platform`/`region` are excluded for artbook/figure/stuff, which never have them in the schema — 8 applicable fields for game/special_edition/steelbook, 6 for artbook/figure/stuff)
+- [x] Implement shared deterministic calculation (`calculateCompleteness(itemType, facts)` — pure function, no I/O, same input always gives the same output)
+- [x] Recalculate after item, relationship, or image changes — no caching exists anywhere in the app (every page fetches fresh on mount, consistent with Phase 18/19 notes), so the score is always computed from live data; deliberately does **not** factor relationship count into the score itself (relationships are cross-links, not missing data on the item), only item fields + cover-image presence
+- [x] Display percentage/progress on detail and relevant summary surfaces (`CompletenessBadge.tsx`: a small progress bar + percentage, reused on `ItemDetailPage` (header area) and on `ItemCard` grid/list cards). Card-level completeness reads from the same lightweight `all_items` row every listing already fetches (`completenessFactsFromRow`) rather than requiring a separate per-item detail query — made possible by using each type's single `subtitle` proxy field (see below) instead of every type-specific column individually
+- [x] Document how missing fields affect the result — doc comments on `calculateCompleteness`/`CompletenessFacts` in `completeness.ts`; each missing applicable field simply doesn't count toward the numerator, no partial credit or per-field weighting
+
+### UI / UX
+
+- [x] `CompletenessBadge` is a compact variant on cards and a larger variant on the detail page, both showing a small progress bar plus the percentage; hovering shows an exact-percent tooltip via the `title` attribute
 
 ### Testing & Verification
 
-- [ ] Unit test empty, partial, and complete examples for all item types
-- [ ] UI updates immediately after relevant edits
+- [x] Unit test empty, partial, and complete examples for all item types — `src/features/items/completeness.test.ts` (11 tests, `vitest run`): 0%/100% for all six types, platform/region correctly excluded for artbook/figure/stuff, a partial (50%) case, and both adapter functions (`completenessFactsFromRow`/`completenessFactsFromDetail`) including the per-type subtitle-proxy mapping. First test suite in the project — added `vitest` as a devDependency and an `npm test` script; no other test infra (jsdom/Testing Library) added since this is pure-function logic only
+- [x] UI updates immediately after relevant edits — verified live by the owner
 
 ### Definition of Done
 
-- [ ] Completeness is deterministic, tested, and clearly represented
+- [x] Completeness is deterministic, tested, and clearly represented
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
