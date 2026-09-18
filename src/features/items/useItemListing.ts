@@ -24,6 +24,7 @@ export function useItemListing(
   const effectiveItemTypes = fixedItemType ? [fixedItemType] : filters.itemTypes
   const effectivePlatformIds = fixedPlatformId ? [fixedPlatformId] : filters.platformIds
   const filterKey = [
+    filters.search,
     effectiveItemTypes.join(''),
     effectivePlatformIds.join(''),
     filters.genreIds.join(''),
@@ -52,6 +53,7 @@ export function useItemListing(
   useEffect(() => {
     let cancelled = false
     fetchItems({
+      search: filters.search,
       itemTypes: effectiveItemTypes,
       platformIds: effectivePlatformIds,
       genreIds: filters.genreIds,

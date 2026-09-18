@@ -53,6 +53,7 @@ const SORT_COLUMNS: Record<SortKey, { column: string; ascending: boolean }> = {
 export const SORT_KEYS: SortKey[] = ['recently_added', 'title', 'release_date', 'last_updated']
 
 export interface FetchItemsParams {
+  search: string
   itemTypes: ItemType[]
   platformIds: string[]
   genreIds: string[]
@@ -113,6 +114,7 @@ export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsRe
   const { column, ascending } = SORT_COLUMNS[params.sort]
   let query = supabase.from('all_items').select('*', { count: 'exact' })
 
+  if (params.search.trim()) query = query.ilike('title', `%${params.search.trim()}%`)
   if (params.itemTypes.length) query = query.in('item_type', params.itemTypes)
   if (params.platformIds.length) query = query.in('platform_id', params.platformIds)
   if (params.conditions.length) query = query.in('condition', params.conditions)

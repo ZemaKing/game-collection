@@ -5,6 +5,7 @@ import { ITEM_CONDITIONS, ITEM_TYPES } from '@/features/items/constants'
 import type { ItemCondition, ItemType } from '@/features/items/types'
 
 export interface Filters {
+  search: string
   itemTypes: ItemType[]
   platformIds: string[]
   genreIds: string[]
@@ -17,6 +18,7 @@ export interface Filters {
 }
 
 export const DEFAULT_FILTERS: Filters = {
+  search: '',
   itemTypes: [],
   platformIds: [],
   genreIds: [],
@@ -29,6 +31,7 @@ export const DEFAULT_FILTERS: Filters = {
 }
 
 const PARAM_KEYS = {
+  search: 'q',
   itemTypes: 'type',
   platformIds: 'platform',
   genreIds: 'genre',
@@ -54,6 +57,7 @@ function parseFilters(params: URLSearchParams): Filters {
   const sort = (SORT_KEYS as string[]).includes(sortRaw ?? '') ? (sortRaw as SortKey) : DEFAULT_FILTERS.sort
 
   return {
+    search: params.get(PARAM_KEYS.search) ?? '',
     itemTypes,
     platformIds: params.get(PARAM_KEYS.platformIds)?.split(',').filter(Boolean) ?? [],
     genreIds: params.get(PARAM_KEYS.genreIds)?.split(',').filter(Boolean) ?? [],
@@ -68,6 +72,7 @@ function parseFilters(params: URLSearchParams): Filters {
 
 function serializeFilters(filters: Filters, preserve: URLSearchParams): URLSearchParams {
   const next = new URLSearchParams(preserve)
+  next.delete(PARAM_KEYS.search)
   next.delete(PARAM_KEYS.itemTypes)
   next.delete(PARAM_KEYS.platformIds)
   next.delete(PARAM_KEYS.genreIds)
@@ -78,6 +83,7 @@ function serializeFilters(filters: Filters, preserve: URLSearchParams): URLSearc
   next.delete(PARAM_KEYS.collectionDateTo)
   next.delete(PARAM_KEYS.sort)
 
+  if (filters.search.trim()) next.set(PARAM_KEYS.search, filters.search.trim())
   if (filters.itemTypes.length) next.set(PARAM_KEYS.itemTypes, filters.itemTypes.join(','))
   if (filters.platformIds.length) next.set(PARAM_KEYS.platformIds, filters.platformIds.join(','))
   if (filters.genreIds.length) next.set(PARAM_KEYS.genreIds, filters.genreIds.join(','))

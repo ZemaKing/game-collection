@@ -87,6 +87,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
   const showTypeBadge = !itemType
   const showGenreFilter = !itemType || itemType === 'game'
   const hasActiveFilters =
+    filters.search.trim().length > 0 ||
     filters.itemTypes.length > 0 ||
     filters.platformIds.length > 0 ||
     filters.genreIds.length > 0 ||

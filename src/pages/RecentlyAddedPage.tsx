@@ -90,6 +90,7 @@ function RecentlyAddedPage() {
   useEffect(() => {
     let cancelled = false
     fetchItems({
+      search: '',
       itemTypes: [],
       platformIds: [],
       genreIds: [],
