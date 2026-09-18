@@ -223,7 +223,7 @@ function DashboardPage() {
           )}
         </div>
 
-        <div className="hidden lg:block">
+        <div>
           {summary && !sidebarLoading && !sidebarError && (
             <SummaryPanel summary={summary} genres={genreSummary} recentItems={recentItems} />
           )}
