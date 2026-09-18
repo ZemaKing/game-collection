@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -26,7 +26,7 @@ import type { AllItemRow, Genre, Platform } from '@/features/items/types'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 
-const PAGE_SIZE = 15
+const PAGE_SIZE = 12
 
 function SidebarSkeleton() {
   return (
@@ -46,10 +46,8 @@ function DashboardPage() {
   const { user } = useAuth()
   const { view, setView } = useListingPrefs('dashboard.view')
   const { filters, setFilters, clearAll } = useFilters()
-  const { items, totalCount, page, setPage, loading, error, hasMore, reload } = useItemListing(
-    filters,
-    PAGE_SIZE,
-  )
+  const [searchParams] = useSearchParams()
+  const { items, loading, error, hasMore, reload } = useItemListing(filters, PAGE_SIZE)
 
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [genres, setGenres] = useState<Genre[]>([])
@@ -162,10 +160,6 @@ function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-4">
-          <p className="text-sm text-muted">
-            {t('listing.itemsCount', { count: String(totalCount) })}
-          </p>
-
           {error && <ErrorState message={t('listing.error', { message: error })} onRetry={reload} />}
 
           {!error && items.length === 0 && !loading && (
@@ -194,7 +188,7 @@ function DashboardPage() {
             />
           )}
 
-          {!error && (items.length > 0 || (loading && page === 0)) && (
+          {!error && (items.length > 0 || loading) && (
             <div
               className={
                 view === 'grid'
@@ -213,20 +207,19 @@ function DashboardPage() {
                 />
               ))}
               {loading &&
-                Array.from({ length: page === 0 ? PAGE_SIZE : 4 }, (_, i) => (
+                Array.from({ length: PAGE_SIZE }, (_, i) => (
                   <ItemCardSkeleton key={`skeleton-${i}`} view={view} />
                 ))}
             </div>
           )}
 
           {hasMore && !loading && (
-            <button
-              type="button"
-              onClick={() => setPage((p) => p + 1)}
+            <Link
+              to={{ pathname: '/items', search: searchParams.toString() }}
               className="self-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
             >
-              {t('listing.loadMore')}
-            </button>
+              {t('dashboard.viewAll')}
+            </Link>
           )}
         </div>
 

@@ -1,4 +1,4 @@
-import { LayoutGrid } from 'lucide-react'
+import { Gamepad2, LayoutGrid } from 'lucide-react'
 import { useState, type ComponentType } from 'react'
 import { Link } from 'react-router-dom'
 import { ITEM_TYPE_COLORS, ITEM_TYPE_META, ITEM_TYPE_ROUTES, ITEM_TYPES } from '@/features/items/constants'
@@ -6,6 +6,8 @@ import { formatRelativeTime } from '@/features/items/format'
 import type { DashboardSummary, GenreSummaryRow } from '@/features/items/api'
 import type { AllItemRow } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
+
+const GENRE_ICON_COLORS = ITEM_TYPES.map((type) => ITEM_TYPE_COLORS[type].icon)
 
 interface SummaryPanelProps {
   summary: DashboardSummary
@@ -88,12 +90,18 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
   return (
     <aside className="flex w-full flex-col gap-5">
       {genres.length > 0 && (
-        <section>
-          <h2 className="heading-section mb-2 text-text">{t('dashboard.genres')}</h2>
-          <ul className="flex flex-col gap-1.5">
-            {visibleGenres.map((genre) => (
-              <li key={genre.id} className="flex items-center justify-between text-sm">
-                <span className="text-text">{genre.name}</span>
+        <section className="rounded-lg border border-border bg-surface p-4">
+          <h2 className="heading-section mb-3 text-text">{t('dashboard.genres')}</h2>
+          <ul className="flex flex-col gap-2.5">
+            {visibleGenres.map((genre, index) => (
+              <li key={genre.id} className="flex items-center justify-between gap-2 text-sm">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <Gamepad2
+                    size={16}
+                    className={`shrink-0 ${GENRE_ICON_COLORS[index % GENRE_ICON_COLORS.length]}`}
+                  />
+                  <span className="truncate text-text">{genre.name}</span>
+                </span>
                 <span className="text-muted">{genre.count}</span>
               </li>
             ))}
@@ -110,8 +118,8 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
         </section>
       )}
 
-      <section>
-        <h2 className="heading-section mb-2 text-text">{t('dashboard.recentlyAdded')}</h2>
+      <section className="rounded-lg border border-border bg-surface p-4">
+        <h2 className="heading-section mb-3 text-text">{t('dashboard.recentlyAdded')}</h2>
         {recentItems.length === 0 ? (
           <p className="text-sm text-muted">{t('dashboard.noRecentItems')}</p>
         ) : (
