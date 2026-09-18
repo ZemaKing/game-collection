@@ -1,5 +1,6 @@
 import { Gamepad2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   fetchAvailableYears,
   fetchGenres,
@@ -27,9 +28,21 @@ interface ItemListingPageProps {
 
 export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
   const { t } = useLocale()
+  const location = useLocation()
+  const navigate = useNavigate()
   const storageKey = platform ? `listing.platform.${platform.slug}` : `listing.${itemType ?? 'all'}`
   const { view, setView } = useListingPrefs(storageKey)
   const { filters, setFilters, clearAll } = useFilters()
+
+  const deletedTitle = (location.state as { deletedTitle?: string } | null)?.deletedTitle ?? null
+  const [deletedBannerTitle, setDeletedBannerTitle] = useState<string | null>(deletedTitle)
+
+  useEffect(() => {
+    if (!deletedTitle) return
+    // Clear the navigation state so refresh/back doesn't re-show the banner.
+    navigate(location.pathname + location.search, { replace: true, state: null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const { items, totalCount, setPage, loading, error, hasMore } = useItemListing(
     filters,
@@ -104,6 +117,19 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
         showPlatformFilter={!platform}
         showGenreFilter={showGenreFilter}
       />
+
+      {deletedBannerTitle && (
+        <p className="flex items-center justify-between gap-3 rounded-lg border border-success bg-success-bg px-4 py-3 text-sm text-success">
+          {t('detail.deleteSuccess', { title: deletedBannerTitle })}
+          <button
+            type="button"
+            onClick={() => setDeletedBannerTitle(null)}
+            className="shrink-0 font-medium hover:underline"
+          >
+            {t('images.dismiss')}
+          </button>
+        </p>
+      )}
 
       {error && (
         <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">

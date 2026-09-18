@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 18 — Delete Management  
+Current Phase: Phase 19 — Duplicate Detection & Unsaved Changes Guard  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -37,7 +37,7 @@ MVP Status: In Progress
 - [x] Phase 15 — Authentication
 - [x] Phase 16 — Add/Edit Item CRUD
 - [x] Phase 17 — Image Management CRUD
-- [ ] Phase 18 — Delete Management
+- [x] Phase 18 — Delete Management
 - [ ] Phase 19 — Duplicate Detection & Unsaved Changes Guard
 - [ ] Phase 20 — Completeness Calculation
 - [ ] Phase 21 — RAWG/IGDB Autofill for Games
@@ -710,20 +710,20 @@ Safely delete items.
 
 ### Tasks
 
-- [ ] Add reusable delete confirmation
-- [ ] Explain related images/relationships affected by deletion
-- [ ] Delete item and associated data safely
-- [ ] Update dashboard counts, listing caches, and activity after mutation
-- [ ] Provide success/error feedback and sensible redirect
+- [x] Add reusable delete confirmation (`ItemDetailPage.tsx` reuses Phase 17's `ConfirmDialog`, gated behind `user` same as the existing Edit link)
+- [x] Explain related images/relationships affected by deletion (`detail.deleteConfirmBody` interpolates live gallery image count and relationship count into the confirmation text)
+- [x] Delete item and associated data safely (`deleteApi.ts` `deleteItem()`: removes Storage objects, then `item_images`, `item_relationships` (both parent- and child-side), and `item_tags` rows, then the item row itself — `game_genres` needs no explicit handling, it's a real FK with `on delete cascade`, unlike the polymorphic tables)
+- [x] Update dashboard counts, listing caches, and activity after mutation — no client-side cache exists anywhere in the app (every listing/dashboard hook fetches fresh on mount), so navigating to the type listing after delete already reflects the change; nothing extra needed
+- [x] Provide success/error feedback and sensible redirect (`useDeleteItem.ts` surfaces a `deleteError` inline banner on failure; on success `ItemDetailPage` navigates to `/${ITEM_TYPE_ROUTES[itemType]}` with `{ deletedTitle }` router state, and `ItemListingPage` renders a dismissible success banner from that state, then clears it via a `replace` navigation so refresh/back doesn't re-show it)
 
 ### Testing & Verification
 
-- [ ] Cancel leaves data unchanged
-- [ ] Confirm removes only the intended record and dependent resources
+- [x] Cancel leaves data unchanged — verified live by the owner: Cancel closes the dialog with no mutation, item/images/relationships unchanged after refresh
+- [x] Confirm removes only the intended record and dependent resources — verified live by the owner: delete redirects with success banner, item and its images/relationships/Storage objects are gone, unrelated items untouched; permission check (no Delete/Edit for signed-out visitors) also confirmed
 
 ### Definition of Done
 
-- [ ] Delete is safe, responsive, and permission-protected
+- [x] Delete is safe, responsive, and permission-protected
 
 ### Out of Scope
 
@@ -731,7 +731,7 @@ Traded/Sold workflow and bulk actions.
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

@@ -1,12 +1,14 @@
-import { Pencil } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { fetchPlatforms } from '@/features/items/api'
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import { MediaViewer } from '@/features/items/components/MediaViewer'
 import { RelatedItemsSection } from '@/features/items/components/RelatedItemsSection'
+import { useDeleteItem } from '@/features/items/useDeleteItem'
 import { useItemDetail } from '@/features/items/useItemDetail'
 import { useItemRelationships } from '@/features/items/useItemRelationships'
 import type { ItemType, Platform } from '@/features/items/types'
@@ -79,11 +81,14 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   const { id } = useParams<{ id: string }>()
   const { t, locale } = useLocale()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const state = useItemDetail(itemType, id)
   const relationships = useItemRelationships(itemType, id)
+  const { remove, isDeleting, error: deleteError } = useDeleteItem(itemType)
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [viewerOpen, setViewerOpen] = useState(false)
   const [viewerIndex, setViewerIndex] = useState(0)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -128,6 +133,15 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
     0,
   )
   const coverImage = images[coverIndex] ?? null
+  const relationshipCount = relationships.parents.length + relationships.children.length
+
+  async function handleDelete() {
+    if (!id) return
+    const ok = await remove(id)
+    if (ok) {
+      navigate(`/${ITEM_TYPE_ROUTES[itemType]}`, { state: { deletedTitle: detail.title } })
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
@@ -195,15 +209,32 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
             {detail.title}
           </h1>
           {user && (
-            <Link
-              to={`/${ITEM_TYPE_ROUTES[itemType]}/${id}/edit`}
-              className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text hover:bg-card-hover"
-            >
-              <Pencil size={14} />
-              {t('form.edit')}
-            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              <Link
+                to={`/${ITEM_TYPE_ROUTES[itemType]}/${id}/edit`}
+                className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text hover:bg-card-hover"
+              >
+                <Pencil size={14} />
+                {t('form.edit')}
+              </Link>
+              <button
+                type="button"
+                onClick={() => setDeleteDialogOpen(true)}
+                disabled={isDeleting}
+                className="flex items-center gap-1.5 rounded-full border border-danger px-3 py-1.5 text-sm font-medium text-danger hover:bg-danger-bg disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Trash2 size={14} />
+                {t('form.delete')}
+              </button>
+            </div>
           )}
         </header>
+
+        {deleteError && (
+          <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
+            {t('detail.deleteError', { message: deleteError })}
+          </p>
+        )}
 
         {fields.length > 0 && (
           <dl className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
@@ -291,6 +322,19 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
         open={viewerOpen}
         initialIndex={viewerIndex}
         onOpenChange={setViewerOpen}
+      />
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title={t('detail.deleteConfirmTitle')}
+        description={t('detail.deleteConfirmBody', {
+          images: String(images.length),
+          relationships: String(relationshipCount),
+        })}
+        confirmLabel={t('form.delete')}
+        cancelLabel={t('filters.cancel')}
+        onConfirm={() => void handleDelete()}
       />
     </div>
   )
