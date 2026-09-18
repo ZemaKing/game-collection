@@ -6,6 +6,8 @@ import {
   ITEM_TYPES,
   ITEM_TYPE_COLORS,
   ITEM_TYPE_META,
+  CONDITION_COLORS,
+  CONDITION_ICONS,
   CONDITION_LABEL_KEYS,
 } from '@/features/items/constants'
 import type { Genre, Platform } from '@/features/items/types'
@@ -195,6 +197,8 @@ export function FilterSheet({
                     onChange={() =>
                       setDraft((d) => ({ ...d, conditions: toggleValue(d.conditions, condition) }))
                     }
+                    icon={CONDITION_ICONS[condition]}
+                    iconColor={CONDITION_COLORS[condition].icon}
                   />
                 ))}
               </div>

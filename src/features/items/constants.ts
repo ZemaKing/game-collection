@@ -3,7 +3,11 @@ import {
   BookOpen,
   Boxes,
   Gamepad2,
+  Gem,
+  Package,
   PersonStanding,
+  ShieldAlert,
+  ShieldX,
   Star,
   type LucideIcon,
 } from 'lucide-react'
@@ -84,6 +88,24 @@ export const CONDITION_LABEL_KEYS: Record<ItemCondition, TranslationKey> = {
 }
 
 export const ITEM_CONDITIONS: ItemCondition[] = ['sealed', 'mint', 'good', 'fair', 'poor']
+
+/** One glyph per condition tier, reused by the condition select, item cards, and filters. */
+export const CONDITION_ICONS: Record<ItemCondition, LucideIcon> = {
+  sealed: Package,
+  mint: Gem,
+  good: Star,
+  fair: ShieldAlert,
+  poor: ShieldX,
+}
+
+/** Same `{ icon, badge }` shape as `ITEM_TYPE_COLORS` — `badge` tints a whole pill, `icon` colors a bare glyph. */
+export const CONDITION_COLORS: Record<ItemCondition, { icon: string; badge: string }> = {
+  sealed: { icon: 'text-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300' },
+  mint: { icon: 'text-sky-400', badge: 'bg-sky-500/15 text-sky-300' },
+  good: { icon: 'text-lime-400', badge: 'bg-lime-500/15 text-lime-300' },
+  fair: { icon: 'text-amber-400', badge: 'bg-amber-500/15 text-amber-300' },
+  poor: { icon: 'text-rose-400', badge: 'bg-rose-500/15 text-rose-300' },
+}
 
 /** Brand glyphs keyed by `platforms.slug`, used in the sidebar and platform pages. */
 export const PLATFORM_ICONS: Record<string, (props: PlatformIconProps) => ReactElement> = {

@@ -1,7 +1,7 @@
 import { Check, ChevronDown, LayoutGrid, List as ListIcon, SlidersHorizontal, X } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { SORT_KEYS, type SortKey, type Tag } from '@/features/items/api'
-import { CONDITION_LABEL_KEYS, ITEM_TYPE_COLORS, ITEM_TYPE_META } from '@/features/items/constants'
+import { CONDITION_COLORS, CONDITION_LABEL_KEYS, ITEM_TYPE_COLORS, ITEM_TYPE_META } from '@/features/items/constants'
 import { FilterSheet } from '@/features/items/components/FilterSheet'
 import type { ViewMode } from '@/features/items/useListingPrefs'
 import type { Filters } from '@/features/items/useFilters'
@@ -111,6 +111,7 @@ export function ItemListingToolbar({
       key: `condition:${condition}`,
       label: t(CONDITION_LABEL_KEYS[condition]),
       onRemove: () => setFilters({ conditions: filters.conditions.filter((v) => v !== condition) }),
+      colorClass: CONDITION_COLORS[condition].badge,
     })),
     ...filters.tagIds.map((id) => ({
       key: `tag:${id}`,

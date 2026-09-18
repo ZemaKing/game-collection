@@ -2,9 +2,9 @@ import { useMemo, useState, type FormEvent } from 'react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Input } from '@/components/ui/Input'
 import { MultiSelect } from '@/components/ui/MultiSelect'
-import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { CONDITION_LABEL_KEYS, ITEM_CONDITIONS } from '@/features/items/constants'
+import { ConditionSelect } from '@/features/items/components/ConditionSelect'
 import { GameAutofillPanel } from '@/features/items/components/GameAutofillPanel'
 import { ImageManager } from '@/features/items/components/ImageManager'
 import { PlatformSelect } from '@/features/items/components/PlatformSelect'
@@ -148,16 +148,14 @@ export function ItemForm({
     }
     if (field.kind === 'conditionSelect') {
       return (
-        <Select
+        <ConditionSelect
           key={field.name}
           label={label}
           name={field.name}
           value={value as string}
           onChange={(v) => setField(field.name, v as never)}
-          options={ITEM_CONDITIONS.map((condition) => ({
-            value: condition,
-            label: t(CONDITION_LABEL_KEYS[condition]),
-          }))}
+          options={ITEM_CONDITIONS}
+          labelKeys={CONDITION_LABEL_KEYS}
           error={error}
         />
       )
@@ -268,7 +266,7 @@ export function ItemForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6 pb-20">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       {submitError && (
         <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
           {submitError}
@@ -305,7 +303,7 @@ export function ItemForm({
         </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-10 flex items-center justify-between gap-3 border-t border-border bg-card p-4 md:sticky md:rounded-b-xl">
+      <div className="sticky inset-x-0 bottom-0 z-10 -mx-4 flex items-center justify-between gap-3 border-t border-border bg-card p-4 md:mx-0 md:rounded-b-xl">
         {isMobile ? (
           <>
             <button

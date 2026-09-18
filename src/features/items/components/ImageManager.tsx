@@ -150,7 +150,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
           {t('images.empty')}
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,200px))] gap-4">
           {images.map((image, index) => (
             <div key={image.id} className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-2">
               <div className="relative">

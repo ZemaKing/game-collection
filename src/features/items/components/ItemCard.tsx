@@ -2,6 +2,8 @@ import { MoreVertical, Pencil } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { calculateCompleteness, completenessFactsFromRow } from '@/features/items/completeness'
 import {
+  CONDITION_COLORS,
+  CONDITION_ICONS,
   CONDITION_LABEL_KEYS,
   ITEM_TYPE_COLORS,
   ITEM_TYPE_META,
@@ -37,8 +39,12 @@ const FOCUS_RING =
 function ConditionBadge({ condition }: { condition: AllItemRow['condition'] }) {
   const { t } = useLocale()
   if (!condition) return null
+  const Icon = CONDITION_ICONS[condition]
   return (
-    <span className="inline-flex shrink-0 items-center rounded-full bg-card-hover px-2 py-0.5 text-xs font-medium text-muted">
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${CONDITION_COLORS[condition].badge}`}
+    >
+      <Icon size={12} />
       {t(CONDITION_LABEL_KEYS[condition])}
     </span>
   )
