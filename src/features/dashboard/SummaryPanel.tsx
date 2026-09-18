@@ -1,13 +1,18 @@
-import { Gamepad2, LayoutGrid } from 'lucide-react'
+import { LayoutGrid } from 'lucide-react'
 import { useState, type ComponentType } from 'react'
 import { Link } from 'react-router-dom'
-import { ITEM_TYPE_COLORS, ITEM_TYPE_META, ITEM_TYPE_ROUTES, ITEM_TYPES } from '@/features/items/constants'
+import {
+  DEFAULT_GENRE_META,
+  GENRE_META,
+  ITEM_TYPE_COLORS,
+  ITEM_TYPE_META,
+  ITEM_TYPE_ROUTES,
+  ITEM_TYPES,
+} from '@/features/items/constants'
 import { formatRelativeTime } from '@/features/items/format'
 import type { DashboardSummary, GenreSummaryRow } from '@/features/items/api'
 import type { AllItemRow } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
-
-const GENRE_ICON_COLORS = ITEM_TYPES.map((type) => ITEM_TYPE_COLORS[type].icon)
 
 interface SummaryPanelProps {
   summary: DashboardSummary
@@ -93,18 +98,19 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
         <section className="rounded-lg border border-border bg-surface p-4">
           <h2 className="heading-section mb-3 text-text">{t('dashboard.genres')}</h2>
           <ul className="flex flex-col gap-2.5">
-            {visibleGenres.map((genre, index) => (
-              <li key={genre.id} className="flex items-center justify-between gap-2 text-sm">
-                <span className="flex min-w-0 items-center gap-2.5">
-                  <Gamepad2
-                    size={16}
-                    className={`shrink-0 ${GENRE_ICON_COLORS[index % GENRE_ICON_COLORS.length]}`}
-                  />
-                  <span className="truncate text-text">{genre.name}</span>
-                </span>
-                <span className="text-muted">{genre.count}</span>
-              </li>
-            ))}
+            {visibleGenres.map((genre) => {
+              const meta = GENRE_META[genre.slug] ?? DEFAULT_GENRE_META
+              const Icon = meta.icon
+              return (
+                <li key={genre.id} className="flex items-center justify-between gap-2 text-sm">
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <Icon size={16} className={`shrink-0 ${meta.color.icon}`} />
+                    <span className="truncate text-text">{genre.name}</span>
+                  </span>
+                  <span className="text-muted">{genre.count}</span>
+                </li>
+              )
+            })}
           </ul>
           {genres.length > 5 && (
             <button

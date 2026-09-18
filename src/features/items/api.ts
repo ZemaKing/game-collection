@@ -164,24 +164,25 @@ export async function fetchDashboardSummary(): Promise<DashboardSummary> {
 export interface GenreSummaryRow {
   id: string
   name: string
+  slug: string
   count: number
 }
 
 export async function fetchGenreSummary(): Promise<GenreSummaryRow[]> {
-  const { data, error } = await supabase.from('game_genres').select('genre_id, genres(name)')
+  const { data, error } = await supabase.from('game_genres').select('genre_id, genres(name, slug)')
   if (error) throw error
 
-  const counts = new Map<string, { name: string; count: number }>()
+  const counts = new Map<string, { name: string; slug: string; count: number }>()
   for (const row of data ?? []) {
-    const genre = row.genres as unknown as { name: string } | null
+    const genre = row.genres as unknown as { name: string; slug: string } | null
     if (!genre) continue
     const existing = counts.get(row.genre_id)
     if (existing) existing.count += 1
-    else counts.set(row.genre_id, { name: genre.name, count: 1 })
+    else counts.set(row.genre_id, { name: genre.name, slug: genre.slug, count: 1 })
   }
 
   return Array.from(counts.entries())
-    .map(([id, { name, count }]) => ({ id, name, count }))
+    .map(([id, { name, slug, count }]) => ({ id, name, slug, count }))
     .sort((a, b) => b.count - a.count)
 }
 

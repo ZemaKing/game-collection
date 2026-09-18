@@ -2,13 +2,35 @@ import {
   Archive,
   BookOpen,
   Boxes,
+  ChessKnight,
+  Compass,
+  Crosshair,
+  Eye,
+  Flag,
+  Flame,
   Gamepad2,
+  Gauge,
   Gem,
+  Ghost,
+  HandFist,
+  Joystick,
+  Map,
+  Music2,
   Package,
+  PartyPopper,
   PersonStanding,
+  PlayingCards,
+  Puzzle,
+  Shield,
   ShieldAlert,
   ShieldX,
+  Skull,
+  SlidersHorizontal,
   Star,
+  Swords,
+  Trophy,
+  Users,
+  GraduationCap,
   type LucideIcon,
 } from 'lucide-react'
 import type { ReactElement } from 'react'
@@ -123,4 +145,42 @@ export const PLATFORM_SHORT_LABELS: Record<string, string> = {
   steam: 'Steam',
   'epic-games': 'Epic',
   xbox: 'Xbox',
+}
+
+/**
+ * One glyph + accent color per genre, keyed by `genres.slug`, shared by genre
+ * chips on the detail page, the genre filter, and the dashboard genre list.
+ * Same `{ icon, badge }` shape as `ITEM_TYPE_COLORS`.
+ */
+export const GENRE_META: Record<string, { icon: LucideIcon; color: { icon: string; badge: string } }> = {
+  action: { icon: Swords, color: { icon: 'text-cyan-400', badge: 'bg-cyan-500/15 text-cyan-300' } },
+  adventure: { icon: Compass, color: { icon: 'text-yellow-400', badge: 'bg-yellow-500/15 text-yellow-300' } },
+  rpg: { icon: Shield, color: { icon: 'text-violet-400', badge: 'bg-violet-500/15 text-violet-300' } },
+  simulation: { icon: SlidersHorizontal, color: { icon: 'text-orange-400', badge: 'bg-orange-500/15 text-orange-300' } },
+  roguelike: { icon: Skull, color: { icon: 'text-rose-400', badge: 'bg-rose-500/15 text-rose-300' } },
+  strategy: { icon: ChessKnight, color: { icon: 'text-blue-400', badge: 'bg-blue-500/15 text-blue-300' } },
+  shooter: { icon: Crosshair, color: { icon: 'text-red-400', badge: 'bg-red-500/15 text-red-300' } },
+  racing: { icon: Gauge, color: { icon: 'text-teal-400', badge: 'bg-teal-500/15 text-teal-300' } },
+  sports: { icon: Trophy, color: { icon: 'text-amber-400', badge: 'bg-amber-500/15 text-amber-300' } },
+  fighting: { icon: HandFist, color: { icon: 'text-red-500', badge: 'bg-red-600/15 text-red-400' } },
+  horror: { icon: Ghost, color: { icon: 'text-purple-400', badge: 'bg-purple-500/15 text-purple-300' } },
+  survival: { icon: Flame, color: { icon: 'text-orange-500', badge: 'bg-orange-600/15 text-orange-400' } },
+  puzzle: { icon: Puzzle, color: { icon: 'text-sky-400', badge: 'bg-sky-500/15 text-sky-300' } },
+  platformer: { icon: Flag, color: { icon: 'text-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300' } },
+  stealth: { icon: Eye, color: { icon: 'text-indigo-400', badge: 'bg-indigo-500/15 text-indigo-300' } },
+  mmo: { icon: Users, color: { icon: 'text-fuchsia-400', badge: 'bg-fuchsia-500/15 text-fuchsia-300' } },
+  sandbox: { icon: Boxes, color: { icon: 'text-amber-500', badge: 'bg-amber-600/15 text-amber-400' } },
+  'open-world': { icon: Map, color: { icon: 'text-emerald-500', badge: 'bg-emerald-600/15 text-emerald-400' } },
+  'card-game': { icon: PlayingCards, color: { icon: 'text-pink-500', badge: 'bg-pink-600/15 text-pink-400' } },
+  'rhythm-music': { icon: Music2, color: { icon: 'text-pink-400', badge: 'bg-pink-500/15 text-pink-300' } },
+  party: { icon: PartyPopper, color: { icon: 'text-lime-400', badge: 'bg-lime-500/15 text-lime-300' } },
+  arcade: { icon: Joystick, color: { icon: 'text-cyan-500', badge: 'bg-cyan-600/15 text-cyan-400' } },
+  'visual-novel': { icon: BookOpen, color: { icon: 'text-rose-300', badge: 'bg-rose-400/15 text-rose-200' } },
+  educational: { icon: GraduationCap, color: { icon: 'text-blue-500', badge: 'bg-blue-600/15 text-blue-400' } },
+}
+
+/** Fallback for a genre slug not present in `GENRE_META` (e.g. a custom genre added directly in the DB). */
+export const DEFAULT_GENRE_META = {
+  icon: Gamepad2,
+  color: { icon: 'text-slate-400', badge: 'bg-slate-500/15 text-slate-300' },
 }

@@ -5,7 +5,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { fetchPlatforms } from '@/features/items/api'
 import { calculateCompleteness, completenessFactsFromDetail } from '@/features/items/completeness'
-import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
+import { DEFAULT_GENRE_META, GENRE_META, ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
 import { ItemDetailSkeleton } from '@/features/items/components/ItemDetailSkeleton'
@@ -282,14 +282,19 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
           <section>
             <h2 className="heading-section mb-2 text-text">{t('dashboard.genres')}</h2>
             <div className="flex flex-wrap gap-2">
-              {detail.genres.map((genre) => (
-                <span
-                  key={genre.id}
-                  className="rounded-full bg-card-hover px-2.5 py-1 text-xs font-medium text-text"
-                >
-                  {genre.name}
-                </span>
-              ))}
+              {detail.genres.map((genre) => {
+                const meta = GENRE_META[genre.slug] ?? DEFAULT_GENRE_META
+                const Icon = meta.icon
+                return (
+                  <span
+                    key={genre.id}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${meta.color.badge}`}
+                  >
+                    <Icon size={13} />
+                    {genre.name}
+                  </span>
+                )
+              })}
             </div>
           </section>
         )}

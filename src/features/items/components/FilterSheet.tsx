@@ -9,6 +9,8 @@ import {
   CONDITION_COLORS,
   CONDITION_ICONS,
   CONDITION_LABEL_KEYS,
+  DEFAULT_GENRE_META,
+  GENRE_META,
 } from '@/features/items/constants'
 import type { Genre, Platform } from '@/features/items/types'
 import type { Tag } from '@/features/items/api'
@@ -158,16 +160,21 @@ export function FilterSheet({
             {showGenreFilter && genres.length > 0 && (
               <FilterSection title={t('filters.genre')}>
                 <div className="flex flex-col">
-                  {genres.map((genre) => (
-                    <CheckboxRow
-                      key={genre.id}
-                      label={genre.name}
-                      checked={draft.genreIds.includes(genre.id)}
-                      onChange={() =>
-                        setDraft((d) => ({ ...d, genreIds: toggleValue(d.genreIds, genre.id) }))
-                      }
-                    />
-                  ))}
+                  {genres.map((genre) => {
+                    const meta = GENRE_META[genre.slug] ?? DEFAULT_GENRE_META
+                    return (
+                      <CheckboxRow
+                        key={genre.id}
+                        label={genre.name}
+                        icon={meta.icon}
+                        iconColor={meta.color.icon}
+                        checked={draft.genreIds.includes(genre.id)}
+                        onChange={() =>
+                          setDraft((d) => ({ ...d, genreIds: toggleValue(d.genreIds, genre.id) }))
+                        }
+                      />
+                    )
+                  })}
                 </div>
               </FilterSection>
             )}
