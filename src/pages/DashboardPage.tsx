@@ -119,9 +119,18 @@ function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-text">{t('home.welcome')}</h1>
-        <p className="mt-1 text-sm text-muted">{t('home.subtitle')}</p>
+      <div
+        className="relative flex h-[110px] items-end overflow-hidden rounded-2xl bg-cover bg-right shadow-lg sm:h-[130px] lg:h-[160px] lg:bg-[position:right_25%]"
+        style={{ backgroundImage: "url('/dashboard_cover.png')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div className="relative flex flex-col gap-1 p-4 sm:p-5 lg:p-6">
+          <h1 className="text-xl font-bold text-text drop-shadow-sm sm:text-2xl lg:text-3xl">
+            {t('home.welcome')}
+          </h1>
+          <p className="text-xs text-muted drop-shadow-sm sm:text-sm">{t('home.subtitle')}</p>
+        </div>
       </div>
 
       {platforms.length > 0 && (
