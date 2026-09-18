@@ -75,14 +75,16 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="flex items-center gap-2 text-xl font-bold text-text">
-        <meta.icon size={22} className="text-muted" />
-        {t('form.editTitle', { title: detail.title })}
-      </h1>
+    <div className="flex min-h-full flex-col gap-6">
       <ItemForm
         key={id}
         itemType={itemType}
+        title={
+          <>
+            <meta.icon size={22} className="text-muted" />
+            {t('form.editTitle', { title: detail.title })}
+          </>
+        }
         initialValues={initialValues}
         initialRelatedItems={initialRelatedItems}
         excludeId={id}

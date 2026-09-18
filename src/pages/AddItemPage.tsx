@@ -60,13 +60,15 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="flex items-center gap-2 text-xl font-bold text-text">
-        <meta.icon size={22} className="text-muted" />
-        {t('form.addTitle', { type: t(meta.labelKey) })}
-      </h1>
+    <div className="flex min-h-full flex-col gap-6">
       <ItemForm
         itemType={itemType}
+        title={
+          <>
+            <meta.icon size={22} className="text-muted" />
+            {t('form.addTitle', { type: t(meta.labelKey) })}
+          </>
+        }
         initialValues={EMPTY_ITEM_FORM_STATE}
         initialRelatedItems={[]}
         isSaving={isSaving || checkingDuplicates}

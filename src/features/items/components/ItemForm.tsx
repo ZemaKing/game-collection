@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Input } from '@/components/ui/Input'
 import { MultiSelect } from '@/components/ui/MultiSelect'
@@ -31,6 +31,7 @@ export interface ItemFormSubmitResult {
 
 interface ItemFormProps {
   itemType: ItemType
+  title: ReactNode
   initialValues: ItemFormState
   initialRelatedItems: RelatedItemSelection[]
   /** The item being edited, excluded from its own relationship search results. Also gates the Images step: `item_images` rows need a real item id, which doesn't exist yet during create. */
@@ -56,6 +57,7 @@ function fieldErrorPath(path: PropertyKey[]): string {
  */
 export function ItemForm({
   itemType,
+  title,
   initialValues,
   initialRelatedItems,
   excludeId,
@@ -102,6 +104,7 @@ export function ItemForm({
             value={value as string}
             onChange={(e) => setField(field.name, e.target.value as never)}
             error={error}
+            rows={field.rows}
           />
         </div>
       )
@@ -266,7 +269,31 @@ export function ItemForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex min-h-full flex-1 flex-col gap-6">
+      {isMobile ? (
+        <h1 className="flex items-center gap-2 text-xl font-bold text-text">{title}</h1>
+      ) : (
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="flex items-center gap-2 text-xl font-bold text-text">{title}</h1>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => guardAction(onCancel)}
+              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
+            >
+              {t('filters.cancel')}
+            </button>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSaving ? t('form.saving') : submitLabel}
+            </button>
+          </div>
+        </div>
+      )}
+
       {submitError && (
         <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
           {submitError}
@@ -303,43 +330,16 @@ export function ItemForm({
         </div>
       )}
 
-      <div className="sticky inset-x-0 bottom-0 z-10 -mx-4 flex items-center justify-between gap-3 border-t border-border bg-card p-4 md:mx-0 md:rounded-b-xl">
-        {isMobile ? (
-          <>
-            <button
-              type="button"
-              onClick={() => (stepIndex === 0 ? guardAction(onCancel) : setStepIndex((i) => i - 1))}
-              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
-            >
-              {stepIndex === 0 ? t('filters.cancel') : t('form.back')}
-            </button>
-            {isLastStep ? (
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSaving ? t('form.saving') : submitLabel}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setStepIndex((i) => i + 1)}
-                className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
-              >
-                {t('form.next')}
-              </button>
-            )}
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={() => guardAction(onCancel)}
-              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
-            >
-              {t('filters.cancel')}
-            </button>
+      {isMobile && (
+        <div className="sticky inset-x-0 bottom-0 z-10 -mx-4 mt-auto flex items-center justify-between gap-3 border-t border-border bg-card p-4">
+          <button
+            type="button"
+            onClick={() => (stepIndex === 0 ? guardAction(onCancel) : setStepIndex((i) => i - 1))}
+            className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
+          >
+            {stepIndex === 0 ? t('filters.cancel') : t('form.back')}
+          </button>
+          {isLastStep ? (
             <button
               type="submit"
               disabled={isSaving}
@@ -347,9 +347,17 @@ export function ItemForm({
             >
               {isSaving ? t('form.saving') : submitLabel}
             </button>
-          </>
-        )}
-      </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setStepIndex((i) => i + 1)}
+              className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
+            >
+              {t('form.next')}
+            </button>
+          )}
+        </div>
+      )}
 
       <ConfirmDialog
         open={isBlocked}

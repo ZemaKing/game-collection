@@ -9,6 +9,7 @@ export interface FormFieldDef {
   labelKey: TranslationKey
   kind: FieldKind
   required?: boolean
+  rows?: number
 }
 
 export interface FormSectionDef {
@@ -30,7 +31,7 @@ const regionField: FormFieldDef = { name: 'region', labelKey: 'detail.region', k
 const notesSection: FormSectionDef = {
   titleKey: 'form.sectionNotes',
   fields: [
-    { name: 'description', labelKey: 'detail.about', kind: 'textarea' },
+    { name: 'description', labelKey: 'detail.about', kind: 'textarea', rows: 5 },
     { name: 'notes', labelKey: 'detail.notes', kind: 'textarea' },
   ],
 }
