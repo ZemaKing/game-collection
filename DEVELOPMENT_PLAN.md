@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 21 — RAWG/IGDB Autofill for Games  
+Current Phase: Phase 22 — Empty, Loading, Error & No Results States  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -40,7 +40,7 @@ MVP Status: In Progress
 - [x] Phase 18 — Delete Management
 - [x] Phase 19 — Duplicate Detection & Unsaved Changes Guard
 - [x] Phase 20 — Completeness Calculation
-- [ ] Phase 21 — RAWG/IGDB Autofill for Games
+- [x] Phase 21 — RAWG/IGDB Autofill for Games
 - [ ] Phase 22 — Empty, Loading, Error & No Results States
 - [ ] Phase 23 — Deployment & Production Verification
 - [ ] MVP Complete
@@ -813,25 +813,25 @@ Speed up Game entry with optional external metadata while keeping the owner in c
 
 ### Tasks
 
-- [ ] Select provider and document API/licensing constraints
-- [ ] Proxy secrets through a secure server-side function
-- [ ] Search external games from Add/Edit flow
-- [ ] Preview and selectively apply title, description, dates, developer, publisher, genres, and artwork
-- [ ] Never overwrite user-entered values without confirmation
-- [ ] Handle provider rate limits, missing data, and outages
+- [x] Select provider and document API/licensing constraints
+- [x] Proxy secrets through a secure server-side function
+- [x] Search external games from Add/Edit flow
+- [x] Preview and selectively apply title, description, dates, developer, publisher, genres, and artwork
+- [x] Never overwrite user-entered values without confirmation
+- [x] Handle provider rate limits, missing data, and outages
 
 ### Testing & Verification
 
-- [ ] Autofill success, partial data, cancellation, and failure paths work
-- [ ] API credentials are absent from client bundle
+- [x] Autofill success, partial data, cancellation, and failure paths work
+- [x] API credentials are absent from client bundle
 
 ### Definition of Done
 
-- [ ] Owner can optionally import game metadata safely and review it before saving
+- [x] Owner can optionally import game metadata safely and review it before saving
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
