@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { ITEM_TABLE_NAMES } from '@/features/items/constants'
 import type { ItemType } from '@/features/items/types'
+import { useOnlineStatus } from '@/hooks/useOnlineStatus'
+import { classifySupabaseError, type ErrorKind } from '@/lib/errorHelpers'
 import { supabase } from '@/lib/supabaseClient'
 
 export interface RelatedItemRef {
@@ -40,8 +42,10 @@ function buildPayload(itemType: ItemType, values: Record<string, unknown>): Reco
  * from both.
  */
 export function useSaveItem(itemType: ItemType) {
+  const isOnline = useOnlineStatus()
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [errorKind, setErrorKind] = useState<ErrorKind | null>(null)
 
   async function save(
     itemId: string | null,
@@ -50,6 +54,7 @@ export function useSaveItem(itemType: ItemType) {
   ): Promise<string> {
     setIsSaving(true)
     setError(null)
+    setErrorKind(null)
     try {
       const table = ITEM_TABLE_NAMES[itemType]
       const payload = buildPayload(itemType, values)
@@ -113,11 +118,12 @@ export function useSaveItem(itemType: ItemType) {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
       setError(message)
+      setErrorKind(classifySupabaseError(err, isOnline))
       throw err
     } finally {
       setIsSaving(false)
     }
   }
 
-  return { save, isSaving, error }
+  return { save, isSaving, error, errorKind }
 }

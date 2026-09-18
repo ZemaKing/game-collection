@@ -1,6 +1,6 @@
 import { Gamepad2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   fetchAvailableYears,
   fetchGenres,
@@ -13,8 +13,12 @@ import { useFilters } from '@/features/items/useFilters'
 import { useItemListing } from '@/features/items/useItemListing'
 import { useListingPrefs } from '@/features/items/useListingPrefs'
 import { ItemCard } from '@/features/items/components/ItemCard'
+import { ItemCardSkeleton } from '@/features/items/components/ItemCardSkeleton'
 import { ItemListingToolbar } from '@/features/items/components/ItemListingToolbar'
 import type { Genre, ItemType, Platform } from '@/features/items/types'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { ErrorState } from '@/components/ui/ErrorState'
+import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 
 const PAGE_SIZE = 20
@@ -28,6 +32,7 @@ interface ItemListingPageProps {
 
 export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
   const { t } = useLocale()
+  const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const storageKey = platform ? `listing.platform.${platform.slug}` : `listing.${itemType ?? 'all'}`
@@ -44,7 +49,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const { items, totalCount, setPage, loading, error, hasMore } = useItemListing(
+  const { items, totalCount, page, setPage, loading, error, hasMore, reload } = useItemListing(
     filters,
     PAGE_SIZE,
     itemType,
@@ -131,47 +136,59 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
         </p>
       )}
 
-      {error && (
-        <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
-          {t('listing.error', { message: error })}
-        </p>
-      )}
+      {error && <ErrorState message={t('listing.error', { message: error })} onRetry={reload} />}
 
       {!error && items.length === 0 && !loading && (
-        <p className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted">
-          {t('listing.empty')}
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={clearAll}
-              className="font-semibold text-accent hover:text-accent-hover"
-            >
-              {t('listing.clearFilters')}
-            </button>
-          )}
-        </p>
+        <EmptyState
+          icon={meta?.icon}
+          body={hasActiveFilters ? t('listing.empty') : t('listing.emptyCollection')}
+          action={
+            hasActiveFilters ? (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="font-semibold text-accent hover:text-accent-hover"
+              >
+                {t('listing.clearFilters')}
+              </button>
+            ) : (
+              user && (
+                <Link
+                  to={itemType ? `/items/new?type=${itemType}` : '/items/new'}
+                  className="font-semibold text-accent hover:text-accent-hover"
+                >
+                  {t('listing.emptyCollectionCta')}
+                </Link>
+              )
+            )
+          }
+        />
       )}
 
-      <div
-        className={
-          view === 'grid'
-            ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8'
-            : 'flex flex-col gap-2'
-        }
-      >
-        {items.map((item) => (
-          <ItemCard
-            key={item.id}
-            item={item}
-            platformName={item.platform_id ? (platformById.get(item.platform_id)?.name ?? null) : null}
-            platformSlug={item.platform_id ? (platformById.get(item.platform_id)?.slug ?? null) : null}
-            view={view}
-            showTypeBadge={showTypeBadge}
-          />
-        ))}
-      </div>
-
-      {loading && <p className="text-center text-sm text-muted">{t('listing.loading')}</p>}
+      {!error && (items.length > 0 || (loading && page === 0)) && (
+        <div
+          className={
+            view === 'grid'
+              ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8'
+              : 'flex flex-col gap-2'
+          }
+        >
+          {items.map((item) => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              platformName={item.platform_id ? (platformById.get(item.platform_id)?.name ?? null) : null}
+              platformSlug={item.platform_id ? (platformById.get(item.platform_id)?.slug ?? null) : null}
+              view={view}
+              showTypeBadge={showTypeBadge}
+            />
+          ))}
+          {loading &&
+            Array.from({ length: page === 0 ? PAGE_SIZE : 4 }, (_, i) => (
+              <ItemCardSkeleton key={`skeleton-${i}`} view={view} />
+            ))}
+        </div>
+      )}
 
       {hasMore && !loading && (
         <button

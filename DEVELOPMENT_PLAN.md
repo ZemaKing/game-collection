@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 22 — Empty, Loading, Error & No Results States  
+Current Phase: Phase 23 — Deployment & Production Verification  
 MVP Status: In Progress
 
 ## MVP Progress
@@ -41,7 +41,7 @@ MVP Status: In Progress
 - [x] Phase 19 — Duplicate Detection & Unsaved Changes Guard
 - [x] Phase 20 — Completeness Calculation
 - [x] Phase 21 — RAWG/IGDB Autofill for Games
-- [ ] Phase 22 — Empty, Loading, Error & No Results States
+- [x] Phase 22 — Empty, Loading, Error & No Results States
 - [ ] Phase 23 — Deployment & Production Verification
 - [ ] MVP Complete
 
@@ -843,32 +843,32 @@ Make every screen understandable and recoverable when content or network state i
 
 ### Tasks
 
-- [ ] Create shared skeleton components for dashboard, cards, rows, details, galleries, stats, and forms
-- [ ] Design first-collection and empty-category states
-- [ ] Design empty Recently Added state
-- [ ] Design search no-results and filtered-zero-results states
-- [ ] Add broken-image fallback
-- [ ] Add API, save, upload, auth-expired, and offline errors with retry/recovery actions
-- [ ] Prevent layout shift where practical
+- [x] Create shared skeleton components for dashboard, cards, rows, details, galleries, stats, and forms
+- [x] Design first-collection and empty-category states
+- [x] Design empty Recently Added state
+- [x] Design search no-results and filtered-zero-results states
+- [x] Add broken-image fallback
+- [x] Add API, save, upload, auth-expired, and offline errors with retry/recovery actions
+- [x] Prevent layout shift where practical
 
 ### UI / UX
 
-- [ ] Every state has Desktop, Tablet, and Mobile behavior
-- [ ] Empty states guide the owner to Add Item but do not expose CRUD to public users
-- [ ] Error messages are specific and actionable
+- [x] Every state has Desktop, Tablet, and Mobile behavior
+- [x] Empty states guide the owner to Add Item but do not expose CRUD to public users
+- [x] Error messages are specific and actionable
 
 ### Testing & Verification
 
-- [ ] Simulate slow, empty, failed, offline, and unauthorized scenarios
-- [ ] Verify retry and recovery actions
+- [x] Simulate slow, empty, failed, offline, and unauthorized scenarios
+- [x] Verify retry and recovery actions
 
 ### Definition of Done
 
-- [ ] No major route depends on a happy-path-only UI
+- [x] No major route depends on a happy-path-only UI
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

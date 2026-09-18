@@ -1,6 +1,9 @@
 import { Search, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { ErrorState } from '@/components/ui/ErrorState'
+import { Spinner } from '@/components/ui/Spinner'
 import { ITEM_TYPES, ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 import { useRecentSearches } from '@/features/search/useRecentSearches'
@@ -39,7 +42,7 @@ export function SearchPanel({ onNavigate, autoFocus = false }: SearchPanelProps)
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
-  const { results, loading, error } = useSearch(query)
+  const { results, loading, error, reload } = useSearch(query)
   const { recent, addRecent, removeRecent, clearRecent } = useRecentSearches()
 
   useEffect(() => {
@@ -122,7 +125,7 @@ export function SearchPanel({ onNavigate, autoFocus = false }: SearchPanelProps)
               )}
             </div>
             {recent.length === 0 ? (
-              <p className="text-sm text-muted">—</p>
+              <EmptyState compact body={t('search.emptyRecent')} />
             ) : (
               <ul className="flex flex-col gap-1">
                 {recent.map((entry) => (
@@ -149,18 +152,16 @@ export function SearchPanel({ onNavigate, autoFocus = false }: SearchPanelProps)
           </section>
         )}
 
-        {trimmed && error && (
-          <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
-            {t('listing.error', { message: error })}
-          </p>
-        )}
+        {trimmed && error && <ErrorState message={t('listing.error', { message: error })} onRetry={reload} />}
 
         {trimmed && !error && loading && (
-          <p className="text-center text-sm text-muted">{t('listing.loading')}</p>
+          <div className="flex justify-center py-6">
+            <Spinner />
+          </div>
         )}
 
         {trimmed && !error && !loading && orderedResults.length === 0 && (
-          <p className="text-center text-sm text-muted">{t('search.noResults', { query: trimmed })}</p>
+          <EmptyState compact body={t('search.noResults', { query: trimmed })} />
         )}
 
         {trimmed &&

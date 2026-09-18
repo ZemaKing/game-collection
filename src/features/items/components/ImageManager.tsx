@@ -1,7 +1,11 @@
-import { ImageUp, Loader2, Star, Trash2 } from 'lucide-react'
+import { ImageUp, Star, Trash2 } from 'lucide-react'
 import { useRef, useState, type DragEvent } from 'react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { ErrorState } from '@/components/ui/ErrorState'
 import { Input } from '@/components/ui/Input'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { Spinner } from '@/components/ui/Spinner'
 import { ITEM_TYPE_META } from '@/features/items/constants'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import type { ItemImageRow } from '@/features/items/detailTypes'
@@ -39,6 +43,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
     moveImage,
     makeCover,
     saveAltText,
+    reload,
   } = useItemImages(itemType, itemId)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -67,14 +72,18 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted">{t('listing.loading')}</p>
+    return (
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,200px))] gap-4">
+        {Array.from({ length: 4 }, (_, i) => (
+          <Skeleton key={i} className="aspect-[4/5] w-full rounded-xl" />
+        ))}
+      </div>
+    )
   }
 
   return (
     <div className="flex flex-col gap-4">
-      {error && (
-        <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">{error}</p>
-      )}
+      {error && <ErrorState message={error} onRetry={reload} />}
       {validationErrors.map((issue, index) => (
         <p key={`${issue.code}-${issue.fileName}-${index}`} className="text-xs text-danger">
           {errorMessage(t, issue.code, issue.fileName)}
@@ -118,7 +127,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
             >
               <span className="truncate text-text">{item.name}</span>
               <span className="flex items-center gap-2 shrink-0">
-                {item.status === 'uploading' && <Loader2 size={14} className="animate-spin text-muted" />}
+                {item.status === 'uploading' && <Spinner size={14} className="text-muted" />}
                 <span
                   className={
                     item.status === 'error'
@@ -146,9 +155,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
       )}
 
       {images.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border py-6 text-center text-sm text-muted">
-          {t('images.empty')}
-        </p>
+        <EmptyState body={t('images.empty')} />
       ) : (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,200px))] gap-4">
           {images.map((image, index) => (
@@ -168,7 +175,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                 )}
                 {busyImageId === image.id && (
                   <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/40">
-                    <Loader2 size={20} className="animate-spin text-white" />
+                    <Spinner size={20} className="text-white" />
                   </div>
                 )}
               </div>

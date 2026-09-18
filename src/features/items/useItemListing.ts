@@ -43,7 +43,8 @@ export function useItemListing(
     setPage(0)
   }
 
-  const paramsKey = `${filterKey}|${page}`
+  const [retryToken, setRetryToken] = useState(0)
+  const paramsKey = `${filterKey}|${page}|${retryToken}`
   const [fetchState, setFetchState] = useState<
     { key: string; status: 'loaded' | 'error'; message?: string } | null
   >(null)
@@ -94,5 +95,6 @@ export function useItemListing(
     loading,
     error,
     hasMore: items.length < totalCount,
+    reload: () => setRetryToken((n) => n + 1),
   }
 }

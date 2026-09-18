@@ -20,13 +20,14 @@ function isInvalidUuidError(message: string): boolean {
   return /invalid input syntax for type uuid/i.test(message)
 }
 
-export function useItemDetail(itemType: ItemType, id: string | undefined): ItemDetailState {
+export function useItemDetail(itemType: ItemType, id: string | undefined) {
   const [state, setState] = useState<ItemDetailState>({ status: 'loading' })
+  const [retryToken, setRetryToken] = useState(0)
 
   // Reset to "loading" whenever the target item changes (e.g. navigating
   // from one detail page straight to another), during render rather than in
   // an effect (see https://react.dev/learn/you-might-not-need-an-effect).
-  const requestKey = `${itemType}|${id ?? ''}`
+  const requestKey = `${itemType}|${id ?? ''}|${retryToken}`
   const [lastRequestKey, setLastRequestKey] = useState(requestKey)
   if (requestKey !== lastRequestKey) {
     setLastRequestKey(requestKey)
@@ -60,8 +61,10 @@ export function useItemDetail(itemType: ItemType, id: string | undefined): ItemD
     return () => {
       cancelled = true
     }
-  }, [itemType, id])
+  }, [itemType, id, retryToken])
 
-  if (!id) return { status: 'not-found' }
-  return state
+  const reload = () => setRetryToken((n) => n + 1)
+
+  if (!id) return { ...({ status: 'not-found' } as ItemDetailState), reload }
+  return { ...state, reload }
 }

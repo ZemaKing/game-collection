@@ -19,7 +19,7 @@ function isItemType(value: string | null): value is ItemType {
 function CreateItemForm({ itemType }: { itemType: ItemType }) {
   const { t } = useLocale()
   const navigate = useNavigate()
-  const { save, isSaving, error } = useSaveItem(itemType)
+  const { save, isSaving, error, errorKind } = useSaveItem(itemType)
   const meta = ITEM_TYPE_META[itemType]
   const [checkingDuplicates, setCheckingDuplicates] = useState(false)
   const [duplicates, setDuplicates] = useState<AllItemRow[]>([])
@@ -32,14 +32,15 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
       result.relatedItems.map((item) => ({ itemType: item.itemType, itemId: item.itemId })),
     )
     if (!id) return
+    let coverFailed = false
     if (result.coverImageFile) {
       try {
         await appendItemCoverImage(itemType, id, result.coverImageFile)
       } catch {
-        // Best-effort: the item itself already saved successfully.
+        coverFailed = true
       }
     }
-    navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${id}`)
+    navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${id}`, coverFailed ? { state: { coverUploadFailed: true } } : undefined)
   }
 
   async function handleSubmit(result: ItemFormSubmitResult) {
@@ -73,6 +74,7 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
         initialRelatedItems={[]}
         isSaving={isSaving || checkingDuplicates}
         submitError={error}
+        submitErrorKind={errorKind}
         submitLabel={t('form.createSubmit')}
         onSubmit={(result) => void handleSubmit(result)}
         onCancel={() => navigate('/items/new')}

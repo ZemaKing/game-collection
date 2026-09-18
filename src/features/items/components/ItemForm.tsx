@@ -1,5 +1,7 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { ErrorState } from '@/components/ui/ErrorState'
 import { Input } from '@/components/ui/Input'
 import { MultiSelect } from '@/components/ui/MultiSelect'
 import { Textarea } from '@/components/ui/Textarea'
@@ -18,6 +20,7 @@ import { useIsMobile } from '@/hooks/useIsMobile'
 import { useLocale } from '@/hooks/useLocale'
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard'
 import type { TranslationKey } from '@/lib/i18n'
+import type { ErrorKind } from '@/lib/errorHelpers'
 
 function sortedIds(items: RelatedItemSelection[]): string[] {
   return [...items.map((item) => item.itemId)].sort()
@@ -38,6 +41,7 @@ interface ItemFormProps {
   excludeId?: string
   isSaving: boolean
   submitError: string | null
+  submitErrorKind?: ErrorKind | null
   submitLabel: string
   onSubmit: (result: ItemFormSubmitResult) => void
   onCancel: () => void
@@ -63,11 +67,13 @@ export function ItemForm({
   excludeId,
   isSaving,
   submitError,
+  submitErrorKind = null,
   submitLabel,
   onSubmit,
   onCancel,
 }: ItemFormProps) {
   const { t } = useLocale()
+  const location = useLocation()
   const isMobile = useIsMobile()
   const { platforms, genres, tags } = useItemLookups()
   const [form, setForm] = useState<ItemFormState>(initialValues)
@@ -294,10 +300,19 @@ export function ItemForm({
         </div>
       )}
 
-      {submitError && (
-        <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
-          {submitError}
-        </p>
+      {submitError && submitErrorKind === 'auth' && (
+        <ErrorState
+          message={t('common.sessionExpired')}
+          secondaryAction={
+            <Link to="/login" state={{ from: location }} className="font-semibold hover:underline">
+              {t('common.signInAgain')}
+            </Link>
+          }
+        />
+      )}
+      {submitError && submitErrorKind === 'network' && <ErrorState message={t('common.networkError')} />}
+      {submitError && (submitErrorKind === 'unknown' || submitErrorKind === null) && (
+        <ErrorState message={submitError} />
       )}
 
       {Object.keys(errors).length > 0 && (

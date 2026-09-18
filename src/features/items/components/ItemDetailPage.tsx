@@ -1,13 +1,16 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { ErrorState } from '@/components/ui/ErrorState'
 import { fetchPlatforms } from '@/features/items/api'
 import { calculateCompleteness, completenessFactsFromDetail } from '@/features/items/completeness'
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
+import { ItemDetailSkeleton } from '@/features/items/components/ItemDetailSkeleton'
 import { ItemImage } from '@/features/items/components/ItemImage'
+import { ItemNotFound } from '@/features/items/components/ItemNotFound'
 import { MediaViewer } from '@/features/items/components/MediaViewer'
 import { RelatedItemsSection } from '@/features/items/components/RelatedItemsSection'
 import { useDeleteItem } from '@/features/items/useDeleteItem'
@@ -19,24 +22,6 @@ import { useLocale } from '@/hooks/useLocale'
 
 interface ItemDetailPageProps {
   itemType: ItemType
-}
-
-function NotFound({ itemType }: { itemType: ItemType }) {
-  const { t } = useLocale()
-  const meta = ITEM_TYPE_META[itemType]
-  return (
-    <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border py-16 text-center">
-      <meta.icon size={32} className="text-muted" />
-      <h1 className="text-lg font-semibold text-text">{t('detail.notFound.title')}</h1>
-      <p className="max-w-sm text-sm text-muted">{t('detail.notFound.body')}</p>
-      <Link
-        to={`/${ITEM_TYPE_ROUTES[itemType]}`}
-        className="mt-2 text-sm font-semibold text-accent hover:text-accent-hover"
-      >
-        {t('detail.backToListing', { label: t(meta.labelKey) })}
-      </Link>
-    </div>
-  )
 }
 
 const DESCRIPTION_COLLAPSED_CLASS = 'line-clamp-3'
@@ -84,6 +69,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   const { t, locale } = useLocale()
   const { user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const state = useItemDetail(itemType, id)
   const relationships = useItemRelationships(itemType, id)
   const { remove, isDeleting, error: deleteError } = useDeleteItem(itemType)
@@ -91,6 +77,15 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   const [viewerOpen, setViewerOpen] = useState(false)
   const [viewerIndex, setViewerIndex] = useState(0)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const coverUploadFailed = (location.state as { coverUploadFailed?: boolean } | null)?.coverUploadFailed ?? false
+  const [showCoverWarning, setShowCoverWarning] = useState(coverUploadFailed)
+
+  useEffect(() => {
+    if (!coverUploadFailed) return
+    // Clear the navigation state so refresh/back doesn't re-show the warning.
+    navigate(location.pathname, { replace: true, state: null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -109,19 +104,15 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
 
   if (state.status === 'loading') {
-    return <p className="text-center text-sm text-muted">{t('listing.loading')}</p>
+    return <ItemDetailSkeleton />
   }
 
   if (state.status === 'not-found') {
-    return <NotFound itemType={itemType} />
+    return <ItemNotFound itemType={itemType} />
   }
 
   if (state.status === 'error') {
-    return (
-      <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
-        {t('listing.error', { message: state.message })}
-      </p>
-    )
+    return <ErrorState message={t('listing.error', { message: state.message })} onRetry={state.reload} />
   }
 
   const { detail, images, tags } = state
@@ -245,6 +236,21 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
           <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
             {t('detail.deleteError', { message: deleteError })}
           </p>
+        )}
+
+        {showCoverWarning && (
+          <ErrorState
+            message={t('images.coverUploadFailed')}
+            secondaryAction={
+              <button
+                type="button"
+                onClick={() => setShowCoverWarning(false)}
+                className="font-semibold hover:underline"
+              >
+                {t('images.dismiss')}
+              </button>
+            }
+          />
         )}
 
         {fields.length > 0 && (

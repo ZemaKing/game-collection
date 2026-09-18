@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { ErrorState } from '@/components/ui/ErrorState'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { SummaryPanel } from '@/features/dashboard/SummaryPanel'
 import {
   fetchAvailableYears,
@@ -13,20 +17,39 @@ import {
   type Tag,
 } from '@/features/items/api'
 import { ItemCard } from '@/features/items/components/ItemCard'
+import { ItemCardSkeleton } from '@/features/items/components/ItemCardSkeleton'
 import { ItemListingToolbar } from '@/features/items/components/ItemListingToolbar'
 import { useFilters } from '@/features/items/useFilters'
 import { useItemListing } from '@/features/items/useItemListing'
 import { useListingPrefs } from '@/features/items/useListingPrefs'
 import type { AllItemRow, Genre, Platform } from '@/features/items/types'
+import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 
 const PAGE_SIZE = 15
 
+function SidebarSkeleton() {
+  return (
+    <div className="flex w-full flex-col gap-5">
+      <div className="grid grid-cols-2 gap-2">
+        {Array.from({ length: 6 }, (_, i) => (
+          <Skeleton key={i} className="h-16 rounded-lg" />
+        ))}
+      </div>
+      <Skeleton className="h-32 rounded-lg" />
+    </div>
+  )
+}
+
 function DashboardPage() {
   const { t } = useLocale()
+  const { user } = useAuth()
   const { view, setView } = useListingPrefs('dashboard.view')
   const { filters, setFilters, clearAll } = useFilters()
-  const { items, totalCount, setPage, loading, error, hasMore } = useItemListing(filters, PAGE_SIZE)
+  const { items, totalCount, page, setPage, loading, error, hasMore, reload } = useItemListing(
+    filters,
+    PAGE_SIZE,
+  )
 
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [genres, setGenres] = useState<Genre[]>([])
@@ -35,8 +58,21 @@ function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null)
   const [genreSummary, setGenreSummary] = useState<GenreSummaryRow[]>([])
   const [recentItems, setRecentItems] = useState<AllItemRow[]>([])
+  const [sidebarLoading, setSidebarLoading] = useState(true)
+  const [sidebarError, setSidebarError] = useState<string | null>(null)
+  const [sidebarRetryToken, setSidebarRetryToken] = useState(0)
 
-  // Sidebar/summary data is independent of the grid's filters, so it loads once.
+  // Reset to "loading" during render when the user retries, rather than in
+  // the effect body (see useItemDetail.ts for the same pattern).
+  const [lastSidebarRetryToken, setLastSidebarRetryToken] = useState(sidebarRetryToken)
+  if (sidebarRetryToken !== lastSidebarRetryToken) {
+    setLastSidebarRetryToken(sidebarRetryToken)
+    setSidebarLoading(true)
+    setSidebarError(null)
+  }
+
+  // Sidebar/summary data is independent of the grid's filters, so it loads once
+  // (plus whenever the user retries after a failure).
   useEffect(() => {
     let cancelled = false
     Promise.all([
@@ -58,13 +94,17 @@ function DashboardPage() {
         setGenreSummary(genreSummaryData)
         setRecentItems(recentData)
       })
-      .catch(() => {
-        // Sidebar data is supplementary; the main grid below surfaces load errors.
+      .catch((err: Error) => {
+        if (cancelled) return
+        setSidebarError(err.message)
+      })
+      .finally(() => {
+        if (!cancelled) setSidebarLoading(false)
       })
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [sidebarRetryToken])
 
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p])), [platforms])
   const hasActiveFilters =
@@ -98,7 +138,22 @@ function DashboardPage() {
         />
       )}
 
-      {summary && (
+      {sidebarLoading && (
+        <div className="lg:hidden">
+          <SidebarSkeleton />
+        </div>
+      )}
+
+      {sidebarError && !sidebarLoading && (
+        <div className="lg:hidden">
+          <ErrorState
+            message={t('listing.error', { message: sidebarError })}
+            onRetry={() => setSidebarRetryToken((n) => n + 1)}
+          />
+        </div>
+      )}
+
+      {summary && !sidebarLoading && (
         <div className="lg:hidden">
           <SummaryPanel compact summary={summary} genres={genreSummary} recentItems={recentItems} />
         </div>
@@ -110,47 +165,58 @@ function DashboardPage() {
             {t('listing.itemsCount', { count: String(totalCount) })}
           </p>
 
-          {error && (
-            <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
-              {t('listing.error', { message: error })}
-            </p>
-          )}
+          {error && <ErrorState message={t('listing.error', { message: error })} onRetry={reload} />}
 
           {!error && items.length === 0 && !loading && (
-            <p className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted">
-              {t('listing.empty')}
-              {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={clearAll}
-                  className="font-semibold text-accent hover:text-accent-hover"
-                >
-                  {t('listing.clearFilters')}
-                </button>
-              )}
-            </p>
+            <EmptyState
+              body={hasActiveFilters ? t('listing.empty') : t('listing.emptyCollection')}
+              action={
+                hasActiveFilters ? (
+                  <button
+                    type="button"
+                    onClick={clearAll}
+                    className="font-semibold text-accent hover:text-accent-hover"
+                  >
+                    {t('listing.clearFilters')}
+                  </button>
+                ) : (
+                  user && (
+                    <Link
+                      to="/items/new"
+                      className="font-semibold text-accent hover:text-accent-hover"
+                    >
+                      {t('listing.emptyCollectionCta')}
+                    </Link>
+                  )
+                )
+              }
+            />
           )}
 
-          <div
-            className={
-              view === 'grid'
-                ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 2xl:grid-cols-6'
-                : 'flex flex-col gap-2'
-            }
-          >
-            {items.map((item) => (
-              <ItemCard
-                key={item.id}
-                item={item}
-                platformName={item.platform_id ? (platformById.get(item.platform_id)?.name ?? null) : null}
-                platformSlug={item.platform_id ? (platformById.get(item.platform_id)?.slug ?? null) : null}
-                view={view}
-                showTypeBadge={filters.itemTypes.length !== 1}
-              />
-            ))}
-          </div>
-
-          {loading && <p className="text-center text-sm text-muted">{t('listing.loading')}</p>}
+          {!error && (items.length > 0 || (loading && page === 0)) && (
+            <div
+              className={
+                view === 'grid'
+                  ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 2xl:grid-cols-6'
+                  : 'flex flex-col gap-2'
+              }
+            >
+              {items.map((item) => (
+                <ItemCard
+                  key={item.id}
+                  item={item}
+                  platformName={item.platform_id ? (platformById.get(item.platform_id)?.name ?? null) : null}
+                  platformSlug={item.platform_id ? (platformById.get(item.platform_id)?.slug ?? null) : null}
+                  view={view}
+                  showTypeBadge={filters.itemTypes.length !== 1}
+                />
+              ))}
+              {loading &&
+                Array.from({ length: page === 0 ? PAGE_SIZE : 4 }, (_, i) => (
+                  <ItemCardSkeleton key={`skeleton-${i}`} view={view} />
+                ))}
+            </div>
+          )}
 
           {hasMore && !loading && (
             <button
@@ -163,11 +229,18 @@ function DashboardPage() {
           )}
         </div>
 
-        {summary && (
-          <div className="hidden lg:block">
+        <div className="hidden lg:block">
+          {sidebarLoading && <SidebarSkeleton />}
+          {sidebarError && !sidebarLoading && (
+            <ErrorState
+              message={t('listing.error', { message: sidebarError })}
+              onRetry={() => setSidebarRetryToken((n) => n + 1)}
+            />
+          )}
+          {summary && !sidebarLoading && (
             <SummaryPanel summary={summary} genres={genreSummary} recentItems={recentItems} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

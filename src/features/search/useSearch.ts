@@ -21,6 +21,8 @@ export function useSearch(query: string) {
     null,
   )
   const [errorState, setErrorState] = useState<{ key: string; message: string } | null>(null)
+  const [retryToken, setRetryToken] = useState(0)
+  const requestKey = `${trimmed}|${retryToken}`
 
   useEffect(() => {
     if (!trimmed) return
@@ -29,22 +31,23 @@ export function useSearch(query: string) {
       searchItems(trimmed)
         .then((results) => {
           if (cancelled) return
-          setResultState({ key: trimmed, results })
+          setResultState({ key: requestKey, results })
         })
         .catch((error: Error) => {
           if (cancelled) return
-          setErrorState({ key: trimmed, message: error.message })
+          setErrorState({ key: requestKey, message: error.message })
         })
     }, DEBOUNCE_MS)
     return () => {
       cancelled = true
       window.clearTimeout(handle)
     }
-  }, [trimmed])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestKey])
 
-  const results = resultState?.key === trimmed ? resultState.results : EMPTY_RESULTS
-  const error = errorState?.key === trimmed ? errorState.message : null
-  const loading = trimmed !== '' && resultState?.key !== trimmed && error === null
+  const results = resultState?.key === requestKey ? resultState.results : EMPTY_RESULTS
+  const error = errorState?.key === requestKey ? errorState.message : null
+  const loading = trimmed !== '' && resultState?.key !== requestKey && error === null
 
-  return { results, loading, error }
+  return { results, loading, error, reload: () => setRetryToken((n) => n + 1) }
 }

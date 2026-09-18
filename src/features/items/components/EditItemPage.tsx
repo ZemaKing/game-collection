@@ -1,5 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom'
+import { ErrorState } from '@/components/ui/ErrorState'
+import { ItemDetailSkeleton } from '@/features/items/components/ItemDetailSkeleton'
 import { ItemForm, type ItemFormSubmitResult } from '@/features/items/components/ItemForm'
+import { ItemNotFound } from '@/features/items/components/ItemNotFound'
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import { detailToFormState } from '@/features/items/forms/formState'
 import { useSaveItem } from '@/features/items/forms/useSaveItem'
@@ -20,29 +23,19 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
   const { id } = useParams<{ id: string }>()
   const state = useItemDetail(itemType, id)
   const relationships = useItemRelationships(itemType, id)
-  const { save, isSaving, error } = useSaveItem(itemType)
+  const { save, isSaving, error, errorKind } = useSaveItem(itemType)
   const meta = ITEM_TYPE_META[itemType]
 
   if (state.status === 'loading') {
-    return <p className="text-center text-sm text-muted">{t('listing.loading')}</p>
+    return <ItemDetailSkeleton />
   }
 
   if (state.status === 'not-found') {
-    return (
-      <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border py-16 text-center">
-        <meta.icon size={32} className="text-muted" />
-        <h1 className="text-lg font-semibold text-text">{t('detail.notFound.title')}</h1>
-        <p className="max-w-sm text-sm text-muted">{t('detail.notFound.body')}</p>
-      </div>
-    )
+    return <ItemNotFound itemType={itemType} />
   }
 
   if (state.status === 'error') {
-    return (
-      <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
-        {t('listing.error', { message: state.message })}
-      </p>
-    )
+    return <ErrorState message={t('listing.error', { message: state.message })} onRetry={state.reload} />
   }
 
   const { detail, tags } = state
@@ -64,14 +57,15 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
       result.relatedItems.map((item) => ({ itemType: item.itemType, itemId: item.itemId })),
     )
     if (!savedId) return
+    let coverFailed = false
     if (result.coverImageFile) {
       try {
         await appendItemCoverImage(itemType, savedId, result.coverImageFile)
       } catch {
-        // Best-effort: the item itself already saved successfully.
+        coverFailed = true
       }
     }
-    navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${savedId}`)
+    navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${savedId}`, coverFailed ? { state: { coverUploadFailed: true } } : undefined)
   }
 
   return (
@@ -90,6 +84,7 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
         excludeId={id}
         isSaving={isSaving}
         submitError={error}
+        submitErrorKind={errorKind}
         submitLabel={t('form.editSubmit')}
         onSubmit={(result) => void handleSubmit(result)}
         onCancel={() => navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${id}`)}

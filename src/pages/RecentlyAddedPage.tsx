@@ -1,7 +1,10 @@
 import { Clock } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { ErrorState } from '@/components/ui/ErrorState'
 import { fetchItems, fetchPlatforms } from '@/features/items/api'
 import { ItemCard } from '@/features/items/components/ItemCard'
+import { ItemCardSkeleton } from '@/features/items/components/ItemCardSkeleton'
 import type { AllItemRow, Platform } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
 import type { Locale, TranslationKey } from '@/lib/i18n'
@@ -68,6 +71,7 @@ function RecentlyAddedPage() {
   const [fetchState, setFetchState] = useState<
     { page: number; status: 'loaded' | 'error'; message?: string } | null
   >(null)
+  const [retryToken, setRetryToken] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -110,7 +114,7 @@ function RecentlyAddedPage() {
     return () => {
       cancelled = true
     }
-  }, [page])
+  }, [page, retryToken])
 
   const loading = fetchState?.page !== page
   const error = fetchState?.page === page && fetchState.status === 'error' ? (fetchState.message ?? null) : null
@@ -132,16 +136,13 @@ function RecentlyAddedPage() {
       </div>
 
       {error && (
-        <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
-          {t('listing.error', { message: error })}
-        </p>
+        <ErrorState
+          message={t('listing.error', { message: error })}
+          onRetry={() => setRetryToken((n) => n + 1)}
+        />
       )}
 
-      {!error && items.length === 0 && !loading && (
-        <p className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted">
-          {t('listing.empty')}
-        </p>
-      )}
+      {!error && items.length === 0 && !loading && <EmptyState icon={Clock} body={t('dashboard.noRecentItems')} />}
 
       <div className="flex flex-col gap-6">
         {groups.map((group) => (
@@ -164,7 +165,13 @@ function RecentlyAddedPage() {
         ))}
       </div>
 
-      {loading && <p className="text-center text-sm text-muted">{t('listing.loading')}</p>}
+      {loading && (
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: page === 0 ? 6 : 4 }, (_, i) => (
+            <ItemCardSkeleton key={i} view="list" />
+          ))}
+        </div>
+      )}
 
       {hasMore && !loading && (
         <button

@@ -36,14 +36,16 @@ export function useItemImages(itemType: ItemType, itemId: string) {
   const [validationErrors, setValidationErrors] = useState<FileValidationError[]>([])
   const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>([])
   const [busyImageId, setBusyImageId] = useState<string | null>(null)
+  const [retryToken, setRetryToken] = useState(0)
 
   // Reset to "loading" during render when the target item changes, rather
   // than in the effect body (see useItemDetail.ts for the same pattern).
-  const requestKey = `${itemType}|${itemId}`
+  const requestKey = `${itemType}|${itemId}|${retryToken}`
   const [lastRequestKey, setLastRequestKey] = useState(requestKey)
   if (requestKey !== lastRequestKey) {
     setLastRequestKey(requestKey)
     setIsLoading(true)
+    setError(null)
   }
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export function useItemImages(itemType: ItemType, itemId: string) {
     return () => {
       cancelled = true
     }
-  }, [itemType, itemId])
+  }, [itemType, itemId, retryToken])
 
   function updateQueueItem(id: string, patch: Partial<UploadQueueItem>) {
     setUploadQueue((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)))
@@ -195,5 +197,6 @@ export function useItemImages(itemType: ItemType, itemId: string) {
     moveImage,
     makeCover,
     saveAltText,
+    reload: () => setRetryToken((n) => n + 1),
   }
 }
