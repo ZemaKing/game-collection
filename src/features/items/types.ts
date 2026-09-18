@@ -34,6 +34,9 @@ export interface AllItemRow {
   notes: string | null
   description: string | null
   cover_image_path: string | null
+  /** First genre (by name) linked to the item, if any — games only. */
+  genre_slug: string | null
+  genre_name: string | null
   created_at: string
   updated_at: string
 }

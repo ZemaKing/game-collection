@@ -5,6 +5,8 @@ import {
   CONDITION_COLORS,
   CONDITION_ICONS,
   CONDITION_LABEL_KEYS,
+  DEFAULT_GENRE_META,
+  GENRE_META,
   ITEM_TYPE_COLORS,
   ITEM_TYPE_META,
   ITEM_TYPE_ROUTES,
@@ -75,6 +77,13 @@ function TypeOverlayBadge({ item }: { item: AllItemRow }) {
       {t(meta.labelKey)}
     </span>
   )
+}
+
+/** Genre glyph shown on the subtitle row of grid cards, next to developer/publisher. */
+function GenreIcon({ slug, name }: { slug: string; name: string | null }) {
+  const meta = GENRE_META[slug] ?? DEFAULT_GENRE_META
+  const Icon = meta.icon
+  return <Icon size={13} className={`shrink-0 ${meta.color.icon}`} aria-label={name ?? undefined} />
 }
 
 function PlatformBadge({ platformName, platformSlug }: { platformName: string; platformSlug?: string | null }) {
@@ -182,7 +191,12 @@ export function ItemCard({
             </DropdownMenu>
           )}
         </div>
-        {item.subtitle && <p className="truncate text-xs text-muted">{item.subtitle}</p>}
+        {(item.subtitle || item.genre_slug) && (
+          <div className="flex min-w-0 items-center justify-between gap-1.5">
+            <p className="min-w-0 flex-1 truncate text-xs text-muted">{item.subtitle}</p>
+            {item.genre_slug && <GenreIcon slug={item.genre_slug} name={item.genre_name} />}
+          </div>
+        )}
         <div className="mt-1 flex min-w-0 items-center justify-between gap-2">
           <ConditionBadge condition={item.condition} />
           {releaseYear && <span className="shrink-0 text-xs text-muted">{releaseYear}</span>}
