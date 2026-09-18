@@ -5,7 +5,9 @@ import { MultiSelect } from '@/components/ui/MultiSelect'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { CONDITION_LABEL_KEYS, ITEM_CONDITIONS } from '@/features/items/constants'
+import { GameAutofillPanel } from '@/features/items/components/GameAutofillPanel'
 import { ImageManager } from '@/features/items/components/ImageManager'
+import { PlatformSelect } from '@/features/items/components/PlatformSelect'
 import { RelationshipPicker, type RelatedItemSelection } from '@/features/items/components/RelationshipPicker'
 import { FORM_SECTIONS, type FormFieldDef } from '@/features/items/forms/formFields'
 import type { ItemFormState } from '@/features/items/forms/formState'
@@ -24,6 +26,7 @@ function sortedIds(items: RelatedItemSelection[]): string[] {
 export interface ItemFormSubmitResult {
   values: Record<string, unknown> & { tagIds: string[]; genreIds?: string[] }
   relatedItems: RelatedItemSelection[]
+  coverImageFile?: File
 }
 
 interface ItemFormProps {
@@ -69,12 +72,14 @@ export function ItemForm({
   const [relatedItems, setRelatedItems] = useState<RelatedItemSelection[]>(initialRelatedItems)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [stepIndex, setStepIndex] = useState(0)
+  const [pendingCoverFile, setPendingCoverFile] = useState<File | undefined>(undefined)
 
   const isDirty = useMemo(
     () =>
       JSON.stringify(form) !== JSON.stringify(initialValues) ||
-      JSON.stringify(sortedIds(relatedItems)) !== JSON.stringify(sortedIds(initialRelatedItems)),
-    [form, initialValues, relatedItems, initialRelatedItems],
+      JSON.stringify(sortedIds(relatedItems)) !== JSON.stringify(sortedIds(initialRelatedItems)) ||
+      pendingCoverFile !== undefined,
+    [form, initialValues, relatedItems, initialRelatedItems, pendingCoverFile],
   )
   const { isBlocked, guardAction, confirmDiscard, cancelDiscard } = useUnsavedChangesGuard(isDirty)
 
@@ -130,13 +135,13 @@ export function ItemForm({
     }
     if (field.kind === 'platformSelect') {
       return (
-        <Select
+        <PlatformSelect
           key={field.name}
           label={label}
           name={field.name}
           value={value as string}
           onChange={(v) => setField(field.name, v as never)}
-          options={platforms.map((platform) => ({ value: platform.id, label: platform.name }))}
+          options={platforms}
           error={error}
         />
       )
@@ -174,10 +179,23 @@ export function ItemForm({
   const perTypeSections = FORM_SECTIONS[itemType]
 
   const steps = [
-    ...perTypeSections.map((section) => ({
+    ...perTypeSections.map((section, index) => ({
       titleKey: section.titleKey,
       render: () => (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">{section.fields.map(renderField)}</div>
+        <div className="flex flex-col gap-4">
+          {itemType === 'game' && index === 0 && (
+            <GameAutofillPanel
+              form={form}
+              genres={genres}
+              platforms={platforms}
+              onApply={(values, coverImageFile) => {
+                setForm((prev) => ({ ...prev, ...values }))
+                if (coverImageFile) setPendingCoverFile(coverImageFile)
+              }}
+            />
+          )}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">{section.fields.map(renderField)}</div>
+        </div>
       ),
     })),
     {
@@ -246,7 +264,7 @@ export function ItemForm({
     }
 
     setErrors({})
-    onSubmit({ values: result.data as ItemFormSubmitResult['values'], relatedItems })
+    onSubmit({ values: result.data as ItemFormSubmitResult['values'], relatedItems, coverImageFile: pendingCoverFile })
   }
 
   return (

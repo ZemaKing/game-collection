@@ -3,6 +3,7 @@ import { ItemForm, type ItemFormSubmitResult } from '@/features/items/components
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import { detailToFormState } from '@/features/items/forms/formState'
 import { useSaveItem } from '@/features/items/forms/useSaveItem'
+import { appendItemCoverImage } from '@/features/items/imageApi'
 import type { ItemType } from '@/features/items/types'
 import { useItemDetail } from '@/features/items/useItemDetail'
 import { useItemRelationships } from '@/features/items/useItemRelationships'
@@ -63,6 +64,13 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
       result.relatedItems.map((item) => ({ itemType: item.itemType, itemId: item.itemId })),
     )
     if (!savedId) return
+    if (result.coverImageFile) {
+      try {
+        await appendItemCoverImage(itemType, savedId, result.coverImageFile)
+      } catch {
+        // Best-effort: the item itself already saved successfully.
+      }
+    }
     navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${savedId}`)
   }
 

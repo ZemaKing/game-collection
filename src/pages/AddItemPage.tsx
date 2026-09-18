@@ -6,6 +6,7 @@ import { TypeSelector } from '@/features/items/components/TypeSelector'
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES, ITEM_TYPES } from '@/features/items/constants'
 import { findLikelyDuplicates } from '@/features/items/duplicateApi'
 import { EMPTY_ITEM_FORM_STATE } from '@/features/items/forms/formState'
+import { appendItemCoverImage } from '@/features/items/imageApi'
 import { useSaveItem } from '@/features/items/forms/useSaveItem'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
@@ -31,6 +32,13 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
       result.relatedItems.map((item) => ({ itemType: item.itemType, itemId: item.itemId })),
     )
     if (!id) return
+    if (result.coverImageFile) {
+      try {
+        await appendItemCoverImage(itemType, id, result.coverImageFile)
+      } catch {
+        // Best-effort: the item itself already saved successfully.
+      }
+    }
     navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${id}`)
   }
 

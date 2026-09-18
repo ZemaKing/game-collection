@@ -1,3 +1,4 @@
+import { fetchItemImages } from '@/features/items/detailApi'
 import { ITEM_IMAGES_BUCKET } from '@/features/items/storage'
 import type { ItemImageRow } from '@/features/items/detailTypes'
 import type { ItemType } from '@/features/items/types'
@@ -122,6 +123,16 @@ export async function replaceItemImageFile(image: ItemImageRow, file: File): Pro
 
   await removeStorageObject(image.storage_path)
   return data
+}
+
+/**
+ * Appends one image (e.g. imported cover artwork) the same way
+ * `useItemImages.addFiles` does for the first manually-picked file: cover
+ * only if the item has no images yet, positioned after whatever's there.
+ */
+export async function appendItemCoverImage(itemType: ItemType, itemId: string, file: File): Promise<ItemImageRow> {
+  const existing = await fetchItemImages(itemType, itemId)
+  return uploadItemImage(itemType, itemId, file, existing.length, existing.length === 0)
 }
 
 export async function reorderItemImages(orderedIds: string[]): Promise<void> {

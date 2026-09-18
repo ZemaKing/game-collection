@@ -1,5 +1,5 @@
 import { Clock, Home, Plus, Search, User } from 'lucide-react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 import type { TranslationKey } from '@/lib/i18n'
@@ -14,6 +14,13 @@ const tabs = [
 export function BottomTabBar() {
   const { t } = useLocale()
   const { user } = useAuth()
+  const { pathname } = useLocation()
+
+  // Add/Edit item forms render their own mobile Back/Next/Save bar fixed to
+  // the same bottom edge (`ItemForm.tsx`); showing both at once would stack
+  // two bottom bars and hide the form's own actions behind this one.
+  const isItemFormRoute = pathname === '/items/new' || pathname.endsWith('/edit')
+  if (isItemFormRoute) return null
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-border bg-surface px-2 py-2 md:hidden">

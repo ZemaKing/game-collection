@@ -26,6 +26,8 @@ Run a single test file: `npx vitest run src/features/items/completeness.test.ts`
 
 Local Supabase env vars live in `.env.local` (see `.env.local.example`): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. The app throws at import time (`src/lib/supabaseClient.ts`) if these are missing.
 
+Games autofill (Phase 21) uses `RAWG_API_KEY` — server-only, no `VITE_` prefix, so it never reaches the client bundle. It's read by the `/api/*` Vercel serverless functions and, for local dev, by a Vite dev-server middleware in `vite.config.ts` that mounts the same routes. Must also be set in the Vercel project's environment variables for preview/production.
+
 ## Architecture
 
 **Path alias**: `@/*` → `src/*` (configured in both `vite.config.ts` and `tsconfig.app.json`).
