@@ -133,6 +133,19 @@ function DashboardPage() {
         </div>
       </div>
 
+      {sidebarLoading && <SidebarSkeleton />}
+
+      {sidebarError && !sidebarLoading && (
+        <ErrorState
+          message={t('listing.error', { message: sidebarError })}
+          onRetry={() => setSidebarRetryToken((n) => n + 1)}
+        />
+      )}
+
+      {summary && !sidebarLoading && (
+        <SummaryPanel compact summary={summary} genres={genreSummary} recentItems={recentItems} />
+      )}
+
       {platforms.length > 0 && (
         <ItemListingToolbar
           filters={filters}
@@ -145,27 +158,6 @@ function DashboardPage() {
           tags={tags}
           years={years}
         />
-      )}
-
-      {sidebarLoading && (
-        <div className="lg:hidden">
-          <SidebarSkeleton />
-        </div>
-      )}
-
-      {sidebarError && !sidebarLoading && (
-        <div className="lg:hidden">
-          <ErrorState
-            message={t('listing.error', { message: sidebarError })}
-            onRetry={() => setSidebarRetryToken((n) => n + 1)}
-          />
-        </div>
-      )}
-
-      {summary && !sidebarLoading && (
-        <div className="lg:hidden">
-          <SummaryPanel compact summary={summary} genres={genreSummary} recentItems={recentItems} />
-        </div>
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
@@ -239,14 +231,7 @@ function DashboardPage() {
         </div>
 
         <div className="hidden lg:block">
-          {sidebarLoading && <SidebarSkeleton />}
-          {sidebarError && !sidebarLoading && (
-            <ErrorState
-              message={t('listing.error', { message: sidebarError })}
-              onRetry={() => setSidebarRetryToken((n) => n + 1)}
-            />
-          )}
-          {summary && !sidebarLoading && (
+          {summary && !sidebarLoading && !sidebarError && (
             <SummaryPanel summary={summary} genres={genreSummary} recentItems={recentItems} />
           )}
         </div>

@@ -1,7 +1,7 @@
 import { LayoutGrid } from 'lucide-react'
 import { useState, type ComponentType } from 'react'
 import { Link } from 'react-router-dom'
-import { ITEM_TYPES, ITEM_TYPE_COLORS, ITEM_TYPE_META } from '@/features/items/constants'
+import { ITEM_TYPE_COLORS, ITEM_TYPE_META, ITEM_TYPE_ROUTES, ITEM_TYPES } from '@/features/items/constants'
 import { formatRelativeTime } from '@/features/items/format'
 import type { DashboardSummary, GenreSummaryRow } from '@/features/items/api'
 import type { AllItemRow } from '@/features/items/types'
@@ -19,26 +19,36 @@ interface StatTileProps {
   value: string | number
   icon: ComponentType<{ size?: number; className?: string }>
   iconColor: string
+  hoverBorder: string
+  to: string
   compact?: boolean
 }
 
-function StatTile({ label, value, icon: Icon, iconColor, compact = false }: StatTileProps) {
+function StatTile({ label, value, icon: Icon, iconColor, hoverBorder, to, compact = false }: StatTileProps) {
   if (compact) {
     return (
-      <div className="flex min-w-0 grow basis-[22%] flex-col items-start gap-1 rounded-lg border border-border bg-surface px-2 py-2">
-        <Icon size={15} className={`shrink-0 ${iconColor}`} />
-        <p className="stat-number text-text">{value}</p>
-        <p className="stat-label w-full truncate text-muted">{label}</p>
-      </div>
+      <Link
+        to={to}
+        className={`flex min-w-0 grow basis-[calc(50%-0.25rem)] items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 transition-colors md:basis-0 md:flex-col md:text-center ${hoverBorder}`}
+      >
+        <Icon size={18} className={`shrink-0 ${iconColor}`} />
+        <div className="flex min-w-0 flex-col md:w-full md:items-center">
+          <p className="stat-number text-text">{value}</p>
+          <p className="stat-label w-full truncate text-muted">{label}</p>
+        </div>
+      </Link>
     )
   }
 
   return (
-    <div className="rounded-lg border border-border bg-surface p-3">
+    <Link
+      to={to}
+      className={`block rounded-lg border border-border bg-surface p-3 transition-colors ${hoverBorder}`}
+    >
       <Icon size={16} className={`mb-1 ${iconColor}`} />
       <p className="stat-number text-text">{value}</p>
       <p className="stat-label text-muted">{label}</p>
-    </div>
+    </Link>
   )
 }
 
@@ -49,11 +59,13 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
 
   if (compact) {
     return (
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         <StatTile
           compact
+          to="/items"
           icon={LayoutGrid}
           iconColor="text-accent"
+          hoverBorder="hover:border-accent/60"
           label={t('dashboard.summary.totalItems')}
           value={summary.totalItems}
         />
@@ -61,8 +73,10 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
           <StatTile
             key={type}
             compact
+            to={`/${ITEM_TYPE_ROUTES[type]}`}
             icon={ITEM_TYPE_META[type].icon}
             iconColor={ITEM_TYPE_COLORS[type].icon}
+            hoverBorder={ITEM_TYPE_COLORS[type].hoverBorder}
             label={t(ITEM_TYPE_META[type].labelKey)}
             value={summary.countsByType[type]}
           />
@@ -73,27 +87,6 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
 
   return (
     <aside className="flex w-full flex-col gap-5">
-      <section>
-        <h2 className="heading-section mb-2 text-text">{t('dashboard.summary.title')}</h2>
-        <div className="grid grid-cols-2 gap-2">
-          <StatTile
-            icon={LayoutGrid}
-            iconColor="text-accent"
-            label={t('dashboard.summary.totalItems')}
-            value={summary.totalItems}
-          />
-          {ITEM_TYPES.map((type) => (
-            <StatTile
-              key={type}
-              icon={ITEM_TYPE_META[type].icon}
-              iconColor={ITEM_TYPE_COLORS[type].icon}
-              label={t(ITEM_TYPE_META[type].labelKey)}
-              value={summary.countsByType[type]}
-            />
-          ))}
-        </div>
-      </section>
-
       {genres.length > 0 && (
         <section>
           <h2 className="heading-section mb-2 text-text">{t('dashboard.genres')}</h2>
