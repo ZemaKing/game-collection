@@ -88,28 +88,21 @@ export function ItemCard({ item, platformName, view, showTypeBadge = false }: It
           storagePath={item.cover_image_path}
           itemType={item.item_type}
           alt={item.title}
-          className="aspect-[3/4] w-full"
+          className="aspect-[4/5] w-full"
         />
-        {(platformName || showTypeBadge) && (
-          <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1">
-            {platformName ? (
-              <span className="min-w-0 truncate rounded-md bg-surface/90 px-1.5 py-0.5 text-xs font-medium text-text shadow-sm backdrop-blur">
-                {platformName}
-              </span>
-            ) : (
-              <span />
-            )}
-            {showTypeBadge && (
-              <span className="shrink-0">
-                <TypeBadge item={item} />
-              </span>
-            )}
+        {showTypeBadge && (
+          <div className="absolute inset-x-2 top-2 flex items-start justify-end">
+            <TypeBadge item={item} />
           </div>
         )}
       </div>
       <div className="flex flex-col gap-1.5 p-3">
         <p className="line-clamp-2 text-sm font-semibold text-text">{item.title}</p>
-        {item.subtitle && <p className="truncate text-xs text-muted">{item.subtitle}</p>}
+        {(item.subtitle || platformName) && (
+          <p className="truncate text-xs text-muted">
+            {[platformName, item.subtitle].filter(Boolean).join(' · ')}
+          </p>
+        )}
         <div className="mt-1 flex items-center justify-between gap-2">
           <ConditionBadge condition={item.condition} />
           {releaseYear && <span className="text-xs text-muted">{releaseYear}</span>}

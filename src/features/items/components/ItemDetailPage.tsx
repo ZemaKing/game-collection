@@ -145,7 +145,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
               storagePath={coverImage.storage_path}
               itemType={itemType}
               alt={coverImage.alt_text ?? detail.title}
-              className="aspect-[3/4] w-full rounded-xl"
+              className="aspect-[4/5] w-full rounded-xl"
               iconSize={64}
             />
           </button>
@@ -154,7 +154,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
             storagePath={null}
             itemType={itemType}
             alt={detail.title}
-            className="aspect-[3/4] w-full rounded-xl"
+            className="aspect-[4/5] w-full rounded-xl"
             iconSize={64}
           />
         )}

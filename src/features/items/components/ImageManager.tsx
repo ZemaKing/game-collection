@@ -158,7 +158,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   storagePath={image.storage_path}
                   itemType={itemType}
                   alt={image.alt_text ?? t(meta.labelKey)}
-                  className="aspect-square w-full rounded-lg"
+                  className="aspect-[4/5] w-full rounded-lg"
                 />
                 {image.is_cover && (
                   <span className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-fg">
