@@ -27,7 +27,7 @@ export const DEFAULT_FILTERS: Filters = {
   conditions: [],
   collectionDateFrom: null,
   collectionDateTo: null,
-  sort: 'recently_added',
+  sort: 'title',
 }
 
 const PARAM_KEYS = {
