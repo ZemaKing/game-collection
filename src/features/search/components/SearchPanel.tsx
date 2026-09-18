@@ -110,12 +110,12 @@ export function SearchPanel({ onNavigate, autoFocus = false }: SearchPanelProps)
         {!trimmed && (
           <section>
             <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-text">{t('search.recentSearches')}</h2>
+              <h2 className="heading-section text-text">{t('search.recentSearches')}</h2>
               {recent.length > 0 && (
                 <button
                   type="button"
                   onClick={clearRecent}
-                  className="text-sm font-medium text-accent hover:text-accent-hover"
+                  className="text-sm font-semibold text-accent hover:text-accent-hover"
                 >
                   {t('search.clearAll')}
                 </button>
@@ -169,7 +169,7 @@ export function SearchPanel({ onNavigate, autoFocus = false }: SearchPanelProps)
             const Icon = ITEM_TYPE_META[group.type].icon
             return (
               <section key={group.type}>
-                <h2 className="mb-2 text-sm font-semibold text-text">
+                <h2 className="heading-section mb-2 text-text">
                   {t(ITEM_TYPE_META[group.type].labelKey)}
                 </h2>
                 <ul className="flex flex-col gap-1">
@@ -190,7 +190,7 @@ export function SearchPanel({ onNavigate, autoFocus = false }: SearchPanelProps)
                             <Icon size={16} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-text">
+                            <p className="truncate text-sm font-semibold text-text">
                               <HighlightMatch text={item.title} query={trimmed} />
                             </p>
                             {item.subtitle && (

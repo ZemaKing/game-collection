@@ -28,7 +28,7 @@ function FilterDropdown({ label, children }: { label: string; children: ReactNod
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text hover:bg-card-hover"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-text hover:bg-card-hover"
         >
           {label}
           <ChevronDown size={14} className="text-muted" />
@@ -134,7 +134,7 @@ export function ItemListingToolbar({
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text hover:bg-card-hover"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-text hover:bg-card-hover"
         >
           <SlidersHorizontal size={14} />
           {t('filters.title')}
@@ -200,7 +200,7 @@ export function ItemListingToolbar({
           <button
             type="button"
             onClick={clearAll}
-            className="text-xs font-medium text-accent hover:text-accent-hover"
+            className="text-xs font-semibold text-accent hover:text-accent-hover"
           >
             {t('filters.clearAll')}
           </button>

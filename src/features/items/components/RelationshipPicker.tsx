@@ -39,8 +39,8 @@ export function RelationshipPicker({ label, selected, onChange, excludeId }: Rel
   }
 
   return (
-    <div className="flex flex-col gap-2 text-sm">
-      <span className="font-medium text-text">{label}</span>
+    <div className="flex flex-col gap-2">
+      <span className="text-label font-semibold text-text">{label}</span>
 
       {selected.length > 0 && (
         <ul className="flex flex-wrap gap-2">

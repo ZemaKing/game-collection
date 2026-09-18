@@ -146,7 +146,7 @@ function RecentlyAddedPage() {
       <div className="flex flex-col gap-6">
         {groups.map((group) => (
           <section key={group.key}>
-            <h2 className="mb-2 text-sm font-semibold text-muted">{group.label}</h2>
+            <h2 className="heading-section mb-2 text-muted">{group.label}</h2>
             <div className="flex flex-col gap-2">
               {group.items.map((item) => (
                 <ItemCard

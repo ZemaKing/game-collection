@@ -273,14 +273,14 @@ export function ItemForm({
               />
             ))}
           </div>
-          <h2 className="text-sm font-semibold text-text">{t(steps[stepIndex].titleKey)}</h2>
+          <h2 className="heading-section text-text">{t(steps[stepIndex].titleKey)}</h2>
           {steps[stepIndex].render()}
         </section>
       ) : (
         <div className="flex flex-col gap-8">
           {steps.map((step) => (
             <section key={step.titleKey} className="flex flex-col gap-4">
-              <h2 className="text-sm font-semibold text-text">{t(step.titleKey)}</h2>
+              <h2 className="heading-section text-text">{t(step.titleKey)}</h2>
               {step.render()}
             </section>
           ))}
@@ -293,7 +293,7 @@ export function ItemForm({
             <button
               type="button"
               onClick={() => (stepIndex === 0 ? guardAction(onCancel) : setStepIndex((i) => i - 1))}
-              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-card-hover"
+              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
             >
               {stepIndex === 0 ? t('filters.cancel') : t('form.back')}
             </button>
@@ -301,7 +301,7 @@ export function ItemForm({
               <button
                 type="submit"
                 disabled={isSaving}
-                className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving ? t('form.saving') : submitLabel}
               </button>
@@ -309,7 +309,7 @@ export function ItemForm({
               <button
                 type="button"
                 onClick={() => setStepIndex((i) => i + 1)}
-                className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-hover"
+                className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
               >
                 {t('form.next')}
               </button>
@@ -320,14 +320,14 @@ export function ItemForm({
             <button
               type="button"
               onClick={() => guardAction(onCancel)}
-              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-card-hover"
+              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
             >
               {t('filters.cancel')}
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving ? t('form.saving') : submitLabel}
             </button>

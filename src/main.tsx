@@ -5,6 +5,10 @@ import App from '@/App.tsx'
 import { AuthProvider } from '@/components/AuthProvider'
 import { LocaleProvider } from '@/components/LocaleProvider'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/600.css'
+import '@fontsource/inter/700.css'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(

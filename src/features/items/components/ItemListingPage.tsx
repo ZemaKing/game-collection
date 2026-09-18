@@ -124,7 +124,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
           <button
             type="button"
             onClick={() => setDeletedBannerTitle(null)}
-            className="shrink-0 font-medium hover:underline"
+            className="shrink-0 font-semibold hover:underline"
           >
             {t('images.dismiss')}
           </button>
@@ -144,7 +144,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
             <button
               type="button"
               onClick={clearAll}
-              className="font-medium text-accent hover:text-accent-hover"
+              className="font-semibold text-accent hover:text-accent-hover"
             >
               {t('listing.clearFilters')}
             </button>
@@ -177,7 +177,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
         <button
           type="button"
           onClick={() => setPage((p) => p + 1)}
-          className="self-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-card-hover"
+          className="self-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
         >
           {t('listing.loadMore')}
         </button>

@@ -15,6 +15,34 @@
   --color-success-bg: var(--app-success-bg);
   --color-danger: var(--app-danger);
   --color-danger-bg: var(--app-danger-bg);
+
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /*
+   * Compact, shared typography scale. Every `text-*` utility below maps to
+   * one of these tokens, so resizing type app-wide means editing this block
+   * rather than individual components. `text-label` and `text-tiny` are
+   * custom sizes (13px form labels, 11px tertiary helper text) that Tailwind
+   * generates utilities for automatically because they're declared here.
+   */
+  --text-tiny: 11px;
+  --text-tiny--line-height: 16px;
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-label: 13px;
+  --text-label--line-height: 18px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 14px;
+  --text-base--line-height: 21px;
+  --text-lg: 16px;
+  --text-lg--line-height: 24px;
+  --text-xl: 22px;
+  --text-xl--line-height: 30px;
+  --text-xl--letter-spacing: -0.015em;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 32px;
+  --text-2xl--letter-spacing: -0.02em;
 }
 
 :root {
@@ -58,7 +86,61 @@
 body {
   margin: 0;
   min-height: 100svh;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--color-bg);
   color: var(--color-text);
+}
+
+@layer components {
+  /* Section headings: "Collection Summary", "Basic Info", dialog titles, filter groups. */
+  .heading-section {
+    font-size: var(--text-lg);
+    line-height: var(--text-lg--line-height);
+    font-weight: 600;
+  }
+
+  /* Collection Summary statistic tiles. */
+  .stat-number {
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 700;
+  }
+  .stat-label {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-weight: 400;
+  }
+
+  /* Sidebar / mobile nav sheet brand wordmark ("MY COLLECTION"). */
+  .sidebar-brand {
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 700;
+  }
+
+  /* Sidebar / mobile nav sheet group labels ("Platforms", "Collection"). */
+  .sidebar-group-label {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+}
+
+/*
+ * Page headings step down slightly on small screens (24→22, 22→20). Body
+ * text and metadata are excluded from this rule and never shrink below
+ * their base sizes.
+ */
+@media (max-width: 640px) {
+  .text-2xl {
+    font-size: 22px;
+    line-height: 30px;
+    letter-spacing: -0.015em;
+  }
+  .text-xl {
+    font-size: 20px;
+    line-height: 28px;
+    letter-spacing: -0.01em;
+  }
 }

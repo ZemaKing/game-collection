@@ -31,7 +31,7 @@ function NotFound({ itemType }: { itemType: ItemType }) {
       <p className="max-w-sm text-sm text-muted">{t('detail.notFound.body')}</p>
       <Link
         to={`/${ITEM_TYPE_ROUTES[itemType]}`}
-        className="mt-2 text-sm font-medium text-accent hover:text-accent-hover"
+        className="mt-2 text-sm font-semibold text-accent hover:text-accent-hover"
       >
         {t('detail.backToListing', { label: t(meta.labelKey) })}
       </Link>
@@ -70,7 +70,7 @@ function ExpandableDescription({ text }: { text: string }) {
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="mt-1 text-sm font-medium text-accent hover:text-accent-hover"
+          className="mt-1 text-sm font-semibold text-accent hover:text-accent-hover"
         >
           {t(expanded ? 'detail.readLess' : 'detail.readMore')}
         </button>
@@ -218,7 +218,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
             <div className="flex shrink-0 items-center gap-2">
               <Link
                 to={`/${ITEM_TYPE_ROUTES[itemType]}/${id}/edit`}
-                className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text hover:bg-card-hover"
+                className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-text hover:bg-card-hover"
               >
                 <Pencil size={14} />
                 {t('form.edit')}
@@ -227,7 +227,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
                 type="button"
                 onClick={() => setDeleteDialogOpen(true)}
                 disabled={isDeleting}
-                className="flex items-center gap-1.5 rounded-full border border-danger px-3 py-1.5 text-sm font-medium text-danger hover:bg-danger-bg disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-full border border-danger px-3 py-1.5 text-sm font-semibold text-danger hover:bg-danger-bg disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Trash2 size={14} />
                 {t('form.delete')}
@@ -260,21 +260,21 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
 
         {detail.description && (
           <section>
-            <h2 className="mb-2 text-sm font-semibold text-text">{t('detail.about')}</h2>
+            <h2 className="heading-section mb-2 text-text">{t('detail.about')}</h2>
             <ExpandableDescription text={detail.description} />
           </section>
         )}
 
         {detail.notes && (
           <section>
-            <h2 className="mb-2 text-sm font-semibold text-text">{t('detail.notes')}</h2>
+            <h2 className="heading-section mb-2 text-text">{t('detail.notes')}</h2>
             <p className="text-sm text-muted">{detail.notes}</p>
           </section>
         )}
 
         {detail.genres.length > 0 && (
           <section>
-            <h2 className="mb-2 text-sm font-semibold text-text">{t('dashboard.genres')}</h2>
+            <h2 className="heading-section mb-2 text-text">{t('dashboard.genres')}</h2>
             <div className="flex flex-wrap gap-2">
               {detail.genres.map((genre) => (
                 <span
@@ -290,7 +290,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
 
         {tags.length > 0 && (
           <section>
-            <h2 className="mb-2 text-sm font-semibold text-text">{t('filters.tags')}</h2>
+            <h2 className="heading-section mb-2 text-text">{t('filters.tags')}</h2>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <span

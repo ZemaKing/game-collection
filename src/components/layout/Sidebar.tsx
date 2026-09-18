@@ -48,7 +48,7 @@ function NavRow({
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <p className="hidden px-3 pt-4 pb-1 text-xs font-semibold tracking-wider text-muted xl:block">
+    <p className="sidebar-group-label hidden px-3 pt-4 pb-1 text-muted xl:block">
       {children}
     </p>
   )
@@ -64,7 +64,7 @@ export function Sidebar() {
         <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-fg">
           <Gamepad2 size={18} />
         </div>
-        <span className="hidden text-sm font-bold tracking-wide text-text xl:inline">
+        <span className="sidebar-brand hidden text-text xl:inline">
           {t('sidebar.title')}
         </span>
       </div>

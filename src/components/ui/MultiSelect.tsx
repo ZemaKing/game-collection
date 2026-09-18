@@ -18,8 +18,8 @@ export function MultiSelect({ label, name, values, onChange, options, emptyLabel
   }
 
   return (
-    <div className="flex flex-col gap-1.5 text-sm">
-      <span className="font-medium text-text">{label}</span>
+    <div className="flex flex-col gap-1.5">
+      <span className="text-label font-semibold text-text">{label}</span>
       {options.length === 0 ? (
         <p className="text-xs text-muted">{emptyLabel}</p>
       ) : (

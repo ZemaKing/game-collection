@@ -68,7 +68,7 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="flex items-center gap-2 text-xl font-semibold text-text">
+      <h1 className="flex items-center gap-2 text-xl font-bold text-text">
         <meta.icon size={22} className="text-muted" />
         {t('form.editTitle', { title: detail.title })}
       </h1>

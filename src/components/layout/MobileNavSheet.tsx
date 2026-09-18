@@ -53,7 +53,7 @@ function NavRow({
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <p className="px-3 pt-4 pb-1 text-xs font-semibold tracking-wider text-muted">{children}</p>
+    <p className="sidebar-group-label px-3 pt-4 pb-1 text-muted">{children}</p>
   )
 }
 
@@ -67,7 +67,7 @@ export function MobileNavSheet({ open, onOpenChange }: MobileNavSheetProps) {
         <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
         <RadixDialog.Content className="fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col overflow-y-auto bg-surface p-3 text-text shadow-xl outline-none">
           <div className="flex shrink-0 items-center justify-between px-1 py-2">
-            <RadixDialog.Title className="text-sm font-bold tracking-wide text-text">
+            <RadixDialog.Title className="sidebar-brand text-text">
               {t('sidebar.title')}
             </RadixDialog.Title>
             <RadixDialog.Close aria-label={t('search.clear')} className="text-muted hover:text-text">

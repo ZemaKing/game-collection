@@ -11,8 +11,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   ref,
 ) {
   return (
-    <label className="flex flex-col gap-1.5 text-sm">
-      <span className="font-medium text-text">
+    <label className="flex flex-col gap-1.5">
+      <span className="text-label font-semibold text-text">
         {label}
         {required && <span className="text-danger"> *</span>}
       </span>

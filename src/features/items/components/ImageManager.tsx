@@ -161,7 +161,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   className="aspect-[4/5] w-full rounded-lg"
                 />
                 {image.is_cover && (
-                  <span className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-fg">
+                  <span className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-tiny font-medium text-accent-fg">
                     <Star size={10} fill="currentColor" />
                     {t('images.cover')}
                   </span>
@@ -186,7 +186,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   type="button"
                   disabled={image.is_cover}
                   onClick={() => void makeCover(image)}
-                  className="rounded-full border border-border px-2 py-1 text-[11px] font-medium text-text hover:bg-card-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-full border border-border px-2 py-1 text-tiny font-medium text-text hover:bg-card-hover disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {t('images.setCover')}
                 </button>
@@ -195,7 +195,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   disabled={index === 0}
                   onClick={() => void moveImage(image, -1)}
                   aria-label={t('images.moveUp')}
-                  className="rounded-full border border-border px-2 py-1 text-[11px] font-medium text-text hover:bg-card-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-full border border-border px-2 py-1 text-tiny font-medium text-text hover:bg-card-hover disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   ↑
                 </button>
@@ -204,7 +204,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   disabled={index === images.length - 1}
                   onClick={() => void moveImage(image, 1)}
                   aria-label={t('images.moveDown')}
-                  className="rounded-full border border-border px-2 py-1 text-[11px] font-medium text-text hover:bg-card-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-full border border-border px-2 py-1 text-tiny font-medium text-text hover:bg-card-hover disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   ↓
                 </button>
@@ -214,14 +214,14 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                     replaceTargetRef.current = image
                     replaceInputRef.current?.click()
                   }}
-                  className="rounded-full border border-border px-2 py-1 text-[11px] font-medium text-text hover:bg-card-hover"
+                  className="rounded-full border border-border px-2 py-1 text-tiny font-medium text-text hover:bg-card-hover"
                 >
                   {t('images.replace')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setDeleteTarget(image)}
-                  className="ml-auto flex items-center gap-1 rounded-full border border-danger px-2 py-1 text-[11px] font-medium text-danger hover:bg-danger-bg"
+                  className="ml-auto flex items-center gap-1 rounded-full border border-danger px-2 py-1 text-tiny font-medium text-danger hover:bg-danger-bg"
                 >
                   <Trash2 size={12} />
                   {t('images.delete')}

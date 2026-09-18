@@ -21,7 +21,7 @@ export function RelatedItemsSection({ titleKey, items, platformById }: RelatedIt
 
   return (
     <section>
-      <h2 className="mb-2 text-sm font-semibold text-text">{t(titleKey)}</h2>
+      <h2 className="heading-section mb-2 text-text">{t(titleKey)}</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {items.map((item) => (
           <ItemCard

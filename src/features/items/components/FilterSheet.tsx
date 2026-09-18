@@ -47,7 +47,7 @@ function CheckboxRow({
 function FilterSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="border-b border-border py-4 first:pt-0 last:border-b-0">
-      <h3 className="mb-2 text-sm font-semibold text-text">{title}</h3>
+      <h3 className="heading-section mb-2 text-text">{title}</h3>
       {children}
     </section>
   )
@@ -242,18 +242,18 @@ export function FilterSheet({
             <button
               type="button"
               onClick={clearDraft}
-              className="text-sm font-medium text-accent hover:text-accent-hover"
+              className="text-sm font-semibold text-accent hover:text-accent-hover"
             >
               {t('filters.clearAll')}
             </button>
             <div className="flex items-center gap-2">
-              <RadixDialog.Close className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-card-hover">
+              <RadixDialog.Close className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover">
                 {t('filters.cancel')}
               </RadixDialog.Close>
               <button
                 type="button"
                 onClick={apply}
-                className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-hover"
+                className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
               >
                 {t('filters.apply')}
               </button>

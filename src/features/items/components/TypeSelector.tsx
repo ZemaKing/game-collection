@@ -8,7 +8,7 @@ export function TypeSelector() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold text-text">{t('form.chooseType')}</h1>
+      <h1 className="text-xl font-bold text-text">{t('form.chooseType')}</h1>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {ITEM_TYPES.map((type) => {
           const meta = ITEM_TYPE_META[type]

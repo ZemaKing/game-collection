@@ -41,7 +41,7 @@ function LoginPage() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-text">
+          <label htmlFor="email" className="text-label font-semibold text-text">
             {t('auth.email')}
           </label>
           <input
@@ -56,7 +56,7 @@ function LoginPage() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-sm font-medium text-text">
+          <label htmlFor="password" className="text-label font-semibold text-text">
             {t('auth.password')}
           </label>
           <input

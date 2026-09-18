@@ -46,7 +46,7 @@ export function DuplicateWarningDialog({
               className="flex items-center justify-between gap-3 rounded-lg border border-border p-2.5"
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-text">{item.title}</p>
+                <p className="truncate text-sm font-semibold text-text">{item.title}</p>
                 {item.subtitle && <p className="truncate text-xs text-muted">{item.subtitle}</p>}
               </div>
               <div className="flex shrink-0 gap-1.5">
@@ -73,14 +73,14 @@ export function DuplicateWarningDialog({
           <button
             type="button"
             onClick={onDismiss}
-            className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-card-hover"
+            className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
           >
             {t('form.keepEditing')}
           </button>
           <button
             type="button"
             onClick={onAddAnyway}
-            className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:bg-accent-hover"
+            className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
           >
             {t('duplicates.addAnyway')}
           </button>
