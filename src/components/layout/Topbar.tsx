@@ -1,15 +1,17 @@
-import { Search } from 'lucide-react'
+import { Menu, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AccountMenu } from '@/components/AccountMenu'
 import { LocaleToggle } from '@/components/LocaleToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { MobileNavSheet } from '@/components/layout/MobileNavSheet'
 import { SearchDialog } from '@/features/search/components/SearchDialog'
 import { useLocale } from '@/hooks/useLocale'
 
 export function Topbar() {
   const { t } = useLocale()
   const [searchOpen, setSearchOpen] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -24,6 +26,15 @@ export function Topbar() {
 
   return (
     <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-3 md:px-6">
+      <button
+        type="button"
+        onClick={() => setNavOpen(true)}
+        aria-label={t('topbar.menu')}
+        className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-bg text-text md:hidden"
+      >
+        <Menu size={18} />
+      </button>
+
       <div className="relative hidden max-w-md flex-1 sm:block">
         <Search
           size={16}
@@ -57,6 +68,7 @@ export function Topbar() {
       </div>
 
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
+      <MobileNavSheet open={navOpen} onOpenChange={setNavOpen} />
     </header>
   )
 }
