@@ -225,6 +225,7 @@ export function ItemForm({
               onChange={(values) => setField('genreIds', values)}
               options={genres}
               emptyLabel={t('form.noOptionsYet')}
+              primary
             />
           )}
           <RelationshipPicker

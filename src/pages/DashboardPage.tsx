@@ -145,17 +145,19 @@ function DashboardPage() {
       )}
 
       {platforms.length > 0 && (
-        <ItemListingToolbar
-          filters={filters}
-          setFilters={setFilters}
-          clearAll={clearAll}
-          view={view}
-          setView={setView}
-          platforms={platforms}
-          genres={genres}
-          tags={tags}
-          years={years}
-        />
+        <div className="lg:hidden">
+          <ItemListingToolbar
+            filters={filters}
+            setFilters={setFilters}
+            clearAll={clearAll}
+            view={view}
+            setView={setView}
+            platforms={platforms}
+            genres={genres}
+            tags={tags}
+            years={years}
+          />
+        </div>
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
@@ -223,7 +225,22 @@ function DashboardPage() {
           )}
         </div>
 
-        <div>
+        <div className="flex flex-col gap-4">
+          {platforms.length > 0 && (
+            <div className="hidden lg:block">
+              <ItemListingToolbar
+                filters={filters}
+                setFilters={setFilters}
+                clearAll={clearAll}
+                view={view}
+                setView={setView}
+                platforms={platforms}
+                genres={genres}
+                tags={tags}
+                years={years}
+              />
+            </div>
+          )}
           {summary && !sidebarLoading && !sidebarError && (
             <SummaryPanel summary={summary} genres={genreSummary} recentItems={recentItems} />
           )}

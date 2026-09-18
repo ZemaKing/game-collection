@@ -32,15 +32,16 @@ const DETAIL_NULLS: Omit<ItemDetail, 'id' | 'item_type' | 'title' | 'created_at'
 async function fetchGameDetail(id: string): Promise<ItemDetail | null> {
   const { data, error } = await supabase
     .from('games')
-    .select('*, platforms(id, name, slug), game_genres(genres(id, name, slug))')
+    .select('*, platforms(id, name, slug), game_genres(position, genres(id, name, slug))')
     .eq('id', id)
     .maybeSingle()
   if (error) throw error
   if (!data) return null
 
   const genres = (
-    (data.game_genres as { genres: Genre | null }[] | null) ?? []
+    (data.game_genres as { position: number; genres: Genre | null }[] | null) ?? []
   )
+    .sort((a, b) => a.position - b.position)
     .map((row) => row.genres)
     .filter((g): g is Genre => g !== null)
 

@@ -90,7 +90,7 @@ export function useSaveItem(itemType: ItemType) {
         if (genreIds.length > 0) {
           const { error: insertGenresError } = await supabase
             .from('game_genres')
-            .insert(genreIds.map((genreId) => ({ game_id: id, genre_id: genreId })))
+            .insert(genreIds.map((genreId, position) => ({ game_id: id, genre_id: genreId, position })))
           if (insertGenresError) throw insertGenresError
         }
       }
