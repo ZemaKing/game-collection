@@ -176,15 +176,12 @@ export function ItemCard({
             </DropdownMenu>
           )}
         </div>
-        {(item.subtitle || releaseYear) && (
-          <p className="truncate text-xs text-muted">
-            {[item.subtitle, releaseYear ? String(releaseYear) : null].filter(Boolean).join(' · ')}
-          </p>
-        )}
-        <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+        {item.subtitle && <p className="truncate text-xs text-muted">{item.subtitle}</p>}
+        <div className="mt-1 flex min-w-0 items-center justify-between gap-2">
           <ConditionBadge condition={item.condition} />
-          <CompletenessBadge percent={completeness.percent} compact />
+          {releaseYear && <span className="shrink-0 text-xs text-muted">{releaseYear}</span>}
         </div>
+        <CompletenessBadge percent={completeness.percent} compact full />
       </div>
       <Link to={to} aria-label={item.title} className={`absolute inset-0 rounded-xl ${FOCUS_RING}`} />
     </div>

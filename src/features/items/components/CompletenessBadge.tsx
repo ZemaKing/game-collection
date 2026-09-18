@@ -4,17 +4,21 @@ interface CompletenessBadgeProps {
   percent: number
   /** Smaller variant for grid/list cards; the default is sized for the detail page. */
   compact?: boolean
+  /** Bar stretches to fill the row instead of a fixed width — used on grid card footers. */
+  full?: boolean
 }
 
-export function CompletenessBadge({ percent, compact = false }: CompletenessBadgeProps) {
+export function CompletenessBadge({ percent, compact = false, full = false }: CompletenessBadgeProps) {
   const { t } = useLocale()
 
   return (
     <span
       title={t('completeness.tooltip', { percent: String(percent) })}
-      className={`inline-flex shrink-0 items-center gap-1.5 ${compact ? 'text-xs' : 'text-sm'} font-medium text-muted`}
+      className={`inline-flex items-center gap-1.5 ${full ? 'w-full' : 'shrink-0'} ${compact ? 'text-xs' : 'text-sm'} font-medium text-muted`}
     >
-      <span className={`overflow-hidden rounded-full bg-card-hover ${compact ? 'h-1.5 w-8' : 'h-2 w-16'}`}>
+      <span
+        className={`overflow-hidden rounded-full bg-card-hover ${full ? 'h-1.5 flex-1' : compact ? 'h-1.5 w-8' : 'h-2 w-16'}`}
+      >
         <span className="block h-full rounded-full bg-accent" style={{ width: `${percent}%` }} />
       </span>
       {percent}%
