@@ -241,8 +241,8 @@ export function ItemListingToolbar({
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5">
+          <div className="flex items-end gap-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <span className="text-sm font-semibold text-text">{t('sort.label')}</span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -273,7 +273,7 @@ export function ItemListingToolbar({
               </DropdownMenu>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex shrink-0 flex-col items-start gap-1.5">
               <span className="text-sm font-semibold text-text">{t('view.label')}</span>
               <div className="inline-flex items-center gap-1 rounded-xl border border-border bg-bg p-1">
                 <button
@@ -281,7 +281,7 @@ export function ItemListingToolbar({
                   aria-label={t('view.grid')}
                   aria-pressed={view === 'grid'}
                   onClick={() => setView('grid')}
-                  className={`flex flex-1 items-center justify-center rounded-lg py-2 ${
+                  className={`flex size-9 items-center justify-center rounded-lg ${
                     view === 'grid' ? 'bg-accent text-accent-fg' : 'text-muted hover:text-text'
                   }`}
                 >
@@ -292,7 +292,7 @@ export function ItemListingToolbar({
                   aria-label={t('view.list')}
                   aria-pressed={view === 'list'}
                   onClick={() => setView('list')}
-                  className={`flex flex-1 items-center justify-center rounded-lg py-2 ${
+                  className={`flex size-9 items-center justify-center rounded-lg ${
                     view === 'list' ? 'bg-accent text-accent-fg' : 'text-muted hover:text-text'
                   }`}
                 >
