@@ -1,10 +1,12 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { Button } from '@/components/ui/Button'
+import { getBrowserStorage, loadSettings } from '@/features/settings/settings'
 import { translate, type Locale } from '@/lib/i18n'
 
+// Sits outside the providers (it must survive a provider crash), so it reads
+// the stored language directly instead of via `useLocale`.
 function getLocale(): Locale {
-  const stored = window.localStorage.getItem('locale')
-  return stored === 'sr' || stored === 'en' ? stored : 'sr'
+  return loadSettings(getBrowserStorage()).locale
 }
 
 interface Props {

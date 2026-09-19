@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 24 — Statistics & Collection Insights (Post-MVP)  
+Current Phase: Phase 25 — Settings & Preferences (Post-MVP)  
 MVP Status: Complete
 
 ## MVP Progress
@@ -48,7 +48,7 @@ MVP Status: Complete
 ## Post-MVP Progress
 
 - [x] Phase 24 — Statistics & Collection Insights
-- [ ] Phase 25 — Settings & Preferences
+- [x] Phase 25 — Settings & Preferences
 - [ ] Phase 26 — Profile & Collection Overview
 - [ ] Phase 27 — Responsive Refinement Pass
 - [ ] Phase 28 — Accessibility Pass
@@ -948,25 +948,25 @@ Centralize display and collection preferences.
 
 ### Tasks
 
-- [ ] Build Settings route
-- [ ] Add default Grid/List view and sort order
-- [ ] Add preferred platforms and theme preference
-- [ ] Add language-ready structure if localization is planned
-- [ ] Add image-loading preference
-- [ ] Persist public-safe preferences locally and account-specific preferences remotely if justified
+- [x] Build Settings route — public `/settings` (`SettingsPage.tsx`), reached from a gear button in the topbar (visible at every breakpoint, for visitors and the owner). Every setting applies instantly and saves automatically; no Save button. All preferences are per-device display preferences, so the page is not owner-gated
+- [x] Add default Grid/List view and sort order — the default view is the starting view for any listing surface (dashboard, All Items, type and platform pages) that has no page-specific choice; `useListingPrefs` now stores a choice only when one is made (before, merely visiting a page pinned it, which would have made a default meaningless). "Use the default view everywhere" clears the page-specific choices. The default sort applies when a listing URL has no `sort` param (`useFilters`); an explicit sort is always written to the URL, so a link shared without one opens in the recipient's own default order
+- [x] Add preferred platforms and theme preference — theme is Light or Dark (no System option, by decision; the topbar toggle and the Settings control edit the same value; a stored `system` from an earlier build falls back to the default). "Preferred platforms" is interpreted as which platforms appear in the sidebar and mobile menu (none checked = all shown; a stale selection naming only removed platforms also shows all). Hiding a platform from the menu doesn't hide its items or its `/platforms/:slug` page
+- [x] Add language-ready structure if localization is planned — localization already exists (sr/en); the language is now a setting stored with the rest instead of `LocaleProvider`'s own key, so adding a locale means adding it to `i18n.ts` and `LOCALES` in `settings.ts`
+- [x] Add image-loading preference — Load as you scroll (default, `loading="lazy"`) / Load immediately (`eager`) / Data saver (listing cards show the type placeholder; item pages, the gallery and the viewer still load images). Applied in `ItemImage` via a `deferrable` prop that only card thumbnails set
+- [x] Persist public-safe preferences locally and account-specific preferences remotely if justified — everything is stored locally in one validated `settings` localStorage entry (`features/settings/settings.ts`; theme and language moved onto it, migrating the old `theme`/`locale` keys once). Remote storage is deliberately not added: every setting is a per-device display preference, visitors are anonymous, and syncing would need a new table, RLS policies and a production migration for little gain in a single-owner app. Revisit if the owner wants preferences to follow them across devices
 
 ### Testing & Verification
 
-- [ ] Preferences apply consistently after refresh and sign-in
-- [ ] Invalid or outdated stored values fall back safely
+- [x] Preferences apply consistently after refresh and sign-in — verified live across reloads for theme, language, view, sort, platforms and image loading; cross-tab changes sync through the `storage` event. Sign-in was not exercised with a real login: settings never read the auth session, so signing in cannot change them
+- [x] Invalid or outdated stored values fall back safely — `parseSettings` validates each field independently (a corrupt value resets only that field), malformed JSON or blocked storage yields defaults, and unknown platform slugs are ignored. Verified live with a deliberately corrupted blob (valid `locale`/`imageLoading` kept, the rest defaulted, storage rewritten clean)
 
 ### Definition of Done
 
-- [ ] Supported preferences are centralized, persistent, and reflected throughout the UI
+- [x] Supported preferences are centralized, persistent, and reflected throughout the UI — `SettingsProvider` is the single source; `ThemeProvider`/`LocaleProvider` read from it, and `ErrorBoundary` (outside the providers) reads it through the same loader so the crash screen keeps the chosen language. `settings.test.ts` (17 tests) covers parsing, per-field fallback, legacy migration, storage failures and view-override clearing; Settings was checked at 375px (no horizontal overflow) and ~1024px in both themes. Not done: an automated accessibility scan (Phase 28) — the segmented controls are ARIA radio groups with arrow-key support
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabaseClient'
 import { FORMAT_TAG_SLUGS, ITEM_TYPES } from '@/features/items/constants'
+import { SORT_KEYS, type SortKey } from '@/features/items/sort'
 import type { AllItemRow, Genre, ItemCondition, ItemType, Platform } from '@/features/items/types'
 
 export async function fetchPlatforms(): Promise<Platform[]> {
@@ -58,7 +59,9 @@ export async function fetchAvailableYears(): Promise<number[]> {
   return Array.from(years).sort((a, b) => b - a)
 }
 
-export type SortKey = 'recently_added' | 'title' | 'release_date' | 'last_updated'
+// Re-exported so existing importers keep working; the definitions live in `sort.ts`, which (unlike this file) has no Supabase dependency.
+export { SORT_KEYS }
+export type { SortKey }
 
 const SORT_COLUMNS: Record<SortKey, { column: string; ascending: boolean }> = {
   recently_added: { column: 'created_at', ascending: false },
@@ -66,8 +69,6 @@ const SORT_COLUMNS: Record<SortKey, { column: string; ascending: boolean }> = {
   release_date: { column: 'release_date', ascending: false },
   last_updated: { column: 'updated_at', ascending: false },
 }
-
-export const SORT_KEYS: SortKey[] = ['recently_added', 'title', 'release_date', 'last_updated']
 
 export interface FetchItemsParams {
   search: string

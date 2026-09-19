@@ -5,9 +5,9 @@ import { ITEM_TYPE_COLORS } from '@/features/items/constants'
 import type { ItemType } from '@/features/items/types'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
+import { usePlatformNavItems } from '@/hooks/usePlatformNavItems'
 import {
   collectionNavItems,
-  platformNavItems,
   primaryNavItems,
 } from '@/lib/navigation'
 
@@ -56,6 +56,7 @@ function SectionLabel({ children }: { children: string }) {
 
 export function Sidebar() {
   const { t } = useLocale()
+  const platformNavItems = usePlatformNavItems()
   const { user } = useAuth()
 
   return (
@@ -85,7 +86,7 @@ export function Sidebar() {
         <SectionLabel>{t('nav.platformsSection')}</SectionLabel>
         <div className="flex flex-col gap-1">
           {platformNavItems.map((item) => (
-            <NavRow key={item.to} {...item} />
+            <NavRow key={item.to} to={item.to} icon={item.icon} label={item.label} />
           ))}
         </div>
 

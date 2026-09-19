@@ -196,6 +196,7 @@ export function ItemCard({
             itemType={item.item_type}
             alt={item.title}
             className="h-full w-full rounded-md"
+            deferrable
           />
           <FormatOverlayBadge slug={item.format_slug} size="sm" />
         </div>
@@ -286,7 +287,7 @@ export function ItemCard({
   return (
     <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card hover:border-accent">
       <div className="relative">
-        <ItemImage storagePath={item.cover_image_path} itemType={item.item_type} alt={item.title} className="aspect-[4/5] w-full" />
+        <ItemImage storagePath={item.cover_image_path} itemType={item.item_type} alt={item.title} className="aspect-[4/5] w-full" deferrable />
         <FormatOverlayBadge slug={item.format_slug} />
         {platformName && (
           <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1">

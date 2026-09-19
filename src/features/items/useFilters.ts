@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { SORT_KEYS, type SortKey } from '@/features/items/api'
+import { SORT_KEYS, type SortKey } from '@/features/items/sort'
 import { ITEM_CONDITIONS, ITEM_TYPES } from '@/features/items/constants'
 import type { ItemCondition, ItemType } from '@/features/items/types'
+import { useSettings } from '@/hooks/useSettings'
 
 export interface Filters {
   search: string
@@ -46,7 +47,7 @@ const PARAM_KEYS = {
   sort: 'sort',
 } as const
 
-function parseFilters(params: URLSearchParams): Filters {
+function parseFilters(params: URLSearchParams, defaultSort: SortKey): Filters {
   const itemTypes = (params.get(PARAM_KEYS.itemTypes)?.split(',').filter(Boolean) ?? []).filter(
     (v): v is ItemType => (ITEM_TYPES as string[]).includes(v),
   )
@@ -57,7 +58,7 @@ function parseFilters(params: URLSearchParams): Filters {
     .map(Number)
     .filter((n) => Number.isInteger(n))
   const sortRaw = params.get(PARAM_KEYS.sort)
-  const sort = (SORT_KEYS as string[]).includes(sortRaw ?? '') ? (sortRaw as SortKey) : DEFAULT_FILTERS.sort
+  const sort = (SORT_KEYS as string[]).includes(sortRaw ?? '') ? (sortRaw as SortKey) : defaultSort
 
   return {
     search: params.get(PARAM_KEYS.search) ?? '',
@@ -74,7 +75,7 @@ function parseFilters(params: URLSearchParams): Filters {
   }
 }
 
-function serializeFilters(filters: Filters, preserve: URLSearchParams): URLSearchParams {
+function serializeFilters(filters: Filters, preserve: URLSearchParams, defaultSort: SortKey): URLSearchParams {
   const next = new URLSearchParams(preserve)
   next.delete(PARAM_KEYS.search)
   next.delete(PARAM_KEYS.itemTypes)
@@ -98,7 +99,7 @@ function serializeFilters(filters: Filters, preserve: URLSearchParams): URLSearc
   if (filters.conditions.length) next.set(PARAM_KEYS.conditions, filters.conditions.join(','))
   if (filters.collectionDateFrom) next.set(PARAM_KEYS.collectionDateFrom, filters.collectionDateFrom)
   if (filters.collectionDateTo) next.set(PARAM_KEYS.collectionDateTo, filters.collectionDateTo)
-  if (filters.sort !== DEFAULT_FILTERS.sort) next.set(PARAM_KEYS.sort, filters.sort)
+  if (filters.sort !== defaultSort) next.set(PARAM_KEYS.sort, filters.sort)
 
   return next
 }
@@ -108,18 +109,25 @@ function serializeFilters(filters: Filters, preserve: URLSearchParams): URLSearc
  * or sharing a listing URL restores the exact same results (Phase 11).
  * Grid/list view stays in `useListingPrefs` (localStorage) since it's a
  * display preference, not a query parameter.
+ *
+ * A URL with no `sort` means "the viewer's default sort" (Settings), so the
+ * param is only written when the sort differs from that default — a link
+ * shared without one opens in the recipient's own default order.
  */
 export function useFilters() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const { defaultSort } = useSettings().settings
 
-  const filters = useMemo(() => parseFilters(searchParams), [searchParams])
+  const filters = useMemo(() => parseFilters(searchParams, defaultSort), [searchParams, defaultSort])
 
   function setFilters(partial: Partial<Filters>) {
-    setSearchParams(serializeFilters({ ...filters, ...partial }, searchParams), { replace: false })
+    setSearchParams(serializeFilters({ ...filters, ...partial }, searchParams, defaultSort), { replace: false })
   }
 
   function clearAll() {
-    setSearchParams(serializeFilters(DEFAULT_FILTERS, searchParams), { replace: false })
+    setSearchParams(serializeFilters({ ...DEFAULT_FILTERS, sort: defaultSort }, searchParams, defaultSort), {
+      replace: false,
+    })
   }
 
   return { filters, setFilters, clearAll }

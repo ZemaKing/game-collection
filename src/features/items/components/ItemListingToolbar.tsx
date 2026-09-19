@@ -1,26 +1,22 @@
 import {
   Calendar,
   CalendarRange,
-  Check,
   ChevronDown,
   ChevronUp,
-  Clock,
   Gamepad2,
   LayoutGrid,
   List as ListIcon,
-  RefreshCw,
   Search,
   SlidersHorizontal,
   Tag as TagIcon,
-  Type as TypeIcon,
   X,
-  type LucideIcon,
 } from 'lucide-react'
 import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import { CloseIcon } from '@/components/icons/ActionIcons'
 import { ButtonIcon } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/buttonStyles'
-import { SORT_KEYS, type SortKey, type Tag } from '@/features/items/api'
+import type { Tag } from '@/features/items/api'
+import { SortMenu } from '@/features/items/components/SortMenu'
 import {
   CONDITION_COLORS,
   CONDITION_ICONS,
@@ -38,28 +34,7 @@ import { FilterSheet } from '@/features/items/components/FilterSheet'
 import type { ViewMode } from '@/features/items/useListingPrefs'
 import type { Filters } from '@/features/items/useFilters'
 import type { Genre, ItemCondition, ItemType, Platform } from '@/features/items/types'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/DropdownMenu'
 import { useLocale } from '@/hooks/useLocale'
-import type { TranslationKey } from '@/lib/i18n'
-
-const SORT_LABEL_KEYS: Record<SortKey, TranslationKey> = {
-  recently_added: 'sort.recently_added',
-  title: 'sort.title',
-  release_date: 'sort.release_date',
-  last_updated: 'sort.last_updated',
-}
-
-const SORT_ICONS: Record<SortKey, LucideIcon> = {
-  recently_added: Clock,
-  title: TypeIcon,
-  release_date: Calendar,
-  last_updated: RefreshCw,
-}
 
 interface Chip {
   key: string
@@ -272,33 +247,7 @@ export function ItemListingToolbar({
           <div className="flex items-end gap-3">
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <span className="text-sm font-semibold text-text">{t('sort.label')}</span>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex items-center gap-2 rounded-xl border border-border bg-bg px-3.5 py-2.5 text-sm font-semibold text-text hover:bg-card-hover"
-                  >
-                    {(() => {
-                      const SortIcon = SORT_ICONS[filters.sort]
-                      return <SortIcon size={16} className="shrink-0 text-muted" />
-                    })()}
-                    <span className="flex-1 text-left">{t(SORT_LABEL_KEYS[filters.sort])}</span>
-                    <ChevronDown size={16} className="text-muted" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="min-w-56">
-                  {SORT_KEYS.map((key: SortKey) => {
-                    const SortIcon = SORT_ICONS[key]
-                    return (
-                      <DropdownMenuItem key={key} onSelect={() => setFilters({ sort: key })}>
-                        <SortIcon size={15} className="shrink-0 text-muted" />
-                        <span className="flex-1">{t(SORT_LABEL_KEYS[key])}</span>
-                        {filters.sort === key && <Check size={16} />}
-                      </DropdownMenuItem>
-                    )
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <SortMenu value={filters.sort} onChange={(sort) => setFilters({ sort })} />
             </div>
 
             <div className="flex shrink-0 flex-col items-start gap-1.5">

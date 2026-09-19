@@ -5,9 +5,9 @@ import { NavLink } from 'react-router-dom'
 import { ITEM_TYPE_COLORS } from '@/features/items/constants'
 import type { ItemType } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
+import { usePlatformNavItems } from '@/hooks/usePlatformNavItems'
 import {
   collectionNavItems,
-  platformNavItems,
   primaryNavItems,
 } from '@/lib/navigation'
 
@@ -59,6 +59,7 @@ function SectionLabel({ children }: { children: string }) {
 
 export function MobileNavSheet({ open, onOpenChange }: MobileNavSheetProps) {
   const { t } = useLocale()
+  const platformNavItems = usePlatformNavItems()
   const close = () => onOpenChange(false)
 
   return (
@@ -92,7 +93,7 @@ export function MobileNavSheet({ open, onOpenChange }: MobileNavSheetProps) {
             <SectionLabel>{t('nav.platformsSection')}</SectionLabel>
             <div className="flex flex-col gap-1">
               {platformNavItems.map((item) => (
-                <NavRow key={item.to} {...item} onNavigate={close} />
+                <NavRow key={item.to} to={item.to} icon={item.icon} label={item.label} onNavigate={close} />
               ))}
             </div>
 

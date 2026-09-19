@@ -1,6 +1,6 @@
-import { Menu, Search } from 'lucide-react'
+import { Menu, Search, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { AccountMenu } from '@/components/AccountMenu'
 import { LocaleToggle } from '@/components/LocaleToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -64,6 +64,18 @@ export function Topbar() {
       <div className="ml-auto flex items-center gap-3">
         <LocaleToggle />
         <ThemeToggle />
+        <NavLink
+          to="/settings"
+          aria-label={t('nav.settings')}
+          title={t('nav.settings')}
+          className={({ isActive }) =>
+            `flex size-10 items-center justify-center rounded-full border border-border text-text hover:bg-card-hover ${
+              isActive ? 'bg-accent text-accent-fg hover:bg-accent' : 'bg-surface'
+            }`
+          }
+        >
+          <Settings size={18} />
+        </NavLink>
         <AccountMenu />
       </div>
 

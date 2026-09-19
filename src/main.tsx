@@ -5,6 +5,7 @@ import App from '@/App.tsx'
 import { AuthProvider } from '@/components/AuthProvider'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LocaleProvider } from '@/components/LocaleProvider'
+import { SettingsProvider } from '@/components/SettingsProvider'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import '@fontsource/inter/400.css'
 import '@fontsource/inter/500.css'
@@ -23,15 +24,17 @@ window.addEventListener('unhandledrejection', (event) => {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
-      <ThemeProvider>
-        <LocaleProvider>
-          <AuthProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </AuthProvider>
-        </LocaleProvider>
-      </ThemeProvider>
+      <SettingsProvider>
+        <ThemeProvider>
+          <LocaleProvider>
+            <AuthProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </AuthProvider>
+          </LocaleProvider>
+        </ThemeProvider>
+      </SettingsProvider>
     </ErrorBoundary>
   </StrictMode>,
 )

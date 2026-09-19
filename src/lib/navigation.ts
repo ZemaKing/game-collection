@@ -45,13 +45,23 @@ export const primaryNavItems: NavItem[] = [
 
 // Platform names are proper nouns and are not translated. Slugs must match
 // the `platforms.slug` seed values so `/platforms/:slug` resolves them.
-export const platformNavItems: { label: string; to: string; icon: IconComponent }[] = [
-  { label: 'PlayStation 5', to: '/platforms/playstation-5', icon: PlayStation5Icon },
-  { label: 'PlayStation 4', to: '/platforms/playstation-4', icon: PlayStation4Icon },
-  { label: 'Steam', to: '/platforms/steam', icon: SteamIcon },
-  { label: 'Epic Games', to: '/platforms/epic-games', icon: EpicGamesIcon },
-  { label: 'Xbox', to: '/platforms/xbox', icon: XboxIcon },
+export const platformNavItems: { slug: string; label: string; to: string; icon: IconComponent }[] = [
+  { slug: 'playstation-5', label: 'PlayStation 5', to: '/platforms/playstation-5', icon: PlayStation5Icon },
+  { slug: 'playstation-4', label: 'PlayStation 4', to: '/platforms/playstation-4', icon: PlayStation4Icon },
+  { slug: 'steam', label: 'Steam', to: '/platforms/steam', icon: SteamIcon },
+  { slug: 'epic-games', label: 'Epic Games', to: '/platforms/epic-games', icon: EpicGamesIcon },
+  { slug: 'xbox', label: 'Xbox', to: '/platforms/xbox', icon: XboxIcon },
 ]
+
+/**
+ * The platforms to list in the navigation given the Settings choice. An empty
+ * choice — or one naming only platforms that no longer exist — shows them all,
+ * so a stale setting can never leave the menu with no platforms.
+ */
+export function visiblePlatformNavItems(slugs: readonly string[]) {
+  const chosen = platformNavItems.filter((item) => slugs.includes(item.slug))
+  return chosen.length > 0 ? chosen : platformNavItems
+}
 
 export const collectionNavItems: NavItem[] = [
   { labelKey: 'nav.recentlyAdded', to: '/recently-added', icon: Clock },
