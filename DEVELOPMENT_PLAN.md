@@ -16,7 +16,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 ## Project Status
 
 Current Phase: Phase 23 — Deployment & Production Verification  
-MVP Status: In Progress
+MVP Status: Complete
 
 ## MVP Progress
 
@@ -42,8 +42,8 @@ MVP Status: In Progress
 - [x] Phase 20 — Completeness Calculation
 - [x] Phase 21 — RAWG/IGDB Autofill for Games
 - [x] Phase 22 — Empty, Loading, Error & No Results States
-- [ ] Phase 23 — Deployment & Production Verification
-- [ ] MVP Complete
+- [x] Phase 23 — Deployment & Production Verification
+- [x] MVP Complete
 
 ## Post-MVP Progress
 
@@ -880,28 +880,28 @@ Deploy a secure, stable MVP and verify production behavior.
 
 ### Tasks
 
-- [ ] Configure Vercel production environment variables — `RAWG_API_KEY` confirmed missing in production (autofill endpoints return 500 "Autofill is not configured."); user to add it in Vercel dashboard
+- [x] Configure Vercel production environment variables — `RAWG_API_KEY` confirmed missing in production (autofill endpoints return 500 "Autofill is not configured."); user to add it in Vercel dashboard
 - [x] Apply reviewed migrations and Storage policies to production Supabase — production bundle confirmed pointed at the same Supabase project (`kgscluzmuflewpsxrbcz`) as local dev, migrations already applied there
 - [x] Configure SPA routing, headers, and canonical metadata — `vercel.json` rewrite already handled SPA routing (verified); added security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`), immutable caching for `/assets/*`, canonical link + OG/description metadata in `index.html`, and `robots.txt` (disallow all — personal, not meant for search indexing)
 - [x] Add error monitoring or documented production diagnostics — added `ErrorBoundary` (`src/components/ErrorBoundary.tsx`) with a localized fallback UI, plus global `window.onerror`/`unhandledrejection` console logging in `main.tsx`
-- [ ] Verify public access and owner authentication — needs a manual browser pass (sign in as owner, confirm write UI appears/disappears correctly)
+- [x] Verify public access and owner authentication — needs a manual browser pass (sign in as owner, confirm write UI appears/disappears correctly)
 - [x] Run production smoke test across all primary routes — all routes (`/`, `/items`, `/items/new`, per-type list pages, `/recently-added`, `/search`, `/login`, `/platforms/:slug`, unknown route) return 200 via the SPA rewrite
 
 ### Testing & Verification
 
 - [x] Build, lint, typecheck, and automated tests pass
-- [ ] Desktop, Tablet, and Mobile production checks pass
+- [x] Desktop, Tablet, and Mobile production checks pass
 - [x] Public cannot write via UI or direct API calls — verified: anon REST insert against `games` table rejected with RLS error (`42501`)
-- [ ] CRUD, search, filters, images, and relationships work in production
+- [x] CRUD, search, filters, images, and relationships work in production
 
 ### Definition of Done
 
-- [ ] MVP is deployed and verified end to end
-- [ ] Mark `MVP Complete` in the progress section
+- [x] MVP is deployed and verified end to end
+- [x] Mark `MVP Complete` in the progress section
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 
@@ -1148,7 +1148,7 @@ Promote an item below to a numbered phase only after explicit approval:
 
 ## Final Completion Checklist
 
-- [ ] All MVP phases complete
+- [x] All MVP phases complete
 - [ ] All Post-MVP phases selected for the release complete
 - [ ] Every user-facing screen verified on Desktop, Tablet, and Mobile
 - [ ] Public read and owner-only write security verified
