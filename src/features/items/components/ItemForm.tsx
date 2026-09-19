@@ -16,6 +16,7 @@ import {
   ITEM_CONDITIONS,
 } from '@/features/items/constants'
 import { ConditionSelect } from '@/features/items/components/ConditionSelect'
+import { EditionSelect } from '@/features/items/components/EditionSelect'
 import { GameAutofillPanel } from '@/features/items/components/GameAutofillPanel'
 import { ImageManager } from '@/features/items/components/ImageManager'
 import { PlatformSelect } from '@/features/items/components/PlatformSelect'
@@ -167,6 +168,18 @@ export function ItemForm({
           value={value as string}
           onChange={(v) => setField(field.name, v as never)}
           options={platforms}
+          error={error}
+        />
+      )
+    }
+    if (field.kind === 'editionSelect') {
+      return (
+        <EditionSelect
+          key={field.name}
+          label={label}
+          name={field.name}
+          value={value as string}
+          onChange={(v) => setField(field.name, v as never)}
           error={error}
         />
       )

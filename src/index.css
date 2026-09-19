@@ -134,6 +134,58 @@ body {
 }
 
 /*
+ * Edition labels (EditionBadge / EditionSelect). Each edition sets two accents
+ * — a darker one for light theme, a brighter one for dark — and every surface
+ * (tinted background, border, icon chip, label) is derived from `--ed` with
+ * color-mix, so both themes share one visual identity.
+ */
+[data-edition='day-one'] { --ed-light: #475569; --ed-dark: #cbd5e1; }
+[data-edition='launch'] { --ed-light: #0369a1; --ed-dark: #38bdf8; }
+[data-edition='special'] { --ed-light: #9333ea; --ed-dark: #c084fc; }
+[data-edition='limited'] { --ed-light: #0e7490; --ed-dark: #22d3ee; }
+[data-edition='deluxe'] { --ed-light: #b45309; --ed-dark: #f59e0b; }
+[data-edition='gold'] { --ed-light: #a16207; --ed-dark: #facc15; }
+[data-edition='ultimate'] { --ed-light: #dc2626; --ed-dark: #f87171; }
+[data-edition='premium'] { --ed-light: #db2777; --ed-dark: #f472b6; }
+[data-edition='complete'] { --ed-light: #15803d; --ed-dark: #4ade80; }
+[data-edition='definitive'] { --ed-light: #1d4ed8; --ed-dark: #6b8dfa; }
+[data-edition='game-of-the-year'] { --ed-light: #6d28d9; --ed-dark: #a78bfa; }
+[data-edition='anniversary'] { --ed-light: #c2410c; --ed-dark: #fb923c; }
+[data-edition='collectors'] { --ed-light: #4d7c0f; --ed-dark: #a3e635; }
+[data-edition='custom'] { --ed-light: #64748b; --ed-dark: #94a3b8; }
+
+.edition-scope {
+  --ed: var(--ed-light);
+}
+.dark .edition-scope {
+  --ed: var(--ed-dark);
+}
+
+.edition-badge {
+  color: color-mix(in srgb, var(--ed) 72%, var(--app-text));
+  border: 1px solid color-mix(in srgb, var(--ed) 42%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ed) 16%, transparent),
+    color-mix(in srgb, var(--ed) 8%, transparent)
+  );
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ed) 16%, transparent);
+}
+
+.edition-glyph {
+  color: var(--ed);
+  background: color-mix(in srgb, var(--ed) 18%, transparent);
+}
+
+/* Selector rows: tinted by the row's own edition on hover / keyboard focus / selection. */
+.edition-option[data-active='true'] {
+  background: color-mix(in srgb, var(--ed) 12%, transparent);
+}
+.edition-option[aria-selected='true'] {
+  box-shadow: inset 2px 0 0 var(--ed);
+}
+
+/*
  * Page headings step down slightly on small screens (24→22, 22→20). Body
  * text and metadata are excluded from this rule and never shrink below
  * their base sizes.

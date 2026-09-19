@@ -26,7 +26,7 @@ export interface ItemDetail {
   publisher: string | null
   barcode: string | null
 
-  // Special editions / steelbooks
+  // Games / special editions / steelbooks
   edition_name: string | null
 
   // Steelbooks

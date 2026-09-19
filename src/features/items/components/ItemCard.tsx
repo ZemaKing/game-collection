@@ -15,6 +15,8 @@ import {
   PLATFORM_SHORT_LABELS,
 } from '@/features/items/constants'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
+import { EditionBadge } from '@/features/items/components/EditionBadge'
+import { editionNameOf, hasEditionField } from '@/features/items/editions'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import type { AllItemRow } from '@/features/items/types'
 import {
@@ -143,6 +145,24 @@ function PlatformBadge({ platformName, platformSlug }: { platformName: string; p
   )
 }
 
+/**
+ * The secondary line under the title in list rows: the subtitle text (developer,
+ * publisher, ...) plus the item's `EditionBadge`. For special editions/steelbooks
+ * the subtitle *is* the edition name, so only the badge is shown. The negative
+ * margin keeps the badge from making the row taller than plain text.
+ */
+function Subtitle({ item, className = '' }: { item: AllItemRow; className?: string }) {
+  const editionName = editionNameOf(item)
+  const text = hasEditionField(item.item_type) && item.item_type !== 'game' ? null : item.subtitle
+  return (
+    <div className={`flex min-h-4 min-w-0 items-center gap-1.5 ${className}`}>
+      {text && <p className="min-w-0 truncate text-xs text-muted">{text}</p>}
+      {editionName && <EditionBadge name={editionName} size="sm" className="-my-0.5 max-w-[65%] shrink-0" />}
+      {!text && !editionName && <p className="text-xs"> </p>}
+    </div>
+  )
+}
+
 export function ItemCard({
   item,
   platformName,
@@ -161,6 +181,9 @@ export function ItemCard({
     const typeLabel = showTypeBadge ? t(ITEM_TYPE_META[item.item_type].labelKey) : null
 
     const shortPlatform = (platformSlug && PLATFORM_SHORT_LABELS[platformSlug]) || platformName
+    const editionName = editionNameOf(item)
+    // For special editions/steelbooks the subtitle *is* the edition name, so it's shown only as the badge.
+    const publisher = hasEditionField(item.item_type) && item.item_type !== 'game' ? null : item.subtitle
 
     return (
       <Link
@@ -180,7 +203,15 @@ export function ItemCard({
         {/* Mobile (<md): title, publisher, compact genre·platform·year line, completeness+condition. */}
         <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 md:hidden">
           <p className="truncate text-sm font-semibold text-text">{item.title}</p>
-          <p className="truncate text-xs text-muted">{[typeLabel, item.subtitle].filter(Boolean).join(' · ') || ' '}</p>
+          {editionNameOf(item) ? (
+            <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted">
+              {typeLabel && <span className="shrink-0">{typeLabel} ·</span>}
+              {item.item_type === 'game' && item.subtitle && <span className="min-w-0 truncate">{item.subtitle}</span>}
+              <EditionBadge name={editionNameOf(item) ?? ''} size="sm" className="-my-0.5 max-w-[65%] shrink-0" />
+            </div>
+          ) : (
+            <p className="truncate text-xs text-muted">{[typeLabel, item.subtitle].filter(Boolean).join(' · ') || ' '}</p>
+          )}
           <div className="flex min-w-0 items-center gap-1.5">
             {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
             <span className="flex min-w-0 items-center gap-1 truncate text-xs text-muted">
@@ -201,7 +232,7 @@ export function ItemCard({
           <div className="flex min-w-0 items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-text">{item.title}</p>
-              <p className="truncate text-xs text-muted">{item.subtitle || ' '}</p>
+              <Subtitle item={item} />
             </div>
             <div className="flex shrink-0 items-center gap-3">
               <CompletenessBadge percent={completeness.percent} compact />
@@ -221,23 +252,32 @@ export function ItemCard({
         </div>
 
         {/* Desktop (lg+): original horizontal table columns. */}
-        <div className="hidden min-w-0 flex-1 lg:block">
+        <div className="hidden min-w-0 flex-1 flex-col justify-center gap-1 py-1 lg:flex">
           <p className="truncate text-sm font-semibold text-text">{item.title}</p>
-          <p className="truncate text-xs text-muted">{item.subtitle || ' '}</p>
+          {publisher && <p className="truncate text-xs text-muted">{publisher}</p>}
+          {editionName && (
+            <div className="flex min-w-0">
+              <EditionBadge name={editionName} size="sm" className="max-w-full" />
+            </div>
+          )}
         </div>
-        <div className="hidden shrink-0 items-center gap-4 lg:flex">
+        <div className="hidden shrink-0 items-center gap-6 lg:flex">
           {showTypeBadge && <TypeBadge item={item} />}
-          {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+          <div className="flex w-28 justify-start">
+            {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+          </div>
           {platformName ? (
-            <PlatformLabel platformName={platformName} platformSlug={platformSlug} className="w-28 text-xs text-muted" />
+            <PlatformLabel platformName={platformName} platformSlug={platformSlug} className="w-32 text-xs text-muted" />
           ) : (
-            <span className="w-28 text-xs text-muted">—</span>
+            <span className="w-32 text-xs text-muted">—</span>
           )}
           <span className="w-10 text-xs text-muted">{releaseYear ?? '—'}</span>
         </div>
-        <div className="hidden shrink-0 items-center gap-3 lg:flex">
+        <div className="hidden shrink-0 items-center gap-4 lg:flex">
           <CompletenessBadge percent={completeness.percent} compact />
-          <ConditionBadge condition={item.condition} />
+          <div className="flex w-28 justify-end">
+            <ConditionBadge condition={item.condition} />
+          </div>
         </div>
       </Link>
     )
@@ -289,9 +329,20 @@ export function ItemCard({
         {/* Everything below the title is pinned to the bottom so publisher/genre, year/condition and
             completeness line up across cards in a row, however many lines the title takes. */}
         <div className="mt-auto flex flex-col gap-1.5 pt-1">
+          {item.item_type === 'game' && editionNameOf(item) && (
+            <div className="flex min-w-0">
+              <EditionBadge name={editionNameOf(item) ?? ''} size="sm" />
+            </div>
+          )}
           {(item.subtitle || item.genre_slug) && (
             <div className="flex min-w-0 items-center justify-between gap-1.5">
-              <p className="min-w-0 flex-1 truncate text-xs text-muted">{item.subtitle}</p>
+              {hasEditionField(item.item_type) && item.item_type !== 'game' ? (
+                <div className="flex min-w-0 flex-1">
+                  <EditionBadge name={editionNameOf(item) ?? ''} size="sm" className="-my-0.5" />
+                </div>
+              ) : (
+                <p className="min-w-0 flex-1 truncate text-xs text-muted">{item.subtitle}</p>
+              )}
               {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
             </div>
           )}

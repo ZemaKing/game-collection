@@ -20,6 +20,7 @@ import {
 } from '@/features/items/constants'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
+import { EditionBadge } from '@/features/items/components/EditionBadge'
 import { ItemDetailSkeleton } from '@/features/items/components/ItemDetailSkeleton'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import { ItemNotFound } from '@/features/items/components/ItemNotFound'
@@ -212,13 +213,13 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-6">
-        <header className="flex items-start justify-between gap-3">
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-text">
-            <meta.icon size={22} className="shrink-0 text-muted" />
-            {detail.title}
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <h1 className="flex min-w-0 items-start gap-2 text-2xl font-bold text-text">
+            <meta.icon size={22} className="mt-1.5 shrink-0 text-muted" />
+            <span className="min-w-0 break-words">{detail.title}</span>
           </h1>
           {user && (
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex sm:items-center [&>*]:justify-center">
               <Link
                 to={`/${ITEM_TYPE_ROUTES[itemType]}/${id}/edit`}
                 className={buttonClasses({ variant: 'primary' })}
@@ -281,6 +282,16 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
                         <ConditionIcon size={12} />
                         {t(CONDITION_LABEL_KEYS[detail.condition])}
                       </span>
+                    </dd>
+                  </div>
+                )
+              }
+              if (field.labelKey === 'detail.editionName' && field.text) {
+                return (
+                  <div key={field.labelKey} className="min-w-0">
+                    <dt className="text-xs font-medium text-muted">{t(field.labelKey)}</dt>
+                    <dd className="mt-1 flex">
+                      <EditionBadge name={field.text} variant="stacked" />
                     </dd>
                   </div>
                 )

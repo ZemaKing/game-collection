@@ -64,6 +64,7 @@ async function fetchGameDetail(id: string): Promise<ItemDetail | null> {
     developer: data.developer,
     publisher: data.publisher,
     barcode: data.barcode,
+    edition_name: data.edition_name ?? null,
   }
 }
 

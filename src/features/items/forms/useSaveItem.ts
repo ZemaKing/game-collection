@@ -14,7 +14,7 @@ const COMMON_KEYS = ['title', 'release_date', 'collection_date', 'condition', 'n
 
 /** Extra columns per table, beyond the common fields every item table shares (see Phase 4 migrations). */
 const TYPE_KEYS: Record<ItemType, string[]> = {
-  game: ['platform_id', 'developer', 'publisher', 'region', 'barcode'],
+  game: ['platform_id', 'edition_name', 'developer', 'publisher', 'region', 'barcode'],
   special_edition: ['platform_id', 'edition_name', 'region'],
   steelbook: ['platform_id', 'game_title', 'edition_name', 'steelbook_number', 'region'],
   artbook: ['publisher', 'page_count', 'isbn', 'language'],

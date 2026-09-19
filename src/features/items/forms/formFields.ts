@@ -2,7 +2,7 @@ import type { ItemFormState } from '@/features/items/forms/formState'
 import type { ItemType } from '@/features/items/types'
 import type { TranslationKey } from '@/lib/i18n'
 
-export type FieldKind = 'text' | 'textarea' | 'date' | 'number' | 'platformSelect' | 'conditionSelect'
+export type FieldKind = 'text' | 'textarea' | 'date' | 'number' | 'platformSelect' | 'conditionSelect' | 'editionSelect'
 
 export interface FormFieldDef {
   name: keyof ItemFormState
@@ -40,7 +40,14 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
   game: [
     {
       titleKey: 'form.sectionBasicInfo',
-      fields: [titleField, platformField, releaseDateField, collectionDateField, conditionField],
+      fields: [
+        titleField,
+        platformField,
+        { name: 'edition_name', labelKey: 'detail.editionName', kind: 'editionSelect' },
+        releaseDateField,
+        collectionDateField,
+        conditionField,
+      ],
     },
     {
       titleKey: 'form.sectionDetails',
@@ -59,7 +66,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
       fields: [
         titleField,
         platformField,
-        { name: 'edition_name', labelKey: 'detail.editionName', kind: 'text' },
+        { name: 'edition_name', labelKey: 'detail.editionName', kind: 'editionSelect' },
         releaseDateField,
         collectionDateField,
         conditionField,
@@ -75,7 +82,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         titleField,
         platformField,
         { name: 'game_title', labelKey: 'detail.gameTitle', kind: 'text' },
-        { name: 'edition_name', labelKey: 'detail.editionName', kind: 'text' },
+        { name: 'edition_name', labelKey: 'detail.editionName', kind: 'editionSelect' },
         { name: 'steelbook_number', labelKey: 'detail.steelbookNumber', kind: 'text' },
         releaseDateField,
         collectionDateField,

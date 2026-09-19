@@ -43,6 +43,7 @@ const commonFields = {
 export const gameSchema = z.object({
   ...commonFields,
   platform_id: optionalText,
+  edition_name: optionalText,
   developer: optionalText,
   publisher: optionalText,
   region: optionalText,

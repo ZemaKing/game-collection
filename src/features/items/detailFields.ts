@@ -33,6 +33,7 @@ const regionField: DetailFieldDef = {
 export const DETAIL_FIELDS: Record<ItemType, DetailFieldDef[]> = {
   game: [
     platformField,
+    { labelKey: 'detail.editionName', value: (d) => d.edition_name },
     { labelKey: 'detail.developer', value: (d) => d.developer },
     { labelKey: 'detail.publisher', value: (d) => d.publisher },
     releaseDateField,
