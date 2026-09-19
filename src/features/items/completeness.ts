@@ -15,7 +15,6 @@ import type { ItemDetail } from '@/features/items/detailTypes'
 export interface CompletenessFacts {
   hasSubtitle: boolean
   hasPlatform: boolean
-  hasRegion: boolean
   hasReleaseDate: boolean
   hasCollectionDate: boolean
   hasCondition: boolean
@@ -26,15 +25,14 @@ export interface CompletenessFacts {
 /**
  * `title` is excluded — it's already required to save an item (see
  * `schemas.ts` `commonFields.title`), so it would always be 100% and add
- * nothing to the score. `platform`/`region` are excluded for types that
- * don't have them (artbook/figure/stuff — see `all_items` view, which hard-
- * codes those columns to null for those types).
+ * nothing to the score. `platform` is excluded for types that
+ * don't have it (artbook/figure/stuff — see `all_items` view, which hard-
+ * codes that column to null for those types).
  */
 const APPLICABLE_FIELDS: Record<ItemType, (keyof CompletenessFacts)[]> = {
   game: [
     'hasSubtitle',
     'hasPlatform',
-    'hasRegion',
     'hasReleaseDate',
     'hasCollectionDate',
     'hasCondition',
@@ -44,7 +42,6 @@ const APPLICABLE_FIELDS: Record<ItemType, (keyof CompletenessFacts)[]> = {
   special_edition: [
     'hasSubtitle',
     'hasPlatform',
-    'hasRegion',
     'hasReleaseDate',
     'hasCollectionDate',
     'hasCondition',
@@ -54,7 +51,6 @@ const APPLICABLE_FIELDS: Record<ItemType, (keyof CompletenessFacts)[]> = {
   steelbook: [
     'hasSubtitle',
     'hasPlatform',
-    'hasRegion',
     'hasReleaseDate',
     'hasCollectionDate',
     'hasCondition',
@@ -93,7 +89,6 @@ export function completenessFactsFromRow(row: AllItemRow): CompletenessFacts {
   return {
     hasSubtitle: !!row.subtitle,
     hasPlatform: !!row.platform_id,
-    hasRegion: !!row.region,
     hasReleaseDate: !!row.release_date,
     hasCollectionDate: !!row.collection_date,
     hasCondition: !!row.condition,
@@ -116,7 +111,6 @@ export function completenessFactsFromDetail(detail: ItemDetail, hasCoverImage: b
   return {
     hasSubtitle: !!DETAIL_SUBTITLE_BY_TYPE[detail.item_type](detail),
     hasPlatform: !!detail.platform,
-    hasRegion: !!detail.region,
     hasReleaseDate: !!detail.release_date,
     hasCollectionDate: !!detail.collection_date,
     hasCondition: !!detail.condition,

@@ -11,7 +11,6 @@ export interface ItemDetail {
   title: string
   description: string | null
   notes: string | null
-  region: string | null
   release_date: string | null
   collection_date: string | null
   condition: ItemCondition | null
@@ -24,7 +23,6 @@ export interface ItemDetail {
   // Games
   developer: string | null
   publisher: string | null
-  barcode: string | null
 
   // Games / special editions / steelbooks
   edition_name: string | null

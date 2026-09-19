@@ -27,7 +27,6 @@ export interface AllItemRow {
   title: string
   subtitle: string | null
   platform_id: string | null
-  region: string | null
   release_date: string | null
   collection_date: string | null
   condition: ItemCondition | null

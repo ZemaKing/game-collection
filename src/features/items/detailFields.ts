@@ -25,10 +25,6 @@ const conditionField: DetailFieldDef = {
   labelKey: 'filters.condition',
   value: (d, t) => (d.condition ? t(CONDITION_LABEL_KEYS[d.condition]) : null),
 }
-const regionField: DetailFieldDef = {
-  labelKey: 'detail.region',
-  value: (d) => d.region,
-}
 
 export const DETAIL_FIELDS: Record<ItemType, DetailFieldDef[]> = {
   game: [
@@ -39,8 +35,6 @@ export const DETAIL_FIELDS: Record<ItemType, DetailFieldDef[]> = {
     releaseDateField,
     collectionDateField,
     conditionField,
-    regionField,
-    { labelKey: 'detail.barcode', value: (d) => d.barcode },
   ],
   special_edition: [
     platformField,
@@ -48,7 +42,6 @@ export const DETAIL_FIELDS: Record<ItemType, DetailFieldDef[]> = {
     releaseDateField,
     collectionDateField,
     conditionField,
-    regionField,
   ],
   steelbook: [
     platformField,
@@ -58,7 +51,6 @@ export const DETAIL_FIELDS: Record<ItemType, DetailFieldDef[]> = {
     releaseDateField,
     collectionDateField,
     conditionField,
-    regionField,
   ],
   artbook: [
     { labelKey: 'detail.publisher', value: (d) => d.publisher },

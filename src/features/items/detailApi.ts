@@ -7,7 +7,6 @@ import type { ItemDetail, ItemImageRow } from '@/features/items/detailTypes'
 const DETAIL_NULLS: Omit<ItemDetail, 'id' | 'item_type' | 'title' | 'created_at' | 'updated_at'> = {
   description: null,
   notes: null,
-  region: null,
   release_date: null,
   collection_date: null,
   condition: null,
@@ -15,7 +14,6 @@ const DETAIL_NULLS: Omit<ItemDetail, 'id' | 'item_type' | 'title' | 'created_at'
   genres: [],
   developer: null,
   publisher: null,
-  barcode: null,
   edition_name: null,
   game_title: null,
   steelbook_number: null,
@@ -53,7 +51,6 @@ async function fetchGameDetail(id: string): Promise<ItemDetail | null> {
     title: data.title,
     description: data.description,
     notes: data.notes,
-    region: data.region,
     release_date: data.release_date,
     collection_date: data.collection_date,
     condition: data.condition,
@@ -63,7 +60,6 @@ async function fetchGameDetail(id: string): Promise<ItemDetail | null> {
     genres,
     developer: data.developer,
     publisher: data.publisher,
-    barcode: data.barcode,
     edition_name: data.edition_name ?? null,
   }
 }
@@ -84,7 +80,6 @@ async function fetchSpecialEditionDetail(id: string): Promise<ItemDetail | null>
     title: data.title,
     description: data.description,
     notes: data.notes,
-    region: data.region,
     release_date: data.release_date,
     collection_date: data.collection_date,
     condition: data.condition,
@@ -111,7 +106,6 @@ async function fetchSteelbookDetail(id: string): Promise<ItemDetail | null> {
     title: data.title,
     description: data.description,
     notes: data.notes,
-    region: data.region,
     release_date: data.release_date,
     collection_date: data.collection_date,
     condition: data.condition,

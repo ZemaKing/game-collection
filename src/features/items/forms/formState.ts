@@ -17,11 +17,9 @@ export interface ItemFormState {
   tagIds: string[]
 
   platform_id: string
-  region: string
 
   developer: string
   publisher: string
-  barcode: string
   genreIds: string[]
 
   edition_name: string
@@ -52,11 +50,9 @@ export const EMPTY_ITEM_FORM_STATE: ItemFormState = {
   tagIds: [],
 
   platform_id: '',
-  region: '',
 
   developer: '',
   publisher: '',
-  barcode: '',
   genreIds: [],
 
   edition_name: '',
@@ -93,10 +89,8 @@ export function detailToFormState(
     description: detail.description ?? '',
     tagIds,
     platform_id: detail.platform?.id ?? '',
-    region: detail.region ?? '',
     developer: detail.developer ?? '',
     publisher: detail.publisher ?? '',
-    barcode: detail.barcode ?? '',
     genreIds,
     edition_name: detail.edition_name ?? '',
     game_title: detail.game_title ?? '',

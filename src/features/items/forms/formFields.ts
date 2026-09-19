@@ -26,7 +26,6 @@ const collectionDateField: FormFieldDef = {
   kind: 'date',
 }
 const conditionField: FormFieldDef = { name: 'condition', labelKey: 'filters.condition', kind: 'conditionSelect' }
-const regionField: FormFieldDef = { name: 'region', labelKey: 'detail.region', kind: 'text' }
 
 const notesSection: FormSectionDef = {
   titleKey: 'form.sectionNotes',
@@ -54,8 +53,6 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
       fields: [
         { name: 'developer', labelKey: 'detail.developer', kind: 'text' },
         { name: 'publisher', labelKey: 'detail.publisher', kind: 'text' },
-        regionField,
-        { name: 'barcode', labelKey: 'detail.barcode', kind: 'text' },
       ],
     },
     notesSection,
@@ -70,7 +67,6 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         releaseDateField,
         collectionDateField,
         conditionField,
-        regionField,
       ],
     },
     notesSection,
@@ -87,7 +83,6 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         releaseDateField,
         collectionDateField,
         conditionField,
-        regionField,
       ],
     },
     notesSection,

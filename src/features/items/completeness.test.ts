@@ -11,7 +11,6 @@ import type { AllItemRow, ItemType } from '@/features/items/types'
 const EMPTY_FACTS: CompletenessFacts = {
   hasSubtitle: false,
   hasPlatform: false,
-  hasRegion: false,
   hasReleaseDate: false,
   hasCollectionDate: false,
   hasCondition: false,
@@ -22,7 +21,6 @@ const EMPTY_FACTS: CompletenessFacts = {
 const FULL_FACTS: CompletenessFacts = {
   hasSubtitle: true,
   hasPlatform: true,
-  hasRegion: true,
   hasReleaseDate: true,
   hasCollectionDate: true,
   hasCondition: true,
@@ -47,7 +45,7 @@ describe('calculateCompleteness', () => {
     }
   })
 
-  it('ignores platform/region for types that never have them', () => {
+  it('ignores platform for types that never have them', () => {
     const facts: CompletenessFacts = {
       ...EMPTY_FACTS,
       hasSubtitle: true,
@@ -64,9 +62,9 @@ describe('calculateCompleteness', () => {
     }
   })
 
-  it('counts platform/region as applicable for game/special_edition/steelbook', () => {
+  it('counts platform as applicable for game/special_edition/steelbook', () => {
     for (const itemType of PLATFORM_TYPES) {
-      expect(calculateCompleteness(itemType, EMPTY_FACTS).total).toBe(8)
+      expect(calculateCompleteness(itemType, EMPTY_FACTS).total).toBe(7)
     }
   })
 
@@ -75,11 +73,10 @@ describe('calculateCompleteness', () => {
       ...EMPTY_FACTS,
       hasSubtitle: true,
       hasPlatform: true,
-      hasRegion: true,
-      hasReleaseDate: true,
+          hasReleaseDate: true,
     }
-    // 4 of 8 applicable fields for `game`.
-    expect(calculateCompleteness('game', halfGameFacts)).toEqual({ percent: 50, filled: 4, total: 8 })
+    // 3 of 7 applicable fields for `game`.
+    expect(calculateCompleteness('game', halfGameFacts)).toEqual({ percent: 43, filled: 3, total: 7 })
   })
 })
 
@@ -91,7 +88,6 @@ describe('completenessFactsFromRow', () => {
       title: 'Test',
       subtitle: null,
       platform_id: null,
-      region: null,
       release_date: null,
       collection_date: null,
       condition: null,
@@ -116,7 +112,6 @@ describe('completenessFactsFromRow', () => {
         row({
           subtitle: 'Some Studio',
           platform_id: 'p1',
-          region: 'EU',
           release_date: '2026-01-01',
           collection_date: '2026-02-01',
           condition: 'mint',
@@ -136,7 +131,6 @@ describe('completenessFactsFromDetail', () => {
       title: 'Test',
       description: null,
       notes: null,
-      region: null,
       release_date: null,
       collection_date: null,
       condition: null,
@@ -146,7 +140,6 @@ describe('completenessFactsFromDetail', () => {
       genres: [],
       developer: null,
       publisher: null,
-      barcode: null,
       edition_name: null,
       game_title: null,
       steelbook_number: null,
