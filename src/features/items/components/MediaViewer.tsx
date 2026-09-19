@@ -137,6 +137,7 @@ export function MediaViewer({
                 itemType={itemType}
                 alt={current.alt_text ?? itemTitle}
                 iconSize={64}
+                fit="contain"
                 className={
                   zoomed
                     ? 'mx-auto h-[150%] w-[150%] max-w-none cursor-zoom-out'

@@ -132,14 +132,14 @@ export function ItemCard({
           <p className="truncate text-xs text-muted md:hidden">
             {[typeLabel, platformName, item.subtitle].filter(Boolean).join(' · ') || ' '}
           </p>
-          <div className="hidden min-w-0 items-center gap-1.5 md:flex">
-            <p className="min-w-0 flex-1 truncate text-xs text-muted">{item.subtitle || ' '}</p>
-            {item.genre_slug && <GenreIcon slug={item.genre_slug} name={item.genre_name} />}
-          </div>
+          <p className="hidden min-w-0 truncate text-xs text-muted md:block">{item.subtitle || ' '}</p>
         </div>
 
         <div className="hidden shrink-0 items-center gap-4 md:flex">
           {showTypeBadge && <TypeBadge item={item} />}
+          <span className="flex w-4 shrink-0 justify-center">
+            {item.genre_slug && <GenreIcon slug={item.genre_slug} name={item.genre_name} />}
+          </span>
           <span className="w-28 truncate text-xs text-muted">{platformName ?? '—'}</span>
           <span className="w-10 text-xs text-muted">{releaseYear ?? '—'}</span>
         </div>
