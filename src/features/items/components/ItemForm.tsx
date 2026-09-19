@@ -1,5 +1,7 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, CloseIcon } from '@/components/icons/ActionIcons'
+import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { DatePickerField } from '@/components/ui/DatePickerField'
 import { ErrorState } from '@/components/ui/ErrorState'
@@ -283,20 +285,12 @@ export function ItemForm({
         <div className="flex items-center justify-between gap-3">
           <h1 className="flex items-center gap-2 text-xl font-bold text-text">{title}</h1>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => guardAction(onCancel)}
-              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
-            >
+            <Button icon={CloseIcon} onClick={() => guardAction(onCancel)}>
               {t('filters.cancel')}
-            </button>
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
-            >
+            </Button>
+            <Button type="submit" variant="primary" icon={CheckIcon} disabled={isSaving}>
               {isSaving ? t('form.saving') : submitLabel}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -348,31 +342,20 @@ export function ItemForm({
 
       {isMobile && (
         <div className="sticky inset-x-0 bottom-0 z-10 -mx-4 mt-auto flex items-center justify-between gap-3 border-t border-border bg-card p-4">
-          <button
-            type="button"
+          <Button
+            icon={stepIndex === 0 ? CloseIcon : ArrowLeftIcon}
             onClick={() => (stepIndex === 0 ? guardAction(onCancel) : setStepIndex((i) => i - 1))}
-            className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
           >
             {stepIndex === 0 ? t('filters.cancel') : t('form.back')}
-          </button>
+          </Button>
           {isLastStep ? (
-            <button
-              key="submit"
-              type="submit"
-              disabled={isSaving}
-              className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
-            >
+            <Button key="submit" type="submit" variant="primary" icon={CheckIcon} disabled={isSaving}>
               {isSaving ? t('form.saving') : submitLabel}
-            </button>
+            </Button>
           ) : (
-            <button
-              key="next"
-              type="button"
-              onClick={() => setStepIndex((i) => i + 1)}
-              className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
-            >
+            <Button key="next" variant="primary" icon={ArrowRightIcon} onClick={() => setStepIndex((i) => i + 1)}>
               {t('form.next')}
-            </button>
+            </Button>
           )}
         </div>
       )}

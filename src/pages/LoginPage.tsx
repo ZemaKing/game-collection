@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate, type Location } from 'react-router-dom'
+import { ArrowRightIcon } from '@/components/icons/ActionIcons'
+import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 
@@ -76,13 +78,9 @@ function LoginPage() {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
-        >
+        <Button type="submit" variant="primary" icon={ArrowRightIcon} disabled={submitting}>
           {submitting ? t('auth.signingIn') : t('auth.signIn')}
-        </button>
+        </Button>
       </form>
     </div>
   )

@@ -1,4 +1,6 @@
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/Dialog'
+import { CheckIcon, CloseIcon, TrashIcon } from '@/components/icons/ActionIcons'
+import { Button } from '@/components/ui/Button'
+import { Dialog,DialogContent, DialogDescription, DialogTitle } from '@/components/ui/Dialog'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -28,27 +30,19 @@ export function ConfirmDialog({
         <DialogTitle className="text-lg font-semibold text-text">{title}</DialogTitle>
         <DialogDescription className="mt-2 text-sm text-muted">{description}</DialogDescription>
         <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
-          >
+          <Button icon={CloseIcon} onClick={() => onOpenChange(false)}>
             {cancelLabel}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant={isDestructive ? 'danger' : 'primary'}
+            icon={isDestructive ? TrashIcon : CheckIcon}
             onClick={() => {
               onConfirm()
               onOpenChange(false)
             }}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${
-              isDestructive
-                ? 'bg-danger text-white hover:bg-danger/90'
-                : 'bg-accent text-accent-fg hover:bg-accent-hover'
-            }`}
           >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

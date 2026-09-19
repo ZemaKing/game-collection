@@ -1,6 +1,9 @@
 import * as RadixDialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { useState, type ComponentType, type ReactNode } from 'react'
+import { CheckIcon, CloseIcon } from '@/components/icons/ActionIcons'
+import { Button, ButtonIcon } from '@/components/ui/Button'
+import { buttonClasses } from '@/components/ui/buttonStyles'
 import { DatePickerField } from '@/components/ui/DatePickerField'
 import { parseIsoDate } from '@/lib/isoDate'
 import {
@@ -13,6 +16,7 @@ import {
   CONDITION_LABEL_KEYS,
   DEFAULT_GENRE_META,
   GENRE_META,
+  PLATFORM_ICONS,
 } from '@/features/items/constants'
 import type { Genre, Platform } from '@/features/items/types'
 import type { Tag } from '@/features/items/api'
@@ -149,6 +153,8 @@ export function FilterSheet({
                     <CheckboxRow
                       key={platform.id}
                       label={platform.name}
+                      icon={PLATFORM_ICONS[platform.slug]}
+                      iconColor="text-muted"
                       checked={draft.platformIds.includes(platform.id)}
                       onChange={() =>
                         setDraft((d) => ({ ...d, platformIds: toggleValue(d.platformIds, platform.id) }))
@@ -258,16 +264,13 @@ export function FilterSheet({
               {t('filters.clearAll')}
             </button>
             <div className="flex items-center gap-2">
-              <RadixDialog.Close className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover">
+              <RadixDialog.Close className={buttonClasses({ variant: 'neutral', size: 'sm' })}>
+                <ButtonIcon icon={CloseIcon} variant="neutral" size="sm" />
                 {t('filters.cancel')}
               </RadixDialog.Close>
-              <button
-                type="button"
-                onClick={apply}
-                className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
-              >
+              <Button variant="primary" size="sm" icon={CheckIcon} onClick={apply}>
                 {t('filters.apply')}
-              </button>
+              </Button>
             </div>
           </div>
         </RadixDialog.Content>

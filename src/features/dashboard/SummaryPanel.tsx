@@ -9,6 +9,9 @@ import {
   ITEM_TYPE_ROUTES,
   ITEM_TYPES,
 } from '@/features/items/constants'
+import { ArrowRightIcon } from '@/components/icons/ActionIcons'
+import { ButtonIcon } from '@/components/ui/Button'
+import { buttonClasses } from '@/components/ui/buttonStyles'
 import { formatRelativeTime } from '@/features/items/format'
 import type { DashboardSummary, GenreSummaryRow } from '@/features/items/api'
 import type { AllItemRow } from '@/features/items/types'
@@ -151,8 +154,9 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
         )}
         <Link
           to="/recently-added"
-          className="mt-3 block rounded-lg border border-border bg-surface px-3 py-2 text-center text-sm font-semibold text-text hover:bg-card-hover"
+          className={buttonClasses({ className: 'mt-3 w-full' })}
         >
+          <ButtonIcon icon={ArrowRightIcon} />
           {t('dashboard.viewAll')}
         </Link>
       </section>

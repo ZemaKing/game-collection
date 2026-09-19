@@ -1,5 +1,7 @@
 import { Clock } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { PlusIcon } from '@/components/icons/ActionIcons'
+import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { fetchItems, fetchPlatforms } from '@/features/items/api'
@@ -175,13 +177,9 @@ function RecentlyAddedPage() {
       )}
 
       {hasMore && !loading && (
-        <button
-          type="button"
-          onClick={() => setPage((p) => p + 1)}
-          className="self-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-card-hover"
-        >
+        <Button icon={PlusIcon} className="self-center" onClick={() => setPage((p) => p + 1)}>
           {t('listing.loadMore')}
-        </button>
+        </Button>
       )}
     </div>
   )

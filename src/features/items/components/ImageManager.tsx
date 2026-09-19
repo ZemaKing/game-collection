@@ -1,5 +1,13 @@
-import { ImageUp, Star, Trash2 } from 'lucide-react'
+import { ImageUp, Star } from 'lucide-react'
 import { useRef, useState, type DragEvent } from 'react'
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  CheckIcon,
+  EditIcon,
+  TrashIcon,
+} from '@/components/icons/ActionIcons'
+import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
@@ -189,50 +197,48 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
               />
 
               <div className="flex flex-wrap items-center gap-1.5">
-                <button
-                  type="button"
+                <Button
+                  size="xs"
+                  variant="primary"
+                  icon={CheckIcon}
                   disabled={image.is_cover}
                   onClick={() => void makeCover(image)}
-                  className="rounded-full border border-border px-2 py-1 text-tiny font-medium text-text hover:bg-card-hover disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {t('images.setCover')}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="xs"
+                  icon={ArrowUpIcon}
                   disabled={index === 0}
                   onClick={() => void moveImage(image, -1)}
                   aria-label={t('images.moveUp')}
-                  className="rounded-full border border-border px-2 py-1 text-tiny font-medium text-text hover:bg-card-hover disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  ↑
-                </button>
-                <button
-                  type="button"
+                />
+                <Button
+                  size="xs"
+                  icon={ArrowDownIcon}
                   disabled={index === images.length - 1}
                   onClick={() => void moveImage(image, 1)}
                   aria-label={t('images.moveDown')}
-                  className="rounded-full border border-border px-2 py-1 text-tiny font-medium text-text hover:bg-card-hover disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  ↓
-                </button>
-                <button
-                  type="button"
+                />
+                <Button
+                  size="xs"
+                  icon={EditIcon}
                   onClick={() => {
                     replaceTargetRef.current = image
                     replaceInputRef.current?.click()
                   }}
-                  className="rounded-full border border-border px-2 py-1 text-tiny font-medium text-text hover:bg-card-hover"
                 >
                   {t('images.replace')}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="xs"
+                  variant="danger"
+                  icon={TrashIcon}
+                  className="ml-auto"
                   onClick={() => setDeleteTarget(image)}
-                  className="ml-auto flex items-center gap-1 rounded-full border border-danger px-2 py-1 text-tiny font-medium text-danger hover:bg-danger-bg"
                 >
-                  <Trash2 size={12} />
                   {t('images.delete')}
-                </button>
+                </Button>
               </div>
             </div>
           ))}

@@ -8,6 +8,8 @@ import {
   fetchTags,
   type Tag,
 } from '@/features/items/api'
+import { PlusIcon } from '@/components/icons/ActionIcons'
+import { Button } from '@/components/ui/Button'
 import { ITEM_TYPE_META, PLATFORM_ICONS } from '@/features/items/constants'
 import { useFilters } from '@/features/items/useFilters'
 import { useItemListing } from '@/features/items/useItemListing'
@@ -192,13 +194,9 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
       )}
 
       {hasMore && !loading && (
-        <button
-          type="button"
-          onClick={() => setPage((p) => p + 1)}
-          className="self-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
-        >
+        <Button icon={PlusIcon} className="self-center" onClick={() => setPage((p) => p + 1)}>
           {t('listing.loadMore')}
-        </button>
+        </Button>
       )}
     </div>
   )

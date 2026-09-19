@@ -1,6 +1,8 @@
-import { Pencil, Trash2 } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { EditIcon, TrashIcon } from '@/components/icons/ActionIcons'
+import { Button, ButtonIcon } from '@/components/ui/Button'
+import { buttonClasses } from '@/components/ui/buttonStyles'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { fetchPlatforms } from '@/features/items/api'
@@ -150,8 +152,8 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-      <div className="flex flex-col gap-3 lg:w-72 lg:shrink-0 xl:w-80">
+    <div className="flex flex-col gap-6 md:flex-row md:items-start">
+      <div className="flex flex-col gap-3 md:w-64 md:shrink-0 lg:w-72 xl:w-80">
         {coverImage ? (
           <button
             type="button"
@@ -184,7 +186,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
           {images.length === 0 ? (
             <p className="text-sm text-muted">{t('detail.noImages')}</p>
           ) : (
-            <div className="grid grid-cols-4 gap-2 lg:grid-cols-3">
+            <div className="grid grid-cols-4 gap-2 md:grid-cols-3">
               {images.map((image, i) => (
                 <button
                   key={image.id}
@@ -218,20 +220,19 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
             <div className="flex shrink-0 items-center gap-2">
               <Link
                 to={`/${ITEM_TYPE_ROUTES[itemType]}/${id}/edit`}
-                className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-text hover:bg-card-hover"
+                className={buttonClasses({ variant: 'primary' })}
               >
-                <Pencil size={14} />
+                <ButtonIcon icon={EditIcon} variant="primary" />
                 {t('form.edit')}
               </Link>
-              <button
-                type="button"
+              <Button
+                variant="danger"
+                icon={TrashIcon}
                 onClick={() => setDeleteDialogOpen(true)}
                 disabled={isDeleting}
-                className="flex items-center gap-1.5 rounded-full border border-danger px-3 py-1.5 text-sm font-semibold text-danger hover:bg-danger-bg disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <Trash2 size={14} />
                 {t('form.delete')}
-              </button>
+              </Button>
             </div>
           )}
         </header>

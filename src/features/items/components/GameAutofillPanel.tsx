@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import { CheckIcon, CloseIcon } from '@/components/icons/ActionIcons'
+import { Button } from '@/components/ui/Button'
 import type { ItemFormState } from '@/features/items/forms/formState'
 import { useGameAutofillSearch } from '@/features/items/forms/useGameAutofillSearch'
 import {
@@ -230,21 +232,18 @@ export function GameAutofillPanel({ form, genres, platforms, onApply }: GameAuto
           {artworkError && <p className="text-xs text-danger">{t(errorMessageKey(artworkError.kind))}</p>}
 
           <div className="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={reset}
-              className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-text hover:bg-card-hover"
-            >
+            <Button size="sm" icon={CloseIcon} onClick={reset}>
               {t('autofill.discardPreview')}
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              size="sm"
+              variant="primary"
+              icon={CheckIcon}
               disabled={applying}
               onClick={() => void handleApply()}
-              className="rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
               {t('autofill.applySelected')}
-            </button>
+            </Button>
           </div>
         </div>
       )}

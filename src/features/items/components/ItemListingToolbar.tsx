@@ -17,6 +17,9 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { useEffect, useMemo, useState, type ComponentType } from 'react'
+import { CloseIcon } from '@/components/icons/ActionIcons'
+import { ButtonIcon } from '@/components/ui/Button'
+import { buttonClasses } from '@/components/ui/buttonStyles'
 import { SORT_KEYS, type SortKey, type Tag } from '@/features/items/api'
 import {
   CONDITION_COLORS,
@@ -210,9 +213,9 @@ export function ItemListingToolbar({
             <button
               type="button"
               onClick={clearAll}
-              className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm font-semibold text-accent hover:bg-card-hover"
+              className={buttonClasses({ size: 'sm' })}
             >
-              <X size={14} />
+              <ButtonIcon icon={CloseIcon} size="sm" />
               {t('filters.clearAll')}
             </button>
           )}

@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/Dialog'
+import { EditIcon, PlusIcon } from '@/components/icons/ActionIcons'
+import { Button } from '@/components/ui/Button'
+import { Dialog,DialogContent, DialogDescription, DialogTitle } from '@/components/ui/Dialog'
 import { ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
@@ -50,40 +52,32 @@ export function DuplicateWarningDialog({
                 {item.subtitle && <p className="truncate text-xs text-muted">{item.subtitle}</p>}
               </div>
               <div className="flex shrink-0 gap-1.5">
-                <button
-                  type="button"
+                <Button
+                  size="xs"
                   onClick={() => navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${item.id}`)}
-                  className="rounded-full border border-border px-2.5 py-1 text-xs font-medium text-text hover:bg-card-hover"
                 >
                   {t('duplicates.viewExisting')}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="xs"
+                  variant="primary"
+                  icon={EditIcon}
                   onClick={() => navigate(`/${ITEM_TYPE_ROUTES[itemType]}/${item.id}/edit`)}
-                  className="rounded-full border border-border px-2.5 py-1 text-xs font-medium text-text hover:bg-card-hover"
                 >
                   {t('duplicates.updateExisting')}
-                </button>
+                </Button>
               </div>
             </li>
           ))}
         </ul>
 
         <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onDismiss}
-            className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
-          >
+          <Button icon={EditIcon} onClick={onDismiss}>
             {t('form.keepEditing')}
-          </button>
-          <button
-            type="button"
-            onClick={onAddAnyway}
-            className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
-          >
+          </Button>
+          <Button variant="primary" icon={PlusIcon} onClick={onAddAnyway}>
             {t('duplicates.addAnyway')}
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

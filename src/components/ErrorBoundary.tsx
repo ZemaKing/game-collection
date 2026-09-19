@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { Button } from '@/components/ui/Button'
 import { translate, type Locale } from '@/lib/i18n'
 
 function getLocale(): Locale {
@@ -35,13 +36,9 @@ export class ErrorBoundary extends Component<Props, State> {
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-surface px-4 text-center">
         <h1 className="text-lg font-semibold text-primary">{t('errorBoundary.title')}</h1>
         <p className="max-w-sm text-sm text-secondary">{t('errorBoundary.description')}</p>
-        <button
-          type="button"
-          onClick={() => window.location.reload()}
-          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white"
-        >
+        <Button variant="primary" onClick={() => window.location.reload()}>
           {t('errorBoundary.reload')}
-        </button>
+        </Button>
       </div>
     )
   }

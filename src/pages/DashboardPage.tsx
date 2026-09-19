@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { ArrowRightIcon } from '@/components/icons/ActionIcons'
+import { ButtonIcon } from '@/components/ui/Button'
+import { buttonClasses } from '@/components/ui/buttonStyles'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -218,8 +221,9 @@ function DashboardPage() {
           {hasMore && !loading && (
             <Link
               to={{ pathname: '/items', search: searchParams.toString() }}
-              className="self-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-text hover:bg-card-hover"
+              className={buttonClasses({ className: 'self-center' })}
             >
+              <ButtonIcon icon={ArrowRightIcon} />
               {t('dashboard.viewAll')}
             </Link>
           )}
