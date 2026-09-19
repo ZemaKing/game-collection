@@ -25,12 +25,12 @@ export function Topbar() {
   }, [])
 
   return (
-    <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-3 md:px-6">
+    <header className="flex items-center gap-2 border-b border-border bg-surface px-4 py-3 sm:gap-3 md:px-6">
       <button
         type="button"
         onClick={() => setNavOpen(true)}
         aria-label={t('topbar.menu')}
-        className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-bg text-text md:hidden"
+        className="flex size-[40px] shrink-0 items-center justify-center rounded-full border border-border bg-bg text-text md:hidden"
       >
         <Menu size={18} />
       </button>
@@ -56,12 +56,12 @@ export function Topbar() {
       <Link
         to="/search"
         aria-label={t('topbar.search')}
-        className="flex size-10 items-center justify-center rounded-full border border-border bg-bg text-text sm:hidden"
+        className="flex size-[40px] shrink-0 items-center justify-center rounded-full border border-border bg-bg text-text sm:hidden"
       >
         <Search size={18} />
       </Link>
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
         <LocaleToggle />
         <ThemeToggle />
         <NavLink
@@ -69,7 +69,7 @@ export function Topbar() {
           aria-label={t('nav.settings')}
           title={t('nav.settings')}
           className={({ isActive }) =>
-            `flex size-10 items-center justify-center rounded-full border border-border text-text hover:bg-card-hover ${
+            `flex size-[40px] shrink-0 items-center justify-center rounded-full border border-border text-text hover:bg-card-hover ${
               isActive ? 'bg-accent text-accent-fg hover:bg-accent' : 'bg-surface'
             }`
           }

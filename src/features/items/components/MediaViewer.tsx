@@ -84,13 +84,13 @@ export function MediaViewer({
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black" />
         <RadixDialog.Content
-          className="fixed inset-0 z-50 flex flex-col bg-black outline-none"
+          className="fixed inset-0 z-50 flex flex-col bg-black pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] outline-none"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
           <RadixDialog.Title className="sr-only">{itemTitle}</RadixDialog.Title>
 
-          <div className="flex items-center justify-between gap-3 p-3 text-white sm:p-4">
+          <div className="flex items-center justify-between gap-3 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white sm:p-4 sm:pt-[max(1rem,env(safe-area-inset-top))]">
             <span className="text-sm font-medium">
               {t('viewer.imageCount', { current: String(index + 1), total: String(images.length) })}
             </span>
@@ -99,7 +99,7 @@ export function MediaViewer({
                 type="button"
                 aria-label={t(zoomed ? 'viewer.zoomOut' : 'viewer.zoomIn')}
                 onClick={() => setZoomed((z) => !z)}
-                className="flex size-9 items-center justify-center rounded-full hover:bg-white/10"
+                className="flex size-11 items-center justify-center rounded-full hover:bg-white/10"
               >
                 {zoomed ? <ZoomOut size={18} /> : <ZoomIn size={18} />}
               </button>
@@ -107,7 +107,7 @@ export function MediaViewer({
                 <button
                   type="button"
                   aria-label={t('viewer.close')}
-                  className="flex size-9 items-center justify-center rounded-full hover:bg-white/10"
+                  className="flex size-11 items-center justify-center rounded-full hover:bg-white/10"
                 >
                   <X size={20} />
                 </button>
@@ -159,7 +159,7 @@ export function MediaViewer({
           </div>
 
           {hasMultiple && (
-            <div className="flex shrink-0 gap-2 overflow-x-auto p-3 sm:p-4">
+            <div className="flex shrink-0 gap-2 overflow-x-auto p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4 sm:pb-[max(1rem,env(safe-area-inset-bottom))] [@media(max-height:480px)]:hidden">
               {images.map((image, i) => (
                 <button
                   key={image.id}

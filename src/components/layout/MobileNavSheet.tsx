@@ -66,12 +66,12 @@ export function MobileNavSheet({ open, onOpenChange }: MobileNavSheetProps) {
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
-        <RadixDialog.Content className="fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col overflow-y-auto bg-surface p-3 text-text shadow-xl outline-none">
+        <RadixDialog.Content className="fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col overflow-y-auto bg-surface p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] text-text shadow-xl outline-none">
           <div className="flex shrink-0 items-center justify-between px-1 py-2">
             <RadixDialog.Title className="sidebar-brand text-text">
               {t('sidebar.title')}
             </RadixDialog.Title>
-            <RadixDialog.Close aria-label={t('search.clear')} className="text-muted hover:text-text">
+            <RadixDialog.Close aria-label={t('search.clear')} className="flex size-10 items-center justify-center rounded-full text-muted hover:text-text">
               <X size={20} />
             </RadixDialog.Close>
           </div>

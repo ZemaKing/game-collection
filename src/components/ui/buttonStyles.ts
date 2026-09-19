@@ -24,9 +24,9 @@ export const VARIANT_CLASSES: Record<ButtonVariant, { root: string; icon: string
 }
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
-  md: 'gap-2 rounded-xl px-5 py-2 text-sm',
-  sm: 'gap-1.5 rounded-lg px-3 py-1.5 text-xs',
-  xs: 'gap-1 rounded-lg px-2 py-1 text-tiny',
+  md: 'gap-2 rounded-xl px-5 py-2 text-sm pointer-coarse:min-h-11',
+  sm: 'gap-1.5 rounded-lg px-3 py-1.5 text-xs pointer-coarse:min-h-10',
+  xs: 'gap-1 rounded-lg px-2 py-1 text-tiny pointer-coarse:min-h-10 pointer-coarse:min-w-10',
 }
 
 interface ButtonClassOptions {

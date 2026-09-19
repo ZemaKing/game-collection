@@ -59,7 +59,7 @@ export function MultiSelect<T extends MultiSelectOption>({
             return (
               <span
                 key={option.id}
-                className={`relative flex items-center gap-1 rounded-full border pl-2.5 pr-2.5 py-1 text-xs font-medium transition-colors focus-within:ring-2 focus-within:ring-accent/50 ${
+                className={`relative flex items-center gap-1 rounded-full border pl-2.5 pr-2.5 py-1 pointer-coarse:py-2.5 text-xs font-medium transition-colors focus-within:ring-2 focus-within:ring-accent/50 ${
                   meta
                     ? checked
                       ? `${meta.colorClass} border-current bg-card-hover`
@@ -76,7 +76,7 @@ export function MultiSelect<T extends MultiSelectOption>({
                     aria-label={isPrimary ? t('form.primaryGenre') : t('form.setPrimaryGenre')}
                     aria-pressed={isPrimary}
                     title={isPrimary ? t('form.primaryGenre') : t('form.setPrimaryGenre')}
-                    className="-ml-0.5 flex items-center"
+                    className="-my-2 -ml-2.5 flex items-center p-2 pl-2.5"
                   >
                     <Star size={12} className={isPrimary ? 'fill-current' : 'opacity-50'} />
                   </button>

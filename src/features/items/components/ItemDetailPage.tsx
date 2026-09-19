@@ -68,7 +68,7 @@ function ExpandableDescription({ text }: { text: string }) {
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="mt-1 text-sm font-semibold text-accent hover:text-accent-hover"
+          className="-my-2 py-2.5 text-sm font-semibold text-accent hover:text-accent-hover"
         >
           {t(expanded ? 'detail.readLess' : 'detail.readMore')}
         </button>

@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 26 — Profile & Collection Overview (Post-MVP)  
+Current Phase: Phase 28 — Accessibility Pass (Post-MVP)  
 MVP Status: Complete
 
 ## MVP Progress
@@ -50,7 +50,7 @@ MVP Status: Complete
 - [x] Phase 24 — Statistics & Collection Insights
 - [x] Phase 25 — Settings & Preferences
 - [x] Phase 26 — Profile & Collection Overview
-- [ ] Phase 27 — Responsive Refinement Pass
+- [x] Phase 27 — Responsive Refinement Pass
 - [ ] Phase 28 — Accessibility Pass
 - [ ] Phase 29 — Performance Pass
 - [ ] Phase 30 — Testing Hardening
@@ -1008,26 +1008,63 @@ Perform a deliberate three-device review of every implemented screen and state.
 
 ### Tasks
 
-- [ ] Create route/state/device verification matrix
-- [ ] Review Dashboard, All Items, six type pages, platforms, Recently Added, Search, Filters, Details, relationships, Gallery, CRUD, Stats, Settings, and Profile
-- [ ] Review Grid/List, empty/loading/error/no-results, duplicate warning, and unsaved changes
-- [ ] Fix overflow, density, tap targets, sticky controls, safe areas, and virtual-keyboard issues
-- [ ] Confirm no feature depends exclusively on hover
+- [x] Create route/state/device verification matrix — see the matrix below. Method: an in-browser audit script walked every public route at each width and reported (a) horizontal overflow of the page or `main`, (b) any element painted outside the viewport (excluding intentional scroll containers), (c) list-row children escaping their card, and (d) interactive elements under 32px. It was re-run after every fix until clean
+- [x] Review Dashboard, All Items, six type pages, platforms, Recently Added, Search, Filters, Details, relationships, Gallery, CRUD, Stats, Settings, and Profile — public screens verified in the browser; CRUD (forms, image manager) is owner-only and was reviewed in code only (see "Not verified" below)
+- [x] Review Grid/List, empty/loading/error/no-results, duplicate warning, and unsaved changes — Grid and List checked on every listing surface; no-results and the open filter sheet checked at 320px; the duplicate and unsaved-changes dialogs share the `Dialog` primitive that was fixed (not opened in a browser, they need owner sign-in)
+- [x] Fix overflow, density, tap targets, sticky controls, safe areas, and virtual-keyboard issues — see "Findings fixed" below
+- [x] Confirm no feature depends exclusively on hover — grepped every `hover:`/`group-hover` use: all are decoration (colour change, arrow nudge, thumbnail opacity). The one hover-revealed control, the grid card's owner "more" menu, is always visible and now has a 36px target
+
+**Findings fixed**
+
+- Topbar overflowed at 320px (search button squashed to an oval): tighter gaps below `sm`, `shrink-0` on every button. Icon buttons are now `size-[40px]` rather than `size-10` so they don't grow past the bar when the user raises their font size
+- Dashboard overflowed horizontally at 1024px in List view (`main` scrolled 451px sideways, the type tiles were cut off): the `1fr` grid track grew to the list row's intrinsic width. Fixed with `minmax(0,1fr)`, and `ItemCard`'s list row now switches between its tablet and desktop layouts by **container width** (`@4xl`) instead of viewport width (`lg`), so the dashboard's narrower column gets the tablet row while All Items at the same viewport still gets the desktop row
+- Recently Added rows: the edition badge escaped its card at 320px (`shrink-0` + a percentage `max-width`); the badge now shrinks and truncates. Genre/platform and completeness/condition lines wrap instead of overflowing
+- Safe areas: added `viewport-fit=cover` and `env(safe-area-inset-*)` to the shell (left/right), bottom tab bar, `main` bottom padding, the form's sticky action bar, the filter sheet, the mobile nav sheet and the media viewer
+- Edit routes on mobile had 80px of dead space under the form's sticky bar (`AppShell` only special-cased `/items/new`); it now treats every Add/Edit route the same way the tab bar does
+- `Dialog`: was `w-full` with no margin and no height limit, so on a 320px phone it touched both edges and could run off-screen when the keyboard was up. Now `calc(100% - 2rem)` wide, `max-h` of the dynamic viewport, scrolls internally; the close button is a 40px target. `SearchDialog` got the same width/height caps
+- Tap targets: "Read more", dashboard/Statistics "Show more" and the filter sheet's "Clear all" were ~20px tall (padding added without moving the layout); media-viewer buttons 36 → 44px; card "more" menu 28 → 36px; close buttons on the sheets 40px. Buttons and filter/genre chips also get a `pointer-coarse:` minimum height (40–44px), so touch devices get bigger targets without changing the mouse layout
+- Font scaling: the typography tokens in `index.css` (and the edition badge) were fixed `px`, so the browser's text-size setting did nothing. Converted to `rem` (identical at the default size). At 150% text the bottom tab bar now wraps its labels instead of overflowing, and the edition badge uses `min-h` instead of a fixed height
+- Media viewer: thumbnail strip is hidden in short landscape viewports (`max-height: 480px`) so the image keeps the room; prev/next still work
+- Dashboard tile labels ("Specijalna izdanja") wrap to two lines instead of being cut off
+
+**Verification matrix** (✓ = audit clean; audited in Serbian, dark theme)
+
+| Route / state | 320 | 375 | 768 | 820 | 1024 | 1440 | 1920 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Dashboard `/` | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ |
+| All Items `/items` | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ |
+| Type listings (all six) | ✓ | Special Editions | ✓ | – | Games, Special Editions | Games, Special Editions | – |
+| Platform page (`/platforms/playstation-5`) | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ |
+| Recently Added | ✓ | ✓ | ✓ | – | ✓ | ✓ | – |
+| Search page | ✓ | – | ✓ | – | – | – | – |
+| Statistics, Profile, Settings | ✓ | ✓ | ✓ | – | ✓ | ✓ | Statistics, Profile |
+| Detail pages (all six types) | ✓ | Game, Special Edition | ✓ | Special Edition | Game, Special Edition | Game, Special Edition | Game |
+| Login, not-found | ✓ | – | Login | – | – | – | – |
+| Filter sheet, no-results state, mobile nav sheet | ✓ | nav sheet | – | – | – | – | – |
+| Media viewer (844×390 landscape phone) | – | – | – | – | – | – | – |
+
+Grid and List views were both audited on Dashboard, All Items and the type/platform listings (List at 320, 768, 1024, 1440 and 1920; Grid at 320, 375, 1024 and 1920). The media viewer row is checked at 844×390 only: controls are 44px, thumbnails hide, the image fills the space.
 
 ### Testing & Verification
 
-- [ ] Desktop: 1440px and representative wider/narrower widths
-- [ ] Tablet: 768px–1024px in portrait and landscape where relevant
-- [ ] Mobile: 320px–430px including safe-area behavior
-- [ ] Long titles, large font scaling, missing images, and dense metadata remain usable
+- [x] Desktop: 1440px and representative wider/narrower widths — 1024, 1440 and 1920px; the sidebar's expanded (≥1280) and icon-rail (768–1279) states both covered
+- [x] Tablet: 768px–1024px in portrait and landscape where relevant — 768×1024, 820×1180, 1024×768
+- [x] Mobile: 320px–430px including safe-area behavior — 320, 375 and an 844×390 landscape phone. 430px was not run separately (it sits between 375 and 768 in the same layout). Safe-area **insets** can't be simulated in the Browser pane (they evaluate to 0), so that code is correct by construction (`max(<old padding>, env(...))`, which is a no-op when the inset is 0) but was not seen on a notched device
+- [x] Long titles, large font scaling, missing images, and dense metadata remain usable — 150% root font size at 375px is clean on the public routes; long titles truncate or clamp; the seed data has items with no cover art and all of them render the placeholder without overflow
+
+**Owner-only and device items (initially code-reviewed only; confirmed by the owner afterwards)**
+
+- Add/Edit forms, the image manager, the duplicate-warning and unsaved-changes dialogs, and owner-only controls (card "more" menu, Add button in the tab bar) were changed and reviewed in code but not opened in a browser — the audit can't sign in
+- Virtual-keyboard behavior (form sticky bar, dialogs) — the fixes (`dvh` height caps, `overflow-y-auto` dialogs) are standard, but the keyboard can't be emulated here
+- Safe-area insets on a physical notched phone; light theme and English were not re-audited after the fixes (the changes are layout-only)
 
 ### Definition of Done
 
-- [ ] Every route and important state has verified device-appropriate behavior
+- [x] Every route and important state has verified device-appropriate behavior — public routes by the audit above; owner-only screens (forms, image manager, duplicate and unsaved-changes dialogs), virtual keyboard and safe areas confirmed by the owner in a signed-in pass
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

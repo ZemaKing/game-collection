@@ -44,7 +44,7 @@ function StatTile({ label, value, icon: Icon, iconColor, hoverBorder, to, compac
         <Icon size={18} className={`shrink-0 ${iconColor}`} />
         <div className="flex min-w-0 flex-col md:w-full md:items-center">
           <p className="stat-number text-text">{value}</p>
-          <p className="stat-label w-full truncate text-muted">{label}</p>
+          <p className="stat-label w-full line-clamp-2 text-muted">{label}</p>
         </div>
       </Link>
     )
@@ -119,7 +119,7 @@ export function SummaryPanel({ summary, genres, recentItems, compact = false }: 
             <button
               type="button"
               onClick={() => setShowAllGenres((v) => !v)}
-              className="mt-2 text-sm font-medium text-accent hover:text-accent-hover"
+              className="mt-2 -mb-2 py-2.5 text-sm font-medium text-accent hover:text-accent-hover"
             >
               {showAllGenres ? t('dashboard.genresShowLess') : t('dashboard.genresShowMore')}
             </button>

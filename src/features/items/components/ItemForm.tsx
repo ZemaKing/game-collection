@@ -387,7 +387,7 @@ export function ItemForm({
       )}
 
       {isMobile && (
-        <div className="sticky inset-x-0 bottom-0 z-10 -mx-4 mt-auto flex items-center justify-between gap-3 border-t border-border bg-card p-4">
+        <div className="sticky inset-x-0 bottom-0 z-10 -mx-4 mt-auto flex items-center justify-between gap-3 border-t border-border bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <Button
             icon={stepIndex === 0 ? CloseIcon : ArrowLeftIcon}
             onClick={() => (stepIndex === 0 ? guardAction(onCancel) : setStepIndex((i) => i - 1))}

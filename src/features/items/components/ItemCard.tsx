@@ -188,7 +188,7 @@ export function ItemCard({
     return (
       <Link
         to={to}
-        className={`flex items-center gap-3 rounded-lg border border-border bg-card p-2.5 hover:bg-card-hover ${FOCUS_RING}`}
+        className={`@container flex items-center gap-3 rounded-lg border border-border bg-card p-2.5 hover:bg-card-hover ${FOCUS_RING}`}
       >
         <div className="relative aspect-[4/5] w-14 shrink-0 self-stretch md:w-16">
           <ItemImage
@@ -208,12 +208,12 @@ export function ItemCard({
             <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted">
               {typeLabel && <span className="shrink-0">{typeLabel} ·</span>}
               {item.item_type === 'game' && item.subtitle && <span className="min-w-0 truncate">{item.subtitle}</span>}
-              <EditionBadge name={editionNameOf(item) ?? ''} size="sm" className="-my-0.5 max-w-[65%] shrink-0" />
+              <EditionBadge name={editionNameOf(item) ?? ''} size="sm" className="-my-0.5 min-w-0 shrink" />
             </div>
           ) : (
             <p className="truncate text-xs text-muted">{[typeLabel, item.subtitle].filter(Boolean).join(' · ') || ' '}</p>
           )}
-          <div className="flex min-w-0 items-center gap-1.5">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
             {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
             <span className="flex min-w-0 items-center gap-1 truncate text-xs text-muted">
               {shortPlatform && (
@@ -222,14 +222,14 @@ export function ItemCard({
               {releaseYear && <span>· {releaseYear}</span>}
             </span>
           </div>
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
             <CompletenessBadge percent={completeness.percent} compact />
             <ConditionBadge condition={item.condition} />
           </div>
         </div>
 
         {/* Tablet (md–lg): title/publisher + completeness/condition on top, genre/platform/year below. */}
-        <div className="hidden min-w-0 flex-1 flex-col justify-center gap-1.5 lg:hidden md:flex">
+        <div className="hidden min-w-0 flex-1 flex-col justify-center gap-1.5 md:flex @4xl:hidden">
           <div className="flex min-w-0 items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-text">{item.title}</p>
@@ -253,7 +253,7 @@ export function ItemCard({
         </div>
 
         {/* Desktop (lg+): original horizontal table columns. */}
-        <div className="hidden min-w-0 flex-1 flex-col justify-center gap-1 py-1 lg:flex">
+        <div className="hidden min-w-0 flex-1 flex-col justify-center gap-1 py-1 @4xl:flex">
           <p className="truncate text-sm font-semibold text-text">{item.title}</p>
           {publisher && <p className="truncate text-xs text-muted">{publisher}</p>}
           {editionName && (
@@ -262,7 +262,7 @@ export function ItemCard({
             </div>
           )}
         </div>
-        <div className="hidden shrink-0 items-center gap-6 lg:flex">
+        <div className="hidden shrink-0 items-center gap-6 @4xl:flex">
           {showTypeBadge && <TypeBadge item={item} />}
           <div className="flex w-28 justify-start">
             {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
@@ -274,7 +274,7 @@ export function ItemCard({
           )}
           <span className="w-10 text-xs text-muted">{releaseYear ?? '—'}</span>
         </div>
-        <div className="hidden shrink-0 items-center gap-4 lg:flex">
+        <div className="hidden shrink-0 items-center gap-4 @4xl:flex">
           <CompletenessBadge percent={completeness.percent} compact />
           <div className="flex w-28 justify-end">
             <ConditionBadge condition={item.condition} />
@@ -311,7 +311,7 @@ export function ItemCard({
                   type="button"
                   aria-label={t('form.edit')}
                   onClick={(e) => e.stopPropagation()}
-                  className="relative z-10 -mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-full text-muted hover:bg-card-hover hover:text-text"
+                  className="relative z-10 -mt-2 -mr-2 flex size-9 shrink-0 items-center justify-center rounded-full text-muted hover:bg-card-hover hover:text-text"
                 >
                   <MoreVertical size={16} />
                 </button>

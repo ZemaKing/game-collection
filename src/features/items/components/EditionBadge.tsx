@@ -70,10 +70,10 @@ export function EditionBadge({
         className={`edition-scope edition-badge inline-flex max-w-full min-w-0 items-center gap-2.5 rounded-lg py-1.5 pr-3.5 pl-2 ${className}`}
       >
         <EditionGlyph edition={edition} size={18} className="rounded-md" />
-        <span className="flex min-w-0 flex-col text-[11px] leading-[14px] font-bold tracking-[0.08em] uppercase">
+        <span className="flex min-w-0 flex-col text-[0.6875rem] leading-[0.875rem] font-bold tracking-[0.08em] uppercase">
           <span className="truncate">{parts[0]}</span>
           {parts[1] && (
-            <span className="truncate text-[10px] leading-[12px] font-semibold opacity-80">
+            <span className="truncate text-[0.625rem] leading-[0.75rem] font-semibold opacity-80">
               {parts[1]}
             </span>
           )}
@@ -83,7 +83,7 @@ export function EditionBadge({
   }
 
   const box =
-    size === 'sm' ? 'h-5 gap-1 pr-2 text-[11px]' : 'h-6 gap-1.5 pr-2.5 text-xs'
+    size === 'sm' ? 'min-h-5 gap-1 pr-2 text-[0.6875rem]' : 'min-h-6 gap-1.5 pr-2.5 text-xs'
   return (
     <span
       data-edition={key}

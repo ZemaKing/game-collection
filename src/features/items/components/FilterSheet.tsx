@@ -46,7 +46,7 @@ function CheckboxRow({
   glyph?: ReactNode
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2.5 rounded-md px-1 py-1.5 text-sm text-text hover:bg-card-hover">
+    <label className="flex cursor-pointer items-center gap-2.5 rounded-md px-1 py-1.5 pointer-coarse:py-3 text-sm text-text hover:bg-card-hover">
       <input
         type="checkbox"
         checked={checked}
@@ -127,13 +127,13 @@ export function FilterSheet({
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black/30" />
         <RadixDialog.Content className="fixed inset-0 z-50 flex flex-col bg-card text-text shadow-xl outline-none sm:inset-y-0 sm:left-auto sm:right-0 sm:w-96 sm:max-w-[90vw] sm:border-l sm:border-border">
-          <div className="flex shrink-0 items-center justify-between border-b border-border p-4">
+          <div className="flex shrink-0 items-center justify-between border-b border-border p-4 pt-[max(1rem,env(safe-area-inset-top))]">
             <RadixDialog.Title className="text-lg font-semibold text-text">
               {t('filters.title')}
             </RadixDialog.Title>
             <RadixDialog.Close
               aria-label={t('search.clear')}
-              className="text-muted hover:text-text"
+              className="-mr-2 flex size-10 items-center justify-center rounded-full text-muted hover:text-text"
             >
               <X size={20} />
             </RadixDialog.Close>
@@ -297,11 +297,11 @@ export function FilterSheet({
             </FilterSection>
           </div>
 
-          <div className="sticky bottom-0 flex shrink-0 items-center justify-between gap-3 border-t border-border bg-card p-4">
+          <div className="sticky bottom-0 flex shrink-0 items-center justify-between gap-3 border-t border-border bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <button
               type="button"
               onClick={clearDraft}
-              className="text-sm font-semibold text-accent hover:text-accent-hover"
+              className="-my-2 py-2.5 pr-2 text-sm font-semibold text-accent hover:text-accent-hover"
             >
               {t('filters.clearAll')}
             </button>

@@ -17,7 +17,7 @@ export function LocaleToggle() {
         <button
           type="button"
           aria-label={t('locale.change')}
-          className="flex size-10 items-center justify-center rounded-full border border-border bg-surface text-text hover:bg-card-hover"
+          className="flex size-[40px] shrink-0 items-center justify-center rounded-full border border-border bg-surface text-text hover:bg-card-hover"
         >
           <Languages size={18} />
         </button>

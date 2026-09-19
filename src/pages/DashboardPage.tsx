@@ -169,7 +169,7 @@ function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex flex-col gap-4">
           {error && <ErrorState message={t('listing.error', { message: error })} onRetry={reload} />}
 

@@ -252,7 +252,7 @@ function StatisticsPage() {
                   <button
                     type="button"
                     onClick={() => setShowAllGenres((v) => !v)}
-                    className="mt-2 text-sm font-medium text-accent hover:text-accent-hover"
+                    className="mt-2 -mb-2 py-2.5 text-sm font-medium text-accent hover:text-accent-hover"
                   >
                     {showAllGenres ? t('dashboard.genresShowLess') : t('dashboard.genresShowMore')}
                   </button>

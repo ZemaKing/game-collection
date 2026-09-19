@@ -19,7 +19,7 @@ export function AccountMenu() {
         to="/login"
         aria-label={t('auth.signIn')}
         title={t('auth.signIn')}
-        className="flex size-10 items-center justify-center rounded-full border border-border bg-surface text-text hover:bg-card-hover"
+        className="flex size-[40px] shrink-0 items-center justify-center rounded-full border border-border bg-surface text-text hover:bg-card-hover"
       >
         <LogIn size={18} />
       </Link>
@@ -32,7 +32,7 @@ export function AccountMenu() {
         <button
           type="button"
           title={t('topbar.collector')}
-          className="flex size-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-fg"
+          className="flex size-[40px] shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-fg"
         >
           C
         </button>
