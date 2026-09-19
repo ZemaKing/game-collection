@@ -1,15 +1,15 @@
-import { Clock, Home, Plus, Search, User } from 'lucide-react'
+import { Clock, Gamepad2, LayoutDashboard, Plus, User } from 'lucide-react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
 import type { TranslationKey } from '@/lib/i18n'
 
 const tabs = [
-  { labelKey: 'bottomTab.home', to: '/', icon: Home },
-  { labelKey: 'bottomTab.search', to: '/search', icon: Search },
+  { labelKey: 'nav.dashboard', to: '/', icon: LayoutDashboard },
+  { labelKey: 'nav.games', to: '/games', icon: Gamepad2 },
   { labelKey: 'bottomTab.recentlyAdded', to: '/recently-added', icon: Clock },
   { labelKey: 'bottomTab.profile', to: '/profile', icon: User },
-] satisfies { labelKey: TranslationKey; to: string; icon: typeof Home }[]
+] satisfies { labelKey: TranslationKey; to: string; icon: typeof LayoutDashboard }[]
 
 export function BottomTabBar() {
   const { t } = useLocale()

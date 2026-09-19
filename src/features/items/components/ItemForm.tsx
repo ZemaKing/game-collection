@@ -323,7 +323,7 @@ export function ItemForm({
       )}
 
       {isMobile ? (
-        <section className="flex flex-col gap-4">
+        <section className="flex flex-col gap-4 pb-20">
           <div className="flex items-center gap-1.5">
             {steps.map((step, i) => (
               <span
@@ -357,6 +357,7 @@ export function ItemForm({
           </button>
           {isLastStep ? (
             <button
+              key="submit"
               type="submit"
               disabled={isSaving}
               className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
@@ -365,6 +366,7 @@ export function ItemForm({
             </button>
           ) : (
             <button
+              key="next"
               type="button"
               onClick={() => setStepIndex((i) => i + 1)}
               className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
