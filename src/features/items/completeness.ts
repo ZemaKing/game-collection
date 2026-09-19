@@ -85,7 +85,12 @@ export function calculateCompleteness(itemType: ItemType, facts: CompletenessFac
 }
 
 /** Adapter for listing/card surfaces, which only ever fetch `all_items` rows. */
-export function completenessFactsFromRow(row: AllItemRow): CompletenessFacts {
+export function completenessFactsFromRow(
+  row: Pick<
+    AllItemRow,
+    'subtitle' | 'platform_id' | 'release_date' | 'collection_date' | 'condition' | 'description' | 'cover_image_path'
+  >,
+): CompletenessFacts {
   return {
     hasSubtitle: !!row.subtitle,
     hasPlatform: !!row.platform_id,

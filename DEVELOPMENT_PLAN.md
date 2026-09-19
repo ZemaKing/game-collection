@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 23 — Deployment & Production Verification  
+Current Phase: Phase 24 — Statistics & Collection Insights (Post-MVP)  
 MVP Status: Complete
 
 ## MVP Progress
@@ -47,7 +47,7 @@ MVP Status: Complete
 
 ## Post-MVP Progress
 
-- [ ] Phase 24 — Statistics & Collection Insights
+- [x] Phase 24 — Statistics & Collection Insights
 - [ ] Phase 25 — Settings & Preferences
 - [ ] Phase 26 — Profile & Collection Overview
 - [ ] Phase 27 — Responsive Refinement Pass
@@ -917,26 +917,26 @@ Turn collection data into useful, readable insights.
 
 ### Tasks
 
-- [ ] Build statistics route and query layer
-- [ ] Show total items
-- [ ] Show breakdowns by type, platform, genre, and condition
-- [ ] Show additions over time
-- [ ] Show completeness distribution
+- [x] Build statistics route and query layer — public `/statistics` route (`StatisticsPage.tsx`), linked from the sidebar and mobile nav sheet via `collectionNavItems` (`nav.statistics`). `statisticsApi.ts` makes one paged pass over `all_items` (only the columns needed) plus platforms and the dashboard's genre summary; `statistics.ts` `computeStatistics(rows, now)` is a pure function that derives every number from those rows, so the cards can't disagree with each other. Added a shared `fetchAllRows` pager to `items/api.ts` because Supabase caps a response at 1000 rows — `fetchDashboardSummary`/`fetchGenreSummary` now use it too so the dashboard and Statistics totals stay identical at any collection size
+- [x] Show total items — metric tile
+- [x] Show breakdowns by type, platform, genre, and condition — ranked bar lists that link through to the matching filtered listing. Platform is scoped to games/special editions/steelbooks (the only types that can have one; otherwise artbook/figure/stuff would all pile up under "Not set"). Genre counts every genre of a game, so its total can exceed the game count (noted in the card). Condition lists only tiers that occur, plus "Not set"
+- [x] Show additions over time — items per month for the last 12 months (zero-filled), plus an "N more added earlier" line. An item counts on its `collection_date` when set, otherwise its `created_at` date; future-dated items are left out of the chart
+- [x] Show completeness distribution — five buckets (0–24 / 25–49 / 50–74 / 75–99 / 100%) plus average and fully-complete count, computed with the existing `calculateCompleteness` (`completenessFactsFromRow` now accepts a `Pick` of the row so the slim query works)
 
 ### UI / UX
 
-- [ ] Desktop uses a balanced metric/chart layout
-- [ ] Tablet reflows charts and cards without horizontal overflow
-- [ ] Mobile prioritizes key metrics and uses scrollable/stacked insights
-- [ ] Charts have textual equivalents and accessible labels
+- [x] Desktop uses a balanced metric/chart layout — 4 metric tiles, then a 2-column card grid with the additions chart spanning full width
+- [x] Tablet reflows charts and cards without horizontal overflow — same 2-column grid; verified no overflow at ~800px
+- [x] Mobile prioritizes key metrics and uses scrollable/stacked insights — 2×2 metric tiles first, then single-column stacked cards; the additions plot scrolls sideways inside its card and opens on the newest month. Verified at 375px (initially the plot's min-width stretched the grid column and overflowed the page; fixed with `grid-cols-1` + `min-w-0`)
+- [x] Charts have textual equivalents and accessible labels — no chart library: bar lists are real `<ul>` text (label, count, percent) with decorative `aria-hidden` bars; the column chart carries a visually-hidden `<table>` with full month names and counts
 
 ### Definition of Done
 
-- [ ] Statistics are accurate, responsive, and useful without duplicating the dashboard
+- [x] Statistics are accurate, responsive, and useful without duplicating the dashboard — verified live against the dev data (28 items: type counts sum to 28, monthly buckets + "earlier" sum to 28, platform/condition shares add up); loading skeleton, error + retry, and empty states included; Serbian and English strings, dark and light themes checked. `statistics.test.ts` (10 tests) covers empty, type/platform/condition breakdowns, month bucketing and fallback, window edges, future dates and completeness. Not done: no automated accessibility scan (that is Phase 28), and 1440px was only checked through the layout classes, not a full-page screenshot
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

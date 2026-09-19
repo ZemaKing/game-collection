@@ -28,7 +28,7 @@ Local Supabase env vars live in `.env.local` (see `.env.local.example`): `VITE_S
 
 Games autofill (Phase 21) uses `RAWG_API_KEY` — server-only, no `VITE_` prefix, so it never reaches the client bundle. It's read by the `/api/*` Vercel serverless functions and, for local dev, by a Vite dev-server middleware in `vite.config.ts` that mounts the same routes. Must also be set in the Vercel project's environment variables for preview/production (as of Phase 23 it was still missing in production, so autofill returns 500 there).
 
-Only one test file exists (`completeness.test.ts`); there is no component/E2E test setup. `tsc -b` type-checks both `src/` (`tsconfig.app.json`) and `api/` + `vite.config.ts` (`tsconfig.node.json`, which uses `erasableSyntaxOnly` — no enums/parameter properties in `api/`).
+Only pure-function unit tests exist (`completeness.test.ts`, `statistics.test.ts`); there is no component/E2E test setup. `tsc -b` type-checks both `src/` (`tsconfig.app.json`) and `api/` + `vite.config.ts` (`tsconfig.node.json`, which uses `erasableSyntaxOnly` — no enums/parameter properties in `api/`).
 
 ## Architecture
 
@@ -56,7 +56,7 @@ Only one test file exists (`completeness.test.ts`); there is no component/E2E te
 
 **Deployment**: `vercel.json` rewrites all paths to `index.html` (SPA) and sets security/caching headers.
 
-**Other feature modules**: `src/features/dashboard/` (home summary panel), `src/features/search/` (global search dialog + panel, recent searches), `src/features/auth/RequireAuth.tsx` (route guard consuming `useAuth`/`AuthProvider`).
+**Other feature modules**: `src/features/dashboard/` (home summary panel), `src/features/statistics/` (`/statistics` page: `statisticsApi.ts` pages through `all_items`, pure `computeStatistics` in `statistics.ts`, hand-rolled accessible `charts.tsx` — no chart library; use `fetchAllRows` from `items/api.ts` for any unbounded aggregate query, since Supabase caps responses at 1000 rows), `src/features/search/` (global search dialog + panel, recent searches), `src/features/auth/RequireAuth.tsx` (route guard consuming `useAuth`/`AuthProvider`).
 
 **Layout & chrome** (`src/components/layout/`): `AppShell.tsx` wraps all routes; `Sidebar.tsx` (desktop) and `BottomTabBar.tsx`/`MobileNavSheet.tsx` (mobile) both read nav structure from `src/lib/navigation.ts` (`primaryNavItems`, `platformNavItems`, `collectionNavItems`) — add new nav entries there, not by hand in each layout component.
 

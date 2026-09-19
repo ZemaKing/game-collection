@@ -180,26 +180,47 @@ export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsRe
   return { rows: await withFormats(data ?? []), count: count ?? 0 }
 }
 
+/** Supabase caps a single response at 1000 rows by default; aggregate queries must page through. */
+const AGGREGATE_PAGE_SIZE = 1000
+
+/**
+ * Reads every row of an unbounded query by paging with `.range()`. `build`
+ * must apply a stable `.order()` so pages never overlap or skip rows.
+ */
+export async function fetchAllRows<T>(
+  build: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: Error | null }>,
+): Promise<T[]> {
+  const all: T[] = []
+  for (let from = 0; ; from += AGGREGATE_PAGE_SIZE) {
+    const { data, error } = await build(from, from + AGGREGATE_PAGE_SIZE - 1)
+    if (error) throw error
+    const page = data ?? []
+    all.push(...page)
+    if (page.length < AGGREGATE_PAGE_SIZE) return all
+  }
+}
+
 export interface DashboardSummary {
   totalItems: number
   countsByType: Record<ItemType, number>
 }
 
 export async function fetchDashboardSummary(): Promise<DashboardSummary> {
-  const { data, error } = await supabase.from('all_items').select('item_type')
-  if (error) throw error
+  const data = await fetchAllRows((from, to) =>
+    supabase.from('all_items').select('id, item_type').order('id').range(from, to),
+  )
 
   const countsByType = Object.fromEntries(ITEM_TYPES.map((type) => [type, 0])) as Record<
     ItemType,
     number
   >
 
-  for (const row of data ?? []) {
+  for (const row of data) {
     countsByType[row.item_type as ItemType] += 1
   }
 
   return {
-    totalItems: (data ?? []).length,
+    totalItems: data.length,
     countsByType,
   }
 }
@@ -212,11 +233,17 @@ export interface GenreSummaryRow {
 }
 
 export async function fetchGenreSummary(): Promise<GenreSummaryRow[]> {
-  const { data, error } = await supabase.from('game_genres').select('genre_id, genres(name, slug)')
-  if (error) throw error
+  const data = await fetchAllRows((from, to) =>
+    supabase
+      .from('game_genres')
+      .select('game_id, genre_id, genres(name, slug)')
+      .order('game_id')
+      .order('genre_id')
+      .range(from, to),
+  )
 
   const counts = new Map<string, { name: string; slug: string; count: number }>()
-  for (const row of data ?? []) {
+  for (const row of data) {
     const genre = row.genres as unknown as { name: string; slug: string } | null
     if (!genre) continue
     const existing = counts.get(row.genre_id)

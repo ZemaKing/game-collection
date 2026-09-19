@@ -1,6 +1,7 @@
 import {
   Archive,
   BookOpen,
+  BarChart3,
   Boxes,
   Clock,
   Gamepad2,
@@ -54,4 +55,5 @@ export const platformNavItems: { label: string; to: string; icon: IconComponent 
 
 export const collectionNavItems: NavItem[] = [
   { labelKey: 'nav.recentlyAdded', to: '/recently-added', icon: Clock },
+  { labelKey: 'nav.statistics', to: '/statistics', icon: BarChart3 },
 ]

@@ -18,6 +18,7 @@ import LoginPage from '@/pages/LoginPage'
 import PlatformPage from '@/pages/PlatformPage'
 import RecentlyAddedPage from '@/pages/RecentlyAddedPage'
 import SearchPage from '@/pages/SearchPage'
+import StatisticsPage from '@/pages/StatisticsPage'
 import SpecialEditionDetailPage from '@/pages/SpecialEditionDetailPage'
 import SpecialEditionEditPage from '@/pages/SpecialEditionEditPage'
 import SpecialEditionsPage from '@/pages/SpecialEditionsPage'
@@ -104,6 +105,7 @@ function App() {
         />
         <Route path="platforms/:slug" element={<PlatformPage />} />
         <Route path="recently-added" element={<RecentlyAddedPage />} />
+        <Route path="statistics" element={<StatisticsPage />} />
         <Route path="search" element={<SearchPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="*" element={<ComingSoonPage />} />
