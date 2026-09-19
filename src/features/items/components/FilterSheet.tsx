@@ -15,6 +15,7 @@ import {
   CONDITION_ICONS,
   CONDITION_LABEL_KEYS,
   DEFAULT_GENRE_META,
+  FORMAT_TAG_META,
   GENRE_META,
   PLATFORM_ICONS,
 } from '@/features/items/constants'
@@ -222,14 +223,19 @@ export function FilterSheet({
             {tags.length > 0 && (
               <FilterSection title={t('filters.tags')}>
                 <div className="flex flex-col">
-                  {tags.map((tag) => (
-                    <CheckboxRow
-                      key={tag.id}
-                      label={tag.name}
-                      checked={draft.tagIds.includes(tag.id)}
-                      onChange={() => setDraft((d) => ({ ...d, tagIds: toggleValue(d.tagIds, tag.id) }))}
-                    />
-                  ))}
+                  {tags.map((tag) => {
+                    const meta = FORMAT_TAG_META[tag.slug]
+                    return (
+                      <CheckboxRow
+                        key={tag.id}
+                        label={meta ? t(meta.labelKey) : tag.name}
+                        icon={meta?.icon}
+                        iconColor={meta?.color}
+                        checked={draft.tagIds.includes(tag.id)}
+                        onChange={() => setDraft((d) => ({ ...d, tagIds: toggleValue(d.tagIds, tag.id) }))}
+                      />
+                    )
+                  })}
                 </div>
               </FilterSection>
             )}

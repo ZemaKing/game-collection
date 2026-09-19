@@ -7,6 +7,7 @@ import { DatePickerField } from '@/components/ui/DatePickerField'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Input } from '@/components/ui/Input'
 import { MultiSelect } from '@/components/ui/MultiSelect'
+import { FormatToggle } from '@/features/items/components/FormatToggle'
 import { Textarea } from '@/components/ui/Textarea'
 import {
   CONDITION_LABEL_KEYS,
@@ -224,13 +225,12 @@ export function ItemForm({
       titleKey: 'form.sectionTagsAndLinks' as TranslationKey,
       render: () => (
         <div className="flex flex-col gap-4">
-          <MultiSelect
+          <FormatToggle
             label={t('filters.tags')}
             name="tagIds"
             values={form.tagIds}
             onChange={(values) => setField('tagIds', values)}
             options={tags}
-            emptyLabel={t('form.noOptionsYet')}
           />
           {showGenres && (
             <MultiSelect

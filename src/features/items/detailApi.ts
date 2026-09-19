@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
+import { FORMAT_TAG_SLUGS } from '@/features/items/constants'
 import type { Tag } from '@/features/items/api'
 import type { Genre, ItemType, Platform } from '@/features/items/types'
 import type { ItemDetail, ItemImageRow } from '@/features/items/detailTypes'
@@ -230,5 +231,5 @@ export async function fetchItemDetailTags(itemType: ItemType, id: string): Promi
   if (error) throw error
   return ((data as unknown as { tags: Tag | null }[] | null) ?? [])
     .map((row) => row.tags)
-    .filter((t): t is Tag => t !== null)
+    .filter((t): t is Tag => t !== null && FORMAT_TAG_SLUGS.includes(t.slug))
 }

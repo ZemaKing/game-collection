@@ -6,6 +6,7 @@ import {
   CONDITION_ICONS,
   CONDITION_LABEL_KEYS,
   DEFAULT_GENRE_META,
+  FORMAT_TAG_META,
   GENRE_META,
   ITEM_TYPE_COLORS,
   ITEM_TYPE_META,
@@ -79,6 +80,25 @@ function TypeOverlayBadge({ item }: { item: AllItemRow }) {
   )
 }
 
+/** Icon-only Digital / Physical marker for the bottom-left corner of a cover image. */
+function FormatOverlayBadge({ slug, size = 'md' }: { slug?: string | null; size?: 'sm' | 'md' }) {
+  const { t } = useLocale()
+  const meta = slug ? FORMAT_TAG_META[slug] : undefined
+  if (!meta) return null
+  const Icon = meta.icon
+  const box = size === 'sm' ? 'bottom-1 left-1 p-1' : 'bottom-2 left-2 p-1.5'
+  return (
+    <span
+      title={t(meta.labelKey)}
+      role="img"
+      aria-label={t(meta.labelKey)}
+      className={`absolute ${box} inline-flex items-center justify-center rounded-md bg-black/50 ${meta.color}`}
+    >
+      <Icon size={size === 'sm' ? 12 : 16} />
+    </span>
+  )
+}
+
 /** Genre pill — same design as the genre badges on the item detail screen. */
 function GenreBadge({ slug, name }: { slug: string; name: string | null }) {
   const meta = GENRE_META[slug] ?? DEFAULT_GENRE_META
@@ -147,12 +167,15 @@ export function ItemCard({
         to={to}
         className={`flex items-center gap-3 rounded-lg border border-border bg-card p-2.5 hover:bg-card-hover ${FOCUS_RING}`}
       >
-        <ItemImage
-          storagePath={item.cover_image_path}
-          itemType={item.item_type}
-          alt={item.title}
-          className="aspect-[4/5] w-14 shrink-0 self-stretch rounded-md md:w-16"
-        />
+        <div className="relative aspect-[4/5] w-14 shrink-0 self-stretch md:w-16">
+          <ItemImage
+            storagePath={item.cover_image_path}
+            itemType={item.item_type}
+            alt={item.title}
+            className="h-full w-full rounded-md"
+          />
+          <FormatOverlayBadge slug={item.format_slug} size="sm" />
+        </div>
 
         {/* Mobile (<md): title, publisher, compact genre·platform·year line, completeness+condition. */}
         <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 md:hidden">
@@ -224,6 +247,7 @@ export function ItemCard({
     <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card hover:border-accent">
       <div className="relative">
         <ItemImage storagePath={item.cover_image_path} itemType={item.item_type} alt={item.title} className="aspect-[4/5] w-full" />
+        <FormatOverlayBadge slug={item.format_slug} />
         {platformName && (
           <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1">
             <PlatformBadge platformName={platformName} platformSlug={platformSlug} />

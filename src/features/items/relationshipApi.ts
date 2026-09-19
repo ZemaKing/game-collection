@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
+import { withFormats } from '@/features/items/api'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 
 export interface RelatedItemRow extends AllItemRow {
@@ -63,7 +64,7 @@ export async function fetchItemRelationships(
 
   const { data: items, error } = await supabase.from('all_items').select('*').in('id', allIds)
   if (error) throw error
-  const byId = new Map((items ?? []).map((item) => [item.id, item]))
+  const byId = new Map((await withFormats(items ?? [])).map((item) => [item.id, item]))
 
   function resolve(refs: RelationshipRef[]): RelatedItemRow[] {
     const rows: RelatedItemRow[] = []

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
-import { ITEM_TYPES } from '@/features/items/constants'
+import { FORMAT_TAG_SLUGS, ITEM_TYPES } from '@/features/items/constants'
 import type { AllItemRow, Genre, ItemCondition, ItemType, Platform } from '@/features/items/types'
 
 export async function fetchPlatforms(): Promise<Platform[]> {
@@ -21,7 +21,11 @@ export interface Tag {
 }
 
 export async function fetchTags(): Promise<Tag[]> {
-  const { data, error } = await supabase.from('tags').select('id, name, slug').order('name')
+  const { data, error } = await supabase
+    .from('tags')
+    .select('id, name, slug')
+    .in('slug', FORMAT_TAG_SLUGS)
+    .order('name')
   if (error) throw error
   return data
 }
@@ -107,6 +111,28 @@ async function resolveGenreTagRestriction(
   return Array.from(genreItemIds ?? tagItemIds ?? [])
 }
 
+/** Attaches each row's Digital / Physical tag slug (`format_slug`) with a single `item_tags` query. */
+export async function withFormats<T extends AllItemRow>(rows: T[]): Promise<T[]> {
+  if (rows.length === 0) return rows
+  const { data, error } = await supabase
+    .from('item_tags')
+    .select('item_id, tags(slug)')
+    .in(
+      'item_id',
+      rows.map((row) => row.id),
+    )
+  if (error) throw error
+
+  const slugByItemId = new Map<string, string>()
+  for (const row of (data as unknown as { item_id: string; tags: { slug: string } | null }[] | null) ?? []) {
+    const slug = row.tags?.slug
+    if (slug && FORMAT_TAG_SLUGS.includes(slug) && !slugByItemId.has(row.item_id)) {
+      slugByItemId.set(row.item_id, slug)
+    }
+  }
+  return rows.map((row) => ({ ...row, format_slug: slugByItemId.get(row.id) ?? null }))
+}
+
 export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsResult> {
   const restriction = await resolveGenreTagRestriction(params.genreIds, params.tagIds)
   if (restriction && restriction.length === 0) return { rows: [], count: 0 }
@@ -136,7 +162,7 @@ export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsRe
     .range(from, to)
 
   if (error) throw error
-  return { rows: data ?? [], count: count ?? 0 }
+  return { rows: await withFormats(data ?? []), count: count ?? 0 }
 }
 
 export interface DashboardSummary {
@@ -195,5 +221,5 @@ export async function fetchRecentlyAdded(limit: number): Promise<AllItemRow[]> {
     .order('created_at', { ascending: false })
     .limit(limit)
   if (error) throw error
-  return data ?? []
+  return withFormats(data ?? [])
 }

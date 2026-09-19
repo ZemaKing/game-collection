@@ -26,6 +26,7 @@ import {
   CONDITION_ICONS,
   CONDITION_LABEL_KEYS,
   DEFAULT_GENRE_META,
+  FORMAT_TAG_META,
   GENRE_META,
   ITEM_TYPE_COLORS,
   ITEM_TYPE_META,
@@ -122,7 +123,7 @@ export function ItemListingToolbar({
 
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p])), [platforms])
   const genreById = useMemo(() => new Map(genres.map((g) => [g.id, g])), [genres])
-  const tagById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag.name])), [tags])
+  const tagById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags])
 
   const chips: Chip[] = [
     ...(showTypeFilter ? filters.itemTypes : []).map((type: ItemType) => ({
@@ -167,13 +168,17 @@ export function ItemListingToolbar({
       icon: CONDITION_ICONS[condition],
       iconColor: CONDITION_COLORS[condition].icon,
     })),
-    ...filters.tagIds.map((id) => ({
-      key: `tag:${id}`,
-      label: tagById.get(id) ?? id,
-      onRemove: () => setFilters({ tagIds: filters.tagIds.filter((v) => v !== id) }),
-      icon: TagIcon,
-      iconColor: 'text-muted',
-    })),
+    ...filters.tagIds.map((id) => {
+      const tag = tagById.get(id)
+      const meta = tag ? FORMAT_TAG_META[tag.slug] : undefined
+      return {
+        key: `tag:${id}`,
+        label: meta ? t(meta.labelKey) : (tag?.name ?? id),
+        onRemove: () => setFilters({ tagIds: filters.tagIds.filter((v) => v !== id) }),
+        icon: meta?.icon ?? TagIcon,
+        iconColor: meta?.color ?? 'text-muted',
+      }
+    }),
     ...(filters.collectionDateFrom || filters.collectionDateTo
       ? [
           {

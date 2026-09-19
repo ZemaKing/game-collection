@@ -3,8 +3,10 @@ import {
   BookOpen,
   Boxes,
   ChessKnight,
+  Cloud,
   Compass,
   Crosshair,
+  Disc3,
   Eye,
   Flag,
   Flame,
@@ -183,4 +185,18 @@ export const GENRE_META: Record<string, { icon: LucideIcon; color: { icon: strin
 export const DEFAULT_GENRE_META = {
   icon: Gamepad2,
   color: { icon: 'text-slate-400', badge: 'bg-slate-500/15 text-slate-300' },
+}
+
+/**
+ * The only tags the app surfaces: a mutually-exclusive Digital / Physical format.
+ * Other rows in `tags` are ignored everywhere (see `fetchTags`).
+ */
+export const FORMAT_TAG_SLUGS = ['digital', 'physical']
+
+export const FORMAT_TAG_META: Record<
+  string,
+  { icon: LucideIcon; labelKey: TranslationKey; color: string }
+> = {
+  digital: { icon: Cloud, labelKey: 'tags.digital', color: 'text-sky-400' },
+  physical: { icon: Disc3, labelKey: 'tags.physical', color: 'text-amber-400' },
 }

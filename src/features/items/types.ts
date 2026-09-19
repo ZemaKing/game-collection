@@ -37,6 +37,8 @@ export interface AllItemRow {
   /** First genre (by name) linked to the item, if any — games only. */
   genre_slug: string | null
   genre_name: string | null
+  /** Slug of the item's Digital / Physical tag, if set. Not part of the view — attached by `withFormats`. */
+  format_slug?: string | null
   created_at: string
   updated_at: string
 }

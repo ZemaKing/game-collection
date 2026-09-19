@@ -12,6 +12,7 @@ import {
   CONDITION_ICONS,
   CONDITION_LABEL_KEYS,
   DEFAULT_GENRE_META,
+  FORMAT_TAG_META,
   GENRE_META,
   ITEM_TYPE_META,
   ITEM_TYPE_ROUTES,
@@ -336,14 +337,20 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
           <section>
             <h2 className="heading-section mb-2 text-text">{t('filters.tags')}</h2>
             <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <span
-                  key={tag.id}
-                  className="rounded-full bg-card-hover px-2.5 py-1 text-xs font-medium text-text"
-                >
-                  {tag.name}
-                </span>
-              ))}
+              {tags.map((tag) => {
+                const meta = FORMAT_TAG_META[tag.slug]
+                if (!meta) return null
+                const Icon = meta.icon
+                return (
+                  <span
+                    key={tag.id}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-card-hover px-2.5 py-1 text-xs font-medium text-text"
+                  >
+                    <Icon size={13} className={meta.color} />
+                    {t(meta.labelKey)}
+                  </span>
+                )
+              })}
             </div>
           </section>
         )}

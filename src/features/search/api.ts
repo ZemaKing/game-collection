@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
+import { FORMAT_TAG_SLUGS } from '@/features/items/constants'
 import type { AllItemRow } from '@/features/items/types'
 
 const RESULT_LIMIT = 30
@@ -77,7 +78,11 @@ async function searchByGenreName(pattern: string) {
 }
 
 async function searchByTagName(pattern: string) {
-  const { data: tags, error: tagsError } = await supabase.from('tags').select('id').ilike('name', pattern)
+  const { data: tags, error: tagsError } = await supabase
+    .from('tags')
+    .select('id')
+    .in('slug', FORMAT_TAG_SLUGS)
+    .ilike('name', pattern)
   if (tagsError || !tags?.length) return { data: [], error: tagsError }
 
   const { data: itemTags, error: itemTagsError } = await supabase
