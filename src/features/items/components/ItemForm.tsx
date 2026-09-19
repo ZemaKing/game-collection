@@ -8,7 +8,12 @@ import { ErrorState } from '@/components/ui/ErrorState'
 import { Input } from '@/components/ui/Input'
 import { MultiSelect } from '@/components/ui/MultiSelect'
 import { Textarea } from '@/components/ui/Textarea'
-import { CONDITION_LABEL_KEYS, ITEM_CONDITIONS } from '@/features/items/constants'
+import {
+  CONDITION_LABEL_KEYS,
+  DEFAULT_GENRE_META,
+  GENRE_META,
+  ITEM_CONDITIONS,
+} from '@/features/items/constants'
 import { ConditionSelect } from '@/features/items/components/ConditionSelect'
 import { GameAutofillPanel } from '@/features/items/components/GameAutofillPanel'
 import { ImageManager } from '@/features/items/components/ImageManager'
@@ -235,6 +240,10 @@ export function ItemForm({
               onChange={(values) => setField('genreIds', values)}
               options={genres}
               emptyLabel={t('form.noOptionsYet')}
+              optionMeta={(genre) => {
+                const meta = GENRE_META[genre.slug] ?? DEFAULT_GENRE_META
+                return { icon: meta.icon, colorClass: meta.color.icon }
+              }}
               primary
             />
           )}

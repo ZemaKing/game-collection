@@ -1,4 +1,4 @@
-import { Star } from 'lucide-react'
+import { Star, type LucideIcon } from 'lucide-react'
 import { useLocale } from '@/hooks/useLocale'
 
 export interface MultiSelectOption {
@@ -6,18 +6,34 @@ export interface MultiSelectOption {
   name: string
 }
 
-interface MultiSelectProps {
+/** Per-option decoration: a glyph shown on every chip, and a `text-*` class that tints icon, text and border once selected. */
+export interface MultiSelectOptionMeta {
+  icon: LucideIcon
+  colorClass: string
+}
+
+interface MultiSelectProps<T extends MultiSelectOption> {
   label: string
   name: string
   values: string[]
   onChange: (values: string[]) => void
-  options: MultiSelectOption[]
+  options: T[]
   emptyLabel?: string
   /** Shows a star toggle on each selected chip to mark it "primary" — moves that option to the front of `values`. */
   primary?: boolean
+  optionMeta?: (option: T) => MultiSelectOptionMeta
 }
 
-export function MultiSelect({ label, name, values, onChange, options, emptyLabel, primary = false }: MultiSelectProps) {
+export function MultiSelect<T extends MultiSelectOption>({
+  label,
+  name,
+  values,
+  onChange,
+  options,
+  emptyLabel,
+  primary = false,
+  optionMeta,
+}: MultiSelectProps<T>) {
   const { t } = useLocale()
 
   function toggle(id: string) {
@@ -38,13 +54,19 @@ export function MultiSelect({ label, name, values, onChange, options, emptyLabel
           {options.map((option) => {
             const checked = values.includes(option.id)
             const isPrimary = primary && checked && values[0] === option.id
+            const meta = optionMeta?.(option)
+            const Icon = meta?.icon
             return (
               <span
                 key={option.id}
                 className={`relative flex items-center gap-1 rounded-full border pl-2.5 pr-2.5 py-1 text-xs font-medium transition-colors focus-within:ring-2 focus-within:ring-accent/50 ${
-                  checked
-                    ? 'border-accent bg-accent text-accent-fg'
-                    : 'border-border text-text hover:bg-card-hover'
+                  meta
+                    ? checked
+                      ? `${meta.colorClass} border-current bg-card-hover`
+                      : 'border-border text-text hover:bg-card-hover'
+                    : checked
+                      ? 'border-accent bg-accent text-accent-fg'
+                      : 'border-border text-text hover:bg-card-hover'
                 }`}
               >
                 {primary && checked && (
@@ -61,6 +83,7 @@ export function MultiSelect({ label, name, values, onChange, options, emptyLabel
                 )}
                 <label className="flex cursor-pointer items-center gap-1.5">
                   <input type="checkbox" checked={checked} onChange={() => toggle(option.id)} className="sr-only" />
+                  {Icon && <Icon size={14} aria-hidden="true" />}
                   {option.name}
                 </label>
               </span>
