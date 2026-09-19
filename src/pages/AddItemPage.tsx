@@ -30,6 +30,7 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
       null,
       result.values,
       result.relatedItems.map((item) => ({ itemType: item.itemType, itemId: item.itemId })),
+      result.baseGames?.map((item) => ({ itemType: item.itemType, itemId: item.itemId })),
     )
     if (!id) return
     let coverFailed = false

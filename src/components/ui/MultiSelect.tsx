@@ -41,7 +41,7 @@ export function MultiSelect({ label, name, values, onChange, options, emptyLabel
             return (
               <span
                 key={option.id}
-                className={`flex items-center gap-1 rounded-full border pl-2.5 pr-2.5 py-1 text-xs font-medium transition-colors ${
+                className={`relative flex items-center gap-1 rounded-full border pl-2.5 pr-2.5 py-1 text-xs font-medium transition-colors focus-within:ring-2 focus-within:ring-accent/50 ${
                   checked
                     ? 'border-accent bg-accent text-accent-fg'
                     : 'border-border text-text hover:bg-card-hover'

@@ -40,6 +40,12 @@ function buildPayload(itemType: ItemType, values: Record<string, unknown>): Reco
  * item being edited; the read side (`RelatedItemsSection`) already walks
  * both directions, so a link made from either item's form becomes visible
  * from both.
+ *
+ * `baseGameIds` is the one exception: a special edition's form can also
+ * write *incoming* links (game → this edition) so its "Base Game" section is
+ * settable from the edition itself. Pass `undefined` to leave incoming links
+ * untouched; otherwise only game-parented incoming links are replaced, so
+ * links from other item types are never dropped.
  */
 export function useSaveItem(itemType: ItemType) {
   const isOnline = useOnlineStatus()
@@ -51,6 +57,7 @@ export function useSaveItem(itemType: ItemType) {
     itemId: string | null,
     values: Record<string, unknown> & { tagIds?: string[]; genreIds?: string[] },
     relatedItemIds: RelatedItemRef[],
+    baseGameIds?: RelatedItemRef[],
   ): Promise<string> {
     setIsSaving(true)
     setError(null)
@@ -112,6 +119,28 @@ export function useSaveItem(itemType: ItemType) {
           })),
         )
         if (insertRelError) throw insertRelError
+      }
+
+      if (baseGameIds) {
+        const { error: deleteBaseError } = await supabase
+          .from('item_relationships')
+          .delete()
+          .eq('child_type', itemType)
+          .eq('child_id', id)
+          .eq('parent_type', 'game')
+        if (deleteBaseError) throw deleteBaseError
+        if (baseGameIds.length > 0) {
+          const { error: insertBaseError } = await supabase.from('item_relationships').insert(
+            baseGameIds.map((ref) => ({
+              parent_type: ref.itemType,
+              parent_id: ref.itemId,
+              child_type: itemType,
+              child_id: id,
+              relationship_type: 'related',
+            })),
+          )
+          if (insertBaseError) throw insertBaseError
+        }
       }
 
       return id as string

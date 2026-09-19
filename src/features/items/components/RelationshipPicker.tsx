@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ITEM_TYPE_META } from '@/features/items/constants'
 import type { RelatedItemRef } from '@/features/items/forms/useSaveItem'
-import type { AllItemRow } from '@/features/items/types'
+import type { AllItemRow, ItemType } from '@/features/items/types'
 import { useSearch } from '@/features/search/useSearch'
 import { useLocale } from '@/hooks/useLocale'
 
@@ -13,6 +13,10 @@ interface RelationshipPickerProps {
   onChange: (next: RelatedItemSelection[]) => void
   /** Excludes the item being edited from its own search results. */
   excludeId?: string
+  /** Extra ids to hide from results (e.g. items already chosen in a sibling picker). */
+  excludeIds?: string[]
+  /** Restricts results to these item types (e.g. only games for a special edition's base game). */
+  allowedTypes?: ItemType[]
 }
 
 /**
@@ -21,13 +25,23 @@ interface RelationshipPickerProps {
  * `searchItems`'s normalized title/subtitle/platform/genre/tag match — no
  * new search query needed.
  */
-export function RelationshipPicker({ label, selected, onChange, excludeId }: RelationshipPickerProps) {
+export function RelationshipPicker({
+  label,
+  selected,
+  onChange,
+  excludeId,
+  excludeIds = [],
+  allowedTypes,
+}: RelationshipPickerProps) {
   const { t } = useLocale()
   const [query, setQuery] = useState('')
   const { results, loading } = useSearch(query)
 
-  const selectedIds = new Set(selected.map((item) => item.itemId))
-  const candidates = results.filter((row) => row.id !== excludeId && !selectedIds.has(row.id))
+  const hiddenIds = new Set([...selected.map((item) => item.itemId), ...excludeIds])
+  const candidates = results.filter(
+    (row) =>
+      row.id !== excludeId && !hiddenIds.has(row.id) && (!allowedTypes || allowedTypes.includes(row.item_type)),
+  )
 
   function add(row: AllItemRow) {
     onChange([...selected, { itemType: row.item_type, itemId: row.id, title: row.title }])

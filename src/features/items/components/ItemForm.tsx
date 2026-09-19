@@ -32,6 +32,8 @@ function sortedIds(items: RelatedItemSelection[]): string[] {
 export interface ItemFormSubmitResult {
   values: Record<string, unknown> & { tagIds: string[]; genreIds?: string[] }
   relatedItems: RelatedItemSelection[]
+  /** Only present for special editions — the games this edition is the special edition of. */
+  baseGames?: RelatedItemSelection[]
   coverImageFile?: File
 }
 
@@ -40,6 +42,8 @@ interface ItemFormProps {
   title: ReactNode
   initialValues: ItemFormState
   initialRelatedItems: RelatedItemSelection[]
+  /** Special editions only: the games already linked as this edition's base game. */
+  initialBaseGames?: RelatedItemSelection[]
   /** The item being edited, excluded from its own relationship search results. Also gates the Images step: `item_images` rows need a real item id, which doesn't exist yet during create. */
   excludeId?: string
   isSaving: boolean
@@ -67,6 +71,7 @@ export function ItemForm({
   title,
   initialValues,
   initialRelatedItems,
+  initialBaseGames = [],
   excludeId,
   isSaving,
   submitError,
@@ -81,6 +86,8 @@ export function ItemForm({
   const { platforms, genres, tags } = useItemLookups()
   const [form, setForm] = useState<ItemFormState>(initialValues)
   const [relatedItems, setRelatedItems] = useState<RelatedItemSelection[]>(initialRelatedItems)
+  const [baseGames, setBaseGames] = useState<RelatedItemSelection[]>(initialBaseGames)
+  const isSpecialEdition = itemType === 'special_edition'
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [stepIndex, setStepIndex] = useState(0)
   const [pendingCoverFile, setPendingCoverFile] = useState<File | undefined>(undefined)
@@ -89,8 +96,9 @@ export function ItemForm({
     () =>
       JSON.stringify(form) !== JSON.stringify(initialValues) ||
       JSON.stringify(sortedIds(relatedItems)) !== JSON.stringify(sortedIds(initialRelatedItems)) ||
+      JSON.stringify(sortedIds(baseGames)) !== JSON.stringify(sortedIds(initialBaseGames)) ||
       pendingCoverFile !== undefined,
-    [form, initialValues, relatedItems, initialRelatedItems, pendingCoverFile],
+    [form, initialValues, relatedItems, initialRelatedItems, baseGames, initialBaseGames, pendingCoverFile],
   )
   const { isBlocked, guardAction, confirmDiscard, cancelDiscard } = useUnsavedChangesGuard(isDirty)
 
@@ -230,11 +238,22 @@ export function ItemForm({
               primary
             />
           )}
+          {isSpecialEdition && (
+            <RelationshipPicker
+              label={t('detail.baseGame')}
+              selected={baseGames}
+              onChange={setBaseGames}
+              excludeId={excludeId}
+              excludeIds={relatedItems.map((item) => item.itemId)}
+              allowedTypes={['game']}
+            />
+          )}
           <RelationshipPicker
-            label={t('form.sectionRelationships')}
+            label={t(isSpecialEdition ? 'detail.contents' : 'form.sectionRelationships')}
             selected={relatedItems}
             onChange={setRelatedItems}
             excludeId={excludeId}
+            excludeIds={baseGames.map((item) => item.itemId)}
           />
         </div>
       ),
@@ -274,7 +293,12 @@ export function ItemForm({
     }
 
     setErrors({})
-    onSubmit({ values: result.data as ItemFormSubmitResult['values'], relatedItems, coverImageFile: pendingCoverFile })
+    onSubmit({
+      values: result.data as ItemFormSubmitResult['values'],
+      relatedItems,
+      baseGames: isSpecialEdition ? baseGames : undefined,
+      coverImageFile: pendingCoverFile,
+    })
   }
 
   return (

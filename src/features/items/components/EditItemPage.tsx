@@ -50,11 +50,16 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
     title: child.title,
   }))
 
+  const initialBaseGames = relationships.parents
+    .filter((parent) => parent.item_type === 'game')
+    .map((parent) => ({ itemType: parent.item_type, itemId: parent.id, title: parent.title }))
+
   async function handleSubmit(result: ItemFormSubmitResult) {
     const savedId = await save(
       id ?? null,
       result.values,
       result.relatedItems.map((item) => ({ itemType: item.itemType, itemId: item.itemId })),
+      result.baseGames?.map((item) => ({ itemType: item.itemType, itemId: item.itemId })),
     )
     if (!savedId) return
     let coverFailed = false
@@ -81,6 +86,7 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
         }
         initialValues={initialValues}
         initialRelatedItems={initialRelatedItems}
+        initialBaseGames={initialBaseGames}
         excludeId={id}
         isSaving={isSaving}
         submitError={error}
