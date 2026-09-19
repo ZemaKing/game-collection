@@ -269,8 +269,8 @@ export function ItemCard({
           </div>
         )}
         <div className="mt-1 flex min-w-0 items-center justify-between gap-2">
+          <span className="shrink-0 text-xs text-muted">{releaseYear}</span>
           <ConditionBadge condition={item.condition} />
-          {releaseYear && <span className="shrink-0 text-xs text-muted">{releaseYear}</span>}
         </div>
         <CompletenessBadge percent={completeness.percent} compact full />
       </div>
