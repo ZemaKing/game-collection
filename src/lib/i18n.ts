@@ -221,6 +221,10 @@ const translations = {
     'autofill.errorRateLimited': 'RAWG je trenutno preopterećen. Pokušajte ponovo za koji trenutak.',
     'autofill.errorUnavailable': 'Automatsko popunjavanje trenutno nije dostupno.',
     'autofill.errorNetwork': 'Provera veze nije uspela. Proverite internet konekciju.',
+    'errorBoundary.title': 'Nešto je pošlo po zlu',
+    'errorBoundary.description':
+      'Aplikacija je naišla na neočekivanu grešku. Osvežite stranicu ili pokušajte kasnije.',
+    'errorBoundary.reload': 'Osveži stranicu',
   },
   en: {
     'common.retry': 'Retry',
@@ -436,6 +440,10 @@ const translations = {
     'autofill.errorRateLimited': 'RAWG is temporarily rate-limited. Try again shortly.',
     'autofill.errorUnavailable': 'Autofill is currently unavailable.',
     'autofill.errorNetwork': "Couldn't reach the network. Check your connection.",
+    'errorBoundary.title': 'Something went wrong',
+    'errorBoundary.description':
+      'The app hit an unexpected error. Reload the page or try again later.',
+    'errorBoundary.reload': 'Reload page',
   },
 } as const satisfies Record<Locale, Record<string, string>>
 

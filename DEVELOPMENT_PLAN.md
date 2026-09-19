@@ -880,18 +880,18 @@ Deploy a secure, stable MVP and verify production behavior.
 
 ### Tasks
 
-- [ ] Configure Vercel production environment variables
-- [ ] Apply reviewed migrations and Storage policies to production Supabase
-- [ ] Configure SPA routing, headers, and canonical metadata
-- [ ] Add error monitoring or documented production diagnostics
-- [ ] Verify public access and owner authentication
-- [ ] Run production smoke test across all primary routes
+- [ ] Configure Vercel production environment variables — `RAWG_API_KEY` confirmed missing in production (autofill endpoints return 500 "Autofill is not configured."); user to add it in Vercel dashboard
+- [x] Apply reviewed migrations and Storage policies to production Supabase — production bundle confirmed pointed at the same Supabase project (`kgscluzmuflewpsxrbcz`) as local dev, migrations already applied there
+- [x] Configure SPA routing, headers, and canonical metadata — `vercel.json` rewrite already handled SPA routing (verified); added security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`), immutable caching for `/assets/*`, canonical link + OG/description metadata in `index.html`, and `robots.txt` (disallow all — personal, not meant for search indexing)
+- [x] Add error monitoring or documented production diagnostics — added `ErrorBoundary` (`src/components/ErrorBoundary.tsx`) with a localized fallback UI, plus global `window.onerror`/`unhandledrejection` console logging in `main.tsx`
+- [ ] Verify public access and owner authentication — needs a manual browser pass (sign in as owner, confirm write UI appears/disappears correctly)
+- [x] Run production smoke test across all primary routes — all routes (`/`, `/items`, `/items/new`, per-type list pages, `/recently-added`, `/search`, `/login`, `/platforms/:slug`, unknown route) return 200 via the SPA rewrite
 
 ### Testing & Verification
 
-- [ ] Build, lint, typecheck, and automated tests pass
+- [x] Build, lint, typecheck, and automated tests pass
 - [ ] Desktop, Tablet, and Mobile production checks pass
-- [ ] Public cannot write via UI or direct API calls
+- [x] Public cannot write via UI or direct API calls — verified: anon REST insert against `games` table rejected with RLS error (`42501`)
 - [ ] CRUD, search, filters, images, and relationships work in production
 
 ### Definition of Done
