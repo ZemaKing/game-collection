@@ -79,11 +79,37 @@ function TypeOverlayBadge({ item }: { item: AllItemRow }) {
   )
 }
 
-/** Genre glyph shown on the subtitle row of grid cards, next to developer/publisher. */
-function GenreIcon({ slug, name }: { slug: string; name: string | null }) {
+/** Genre pill — same design as the genre badges on the item detail screen. */
+function GenreBadge({ slug, name }: { slug: string; name: string | null }) {
   const meta = GENRE_META[slug] ?? DEFAULT_GENRE_META
   const Icon = meta.icon
-  return <Icon size={13} className={`shrink-0 ${meta.color.icon}`} aria-label={name ?? undefined} />
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${meta.color.badge}`}
+    >
+      <Icon size={13} />
+      {name}
+    </span>
+  )
+}
+
+/** Icon + name for plain (non-overlay) platform text, e.g. list rows. */
+function PlatformLabel({
+  platformName,
+  platformSlug,
+  className = '',
+}: {
+  platformName: string
+  platformSlug?: string | null
+  className?: string
+}) {
+  const Icon = platformSlug ? PLATFORM_ICONS[platformSlug] : null
+  return (
+    <span className={`inline-flex min-w-0 items-center gap-1 ${className}`}>
+      {Icon && <Icon size={12} className="shrink-0" />}
+      <span className="truncate">{platformName}</span>
+    </span>
+  )
 }
 
 function PlatformBadge({ platformName, platformSlug }: { platformName: string; platformSlug?: string | null }) {
@@ -114,6 +140,8 @@ export function ItemCard({
   if (view === 'list') {
     const typeLabel = showTypeBadge ? t(ITEM_TYPE_META[item.item_type].labelKey) : null
 
+    const shortPlatform = (platformSlug && PLATFORM_SHORT_LABELS[platformSlug]) || platformName
+
     return (
       <Link
         to={to}
@@ -123,28 +151,68 @@ export function ItemCard({
           storagePath={item.cover_image_path}
           itemType={item.item_type}
           alt={item.title}
-          className="aspect-[4/5] w-14 rounded-md md:w-16"
+          className="aspect-[4/5] w-14 shrink-0 self-stretch rounded-md md:w-16"
         />
 
-        <div className="min-w-0 flex-1">
+        {/* Mobile (<md): title, publisher, compact genre·platform·year line, completeness+condition. */}
+        <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 md:hidden">
           <p className="truncate text-sm font-semibold text-text">{item.title}</p>
-          {/* Mobile: one compact combined line. Desktop/tablet: subtitle only, the rest moves into dedicated columns below. */}
-          <p className="truncate text-xs text-muted md:hidden">
-            {[typeLabel, platformName, item.subtitle].filter(Boolean).join(' · ') || ' '}
-          </p>
-          <p className="hidden min-w-0 truncate text-xs text-muted md:block">{item.subtitle || ' '}</p>
+          <p className="truncate text-xs text-muted">{[typeLabel, item.subtitle].filter(Boolean).join(' · ') || ' '}</p>
+          <div className="flex min-w-0 items-center gap-1.5">
+            {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+            <span className="flex min-w-0 items-center gap-1 truncate text-xs text-muted">
+              {shortPlatform && (
+                <PlatformLabel platformName={shortPlatform} platformSlug={platformSlug} className="shrink-0" />
+              )}
+              {releaseYear && <span>· {releaseYear}</span>}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <CompletenessBadge percent={completeness.percent} compact />
+            <ConditionBadge condition={item.condition} />
+          </div>
         </div>
 
-        <div className="hidden shrink-0 items-center gap-4 md:flex">
+        {/* Tablet (md–lg): title/publisher + completeness/condition on top, genre/platform/year below. */}
+        <div className="hidden min-w-0 flex-1 flex-col justify-center gap-1.5 lg:hidden md:flex">
+          <div className="flex min-w-0 items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-text">{item.title}</p>
+              <p className="truncate text-xs text-muted">{item.subtitle || ' '}</p>
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+              <CompletenessBadge percent={completeness.percent} compact />
+              <ConditionBadge condition={item.condition} />
+            </div>
+          </div>
+          <div className="flex min-w-0 items-center gap-4">
+            {showTypeBadge && <TypeBadge item={item} />}
+            {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+            {platformName ? (
+              <PlatformLabel platformName={platformName} platformSlug={platformSlug} className="text-xs text-muted" />
+            ) : (
+              <span className="text-xs text-muted">—</span>
+            )}
+            <span className="shrink-0 text-xs text-muted">{releaseYear ?? '—'}</span>
+          </div>
+        </div>
+
+        {/* Desktop (lg+): original horizontal table columns. */}
+        <div className="hidden min-w-0 flex-1 lg:block">
+          <p className="truncate text-sm font-semibold text-text">{item.title}</p>
+          <p className="truncate text-xs text-muted">{item.subtitle || ' '}</p>
+        </div>
+        <div className="hidden shrink-0 items-center gap-4 lg:flex">
           {showTypeBadge && <TypeBadge item={item} />}
-          <span className="flex w-4 shrink-0 justify-center">
-            {item.genre_slug && <GenreIcon slug={item.genre_slug} name={item.genre_name} />}
-          </span>
-          <span className="w-28 truncate text-xs text-muted">{platformName ?? '—'}</span>
+          {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+          {platformName ? (
+            <PlatformLabel platformName={platformName} platformSlug={platformSlug} className="w-28 text-xs text-muted" />
+          ) : (
+            <span className="w-28 text-xs text-muted">—</span>
+          )}
           <span className="w-10 text-xs text-muted">{releaseYear ?? '—'}</span>
         </div>
-
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="hidden shrink-0 items-center gap-3 lg:flex">
           <CompletenessBadge percent={completeness.percent} compact />
           <ConditionBadge condition={item.condition} />
         </div>
@@ -197,7 +265,7 @@ export function ItemCard({
         {(item.subtitle || item.genre_slug) && (
           <div className="flex min-w-0 items-center justify-between gap-1.5">
             <p className="min-w-0 flex-1 truncate text-xs text-muted">{item.subtitle}</p>
-            {item.genre_slug && <GenreIcon slug={item.genre_slug} name={item.genre_name} />}
+            {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
           </div>
         )}
         <div className="mt-1 flex min-w-0 items-center justify-between gap-2">

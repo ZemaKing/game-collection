@@ -1,12 +1,13 @@
 import { ItemCard } from '@/features/items/components/ItemCard'
 import type { RelatedItemRow } from '@/features/items/relationshipApi'
+import type { Platform } from '@/features/items/types'
 import type { TranslationKey } from '@/lib/i18n'
 import { useLocale } from '@/hooks/useLocale'
 
 interface RelatedItemsSectionProps {
   titleKey: TranslationKey
   items: RelatedItemRow[]
-  platformById: Map<string, string>
+  platformById: Map<string, Platform>
 }
 
 /**
@@ -23,15 +24,19 @@ export function RelatedItemsSection({ titleKey, items, platformById }: RelatedIt
     <section>
       <h2 className="heading-section mb-2 text-text">{t(titleKey)}</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-        {items.map((item) => (
-          <ItemCard
-            key={item.id}
-            item={item}
-            platformName={item.platform_id ? (platformById.get(item.platform_id) ?? null) : null}
-            view="grid"
-            showTypeBadge
-          />
-        ))}
+        {items.map((item) => {
+          const platform = item.platform_id ? (platformById.get(item.platform_id) ?? null) : null
+          return (
+            <ItemCard
+              key={item.id}
+              item={item}
+              platformName={platform?.name ?? null}
+              platformSlug={platform?.slug ?? null}
+              view="grid"
+              showTypeBadge
+            />
+          )
+        })}
       </div>
     </section>
   )

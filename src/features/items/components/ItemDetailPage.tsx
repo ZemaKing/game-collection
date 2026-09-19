@@ -5,7 +5,16 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { fetchPlatforms } from '@/features/items/api'
 import { calculateCompleteness, completenessFactsFromDetail } from '@/features/items/completeness'
-import { DEFAULT_GENRE_META, GENRE_META, ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
+import {
+  CONDITION_COLORS,
+  CONDITION_ICONS,
+  CONDITION_LABEL_KEYS,
+  DEFAULT_GENRE_META,
+  GENRE_META,
+  ITEM_TYPE_META,
+  ITEM_TYPE_ROUTES,
+  PLATFORM_ICONS,
+} from '@/features/items/constants'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
 import { ItemDetailSkeleton } from '@/features/items/components/ItemDetailSkeleton'
@@ -101,7 +110,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
     }
   }, [])
 
-  const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
+  const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p])), [platforms])
 
   if (state.status === 'loading') {
     return <ItemDetailSkeleton />
@@ -255,12 +264,35 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
 
         {fields.length > 0 && (
           <dl className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
-            {fields.map((field) => (
-              <div key={field.labelKey}>
-                <dt className="text-xs font-medium text-muted">{t(field.labelKey)}</dt>
-                <dd className="mt-0.5 text-sm text-text">{field.text}</dd>
-              </div>
-            ))}
+            {fields.map((field) => {
+              const PlatformIcon =
+                field.labelKey === 'filters.platform' && detail.platform ? PLATFORM_ICONS[detail.platform.slug] : null
+              if (field.labelKey === 'filters.condition' && detail.condition) {
+                const ConditionIcon = CONDITION_ICONS[detail.condition]
+                return (
+                  <div key={field.labelKey}>
+                    <dt className="text-xs font-medium text-muted">{t(field.labelKey)}</dt>
+                    <dd className="mt-0.5">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${CONDITION_COLORS[detail.condition].badge}`}
+                      >
+                        <ConditionIcon size={12} />
+                        {t(CONDITION_LABEL_KEYS[detail.condition])}
+                      </span>
+                    </dd>
+                  </div>
+                )
+              }
+              return (
+                <div key={field.labelKey}>
+                  <dt className="text-xs font-medium text-muted">{t(field.labelKey)}</dt>
+                  <dd className="mt-0.5 flex items-center gap-1.5 text-sm text-text">
+                    {PlatformIcon && <PlatformIcon size={14} className="shrink-0" />}
+                    {field.text}
+                  </dd>
+                </div>
+              )
+            })}
           </dl>
         )}
 
