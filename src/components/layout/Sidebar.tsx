@@ -1,4 +1,4 @@
-import { Gamepad2, Plus } from 'lucide-react'
+import { ChevronRight, Gamepad2, Plus } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { ITEM_TYPE_COLORS } from '@/features/items/constants'
@@ -101,10 +101,14 @@ export function Sidebar() {
         <Link
           to="/items/new"
           title={t('sidebar.addNewItem')}
-          className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-fg hover:bg-accent-hover"
+          className="group mt-3 flex items-center justify-center gap-3 rounded-xl border border-accent px-3 py-2.5 text-sm font-semibold text-text transition-colors hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent xl:justify-start"
         >
-          <Plus size={18} />
-          <span className="hidden xl:inline">{t('sidebar.addNewItem')}</span>
+          <Plus size={20} className="shrink-0 text-accent" />
+          <span className="hidden flex-1 xl:inline">{t('sidebar.addNewItem')}</span>
+          <ChevronRight
+            size={16}
+            className="hidden shrink-0 text-muted transition-transform group-hover:translate-x-0.5 xl:block"
+          />
         </Link>
       )}
     </aside>

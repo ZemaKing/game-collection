@@ -221,7 +221,7 @@ export function ItemCard({
   }
 
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-border bg-card hover:border-accent">
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card hover:border-accent">
       <div className="relative">
         <ItemImage storagePath={item.cover_image_path} itemType={item.item_type} alt={item.title} className="aspect-[4/5] w-full" />
         {platformName && (
@@ -236,7 +236,7 @@ export function ItemCard({
           </div>
         )}
       </div>
-      <div className="flex flex-col gap-1.5 p-3">
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
         <div className="flex items-start justify-between gap-1">
           <p className="line-clamp-2 flex-1 text-sm font-semibold text-text">{item.title}</p>
           {user && (
@@ -262,17 +262,21 @@ export function ItemCard({
             </DropdownMenu>
           )}
         </div>
-        {(item.subtitle || item.genre_slug) && (
-          <div className="flex min-w-0 items-center justify-between gap-1.5">
-            <p className="min-w-0 flex-1 truncate text-xs text-muted">{item.subtitle}</p>
-            {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+        {/* Everything below the title is pinned to the bottom so publisher/genre, year/condition and
+            completeness line up across cards in a row, however many lines the title takes. */}
+        <div className="mt-auto flex flex-col gap-1.5 pt-1">
+          {(item.subtitle || item.genre_slug) && (
+            <div className="flex min-w-0 items-center justify-between gap-1.5">
+              <p className="min-w-0 flex-1 truncate text-xs text-muted">{item.subtitle}</p>
+              {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+            </div>
+          )}
+          <div className="mt-1 flex min-w-0 items-center justify-between gap-2">
+            <span className="shrink-0 text-xs text-muted">{releaseYear}</span>
+            <ConditionBadge condition={item.condition} />
           </div>
-        )}
-        <div className="mt-1 flex min-w-0 items-center justify-between gap-2">
-          <span className="shrink-0 text-xs text-muted">{releaseYear}</span>
-          <ConditionBadge condition={item.condition} />
+          <CompletenessBadge percent={completeness.percent} compact full />
         </div>
-        <CompletenessBadge percent={completeness.percent} compact full />
       </div>
       <Link to={to} aria-label={item.title} className={`absolute inset-0 rounded-xl ${FOCUS_RING}`} />
     </div>

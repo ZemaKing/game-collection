@@ -72,13 +72,13 @@ export const ITEM_TYPE_META: Record<
  * everywhere. `icon` colors the glyph; `badge` is the tinted pill background
  * used on cards/checkmarks (kept low-opacity so it holds up in both themes).
  */
-export const ITEM_TYPE_COLORS: Record<ItemType, { icon: string; badge: string; hoverBorder: string }> = {
-  game: { icon: 'text-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300', hoverBorder: 'hover:border-emerald-400/60' },
-  special_edition: { icon: 'text-amber-400', badge: 'bg-amber-500/15 text-amber-300', hoverBorder: 'hover:border-amber-400/60' },
-  steelbook: { icon: 'text-violet-400', badge: 'bg-violet-500/15 text-violet-300', hoverBorder: 'hover:border-violet-400/60' },
-  artbook: { icon: 'text-orange-400', badge: 'bg-orange-500/15 text-orange-300', hoverBorder: 'hover:border-orange-400/60' },
-  figure: { icon: 'text-rose-400', badge: 'bg-rose-500/15 text-rose-300', hoverBorder: 'hover:border-rose-400/60' },
-  stuff: { icon: 'text-slate-400', badge: 'bg-slate-500/15 text-slate-300', hoverBorder: 'hover:border-slate-400/60' },
+export const ITEM_TYPE_COLORS: Record<ItemType, { icon: string; badge: string; hoverBorder: string; hoverBorderSolid: string }> = {
+  game: { icon: 'text-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300', hoverBorder: 'hover:border-emerald-400/60', hoverBorderSolid: 'hover:border-emerald-400' },
+  special_edition: { icon: 'text-amber-400', badge: 'bg-amber-500/15 text-amber-300', hoverBorder: 'hover:border-amber-400/60', hoverBorderSolid: 'hover:border-amber-400' },
+  steelbook: { icon: 'text-violet-400', badge: 'bg-violet-500/15 text-violet-300', hoverBorder: 'hover:border-violet-400/60', hoverBorderSolid: 'hover:border-violet-400' },
+  artbook: { icon: 'text-orange-400', badge: 'bg-orange-500/15 text-orange-300', hoverBorder: 'hover:border-orange-400/60', hoverBorderSolid: 'hover:border-orange-400' },
+  figure: { icon: 'text-rose-400', badge: 'bg-rose-500/15 text-rose-300', hoverBorder: 'hover:border-rose-400/60', hoverBorderSolid: 'hover:border-rose-400' },
+  stuff: { icon: 'text-slate-400', badge: 'bg-slate-500/15 text-slate-300', hoverBorder: 'hover:border-slate-400/60', hoverBorderSolid: 'hover:border-slate-400' },
 }
 
 /** URL path segments, matching the sidebar links in `lib/navigation.ts`. */

@@ -117,7 +117,7 @@ body {
     font-weight: 400;
   }
 
-  /* Sidebar / mobile nav sheet brand wordmark ("MY COLLECTION"). */
+  /* Sidebar / mobile nav sheet brand wordmark ("ZemaKing Games Collection", wraps to two rows). */
   .sidebar-brand {
     font-size: 15px;
     line-height: 20px;

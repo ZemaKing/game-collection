@@ -16,7 +16,7 @@ export function TypeSelector() {
             <Link
               key={type}
               to={`/items/new?type=${type}`}
-              className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-6 text-center transition-colors hover:border-accent hover:bg-card-hover"
+              className={`flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-6 text-center transition-colors hover:bg-card-hover ${ITEM_TYPE_COLORS[type].hoverBorderSolid}`}
             >
               <meta.icon size={28} className={ITEM_TYPE_COLORS[type].icon} />
               <span className="text-sm font-medium text-text">{t(meta.labelKey)}</span>
