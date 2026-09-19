@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  collectionSince,
   computeStatistics,
   effectiveAddedDate,
   MONTHS_SHOWN,
@@ -164,6 +165,30 @@ describe('computeStatistics', () => {
     const counts = stats.completeness.buckets.map((b) => b.count)
     expect(counts).toEqual([1, 0, 1, 0, 1])
     expect(counts.reduce((a, b) => a + b, 0)).toBe(stats.total)
+  })
+})
+
+describe('collectionSince', () => {
+  it('is null for an empty collection', () => {
+    expect(collectionSince([])).toBeNull()
+  })
+
+  it('is the earliest added date, preferring a back-dated collection date over created_at', () => {
+    const since = collectionSince([
+      row({ collection_date: '2026-05-10' }),
+      // Created last month but bought years ago.
+      row({ collection_date: '2019-11-03', created_at: new Date(2026, 7, 1, 9).toISOString() }),
+      row({ created_at: new Date(2024, 0, 15, 9).toISOString() }),
+    ])
+    expect(since && [since.getFullYear(), since.getMonth(), since.getDate()]).toEqual([2019, 10, 3])
+  })
+
+  it('falls back to created_at when no item has a collection date', () => {
+    const since = collectionSince([
+      row({ created_at: new Date(2026, 8, 1, 9).toISOString() }),
+      row({ created_at: new Date(2026, 2, 5, 10).toISOString() }),
+    ])
+    expect(since && [since.getFullYear(), since.getMonth()]).toEqual([2026, 2])
   })
 })
 

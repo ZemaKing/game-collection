@@ -97,6 +97,21 @@ export function effectiveAddedDate(row: Pick<StatsRow, 'collection_date' | 'crea
   return new Date(row.created_at)
 }
 
+/**
+ * When the collection began: the earliest "added" date of any item (see
+ * `effectiveAddedDate`), or `null` for an empty collection. A collection date
+ * can be back-dated to when an item was actually bought, so this can precede
+ * the first row's `created_at` — which is the point.
+ */
+export function collectionSince(rows: Pick<StatsRow, 'collection_date' | 'created_at'>[]): Date | null {
+  let earliest: Date | null = null
+  for (const row of rows) {
+    const added = effectiveAddedDate(row)
+    if (earliest === null || added < earliest) earliest = added
+  }
+  return earliest
+}
+
 function monthKey(year: number, month: number): string {
   return `${year}-${String(month + 1).padStart(2, '0')}`
 }

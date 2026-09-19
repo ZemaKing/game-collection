@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react'
 import { useEffect, useRef, type ComponentType, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -139,6 +140,27 @@ export function ColumnChart({ entries, caption, columnHeader, valueHeader }: Col
         </tbody>
       </table>
     </figure>
+  )
+}
+
+/** A single headline number with an icon and label. */
+export function MetricTile({
+  label,
+  value,
+  icon: Icon,
+  iconColor,
+}: {
+  label: string
+  value: string | number
+  icon: LucideIcon
+  iconColor: string
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-surface p-3">
+      <Icon size={16} className={`mb-1 ${iconColor}`} />
+      <p className="stat-number text-text">{value}</p>
+      <p className="stat-label text-muted">{label}</p>
+    </div>
   )
 }
 

@@ -1,4 +1,4 @@
-import { BarChart3, CalendarPlus, CheckCircle2, Gauge, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { BarChart3, CalendarPlus, CheckCircle2, Gauge, LayoutGrid } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PlusIcon } from '@/components/icons/ActionIcons'
@@ -19,7 +19,14 @@ import {
   ITEM_TYPES,
   PLATFORM_ICONS,
 } from '@/features/items/constants'
-import { BarList, ColumnChart, StatCard, type BarListEntry, type ColumnEntry } from '@/features/statistics/charts'
+import {
+  BarList,
+  ColumnChart,
+  MetricTile,
+  StatCard,
+  type BarListEntry,
+  type ColumnEntry,
+} from '@/features/statistics/charts'
 import { MONTHS_SHOWN, RECENT_WINDOW_DAYS } from '@/features/statistics/statistics'
 import { useStatistics } from '@/features/statistics/useStatistics'
 import { useAuth } from '@/hooks/useAuth'
@@ -33,26 +40,6 @@ const INTL_LOCALE: Record<Locale, string> = { sr: 'sr-Latn-RS', en: 'en-US' }
 
 function share(count: number, total: number): number {
   return total === 0 ? 0 : Math.round((count / total) * 100)
-}
-
-function MetricTile({
-  label,
-  value,
-  icon: Icon,
-  iconColor,
-}: {
-  label: string
-  value: string | number
-  icon: LucideIcon
-  iconColor: string
-}) {
-  return (
-    <div className="rounded-lg border border-border bg-surface p-3">
-      <Icon size={16} className={`mb-1 ${iconColor}`} />
-      <p className="stat-number text-text">{value}</p>
-      <p className="stat-label text-muted">{label}</p>
-    </div>
-  )
 }
 
 function StatisticsSkeleton() {

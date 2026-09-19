@@ -16,6 +16,7 @@ import GameEditPage from '@/pages/GameEditPage'
 import GamesPage from '@/pages/GamesPage'
 import LoginPage from '@/pages/LoginPage'
 import PlatformPage from '@/pages/PlatformPage'
+import ProfilePage from '@/pages/ProfilePage'
 import RecentlyAddedPage from '@/pages/RecentlyAddedPage'
 import SearchPage from '@/pages/SearchPage'
 import SettingsPage from '@/pages/SettingsPage'
@@ -108,6 +109,7 @@ function App() {
         <Route path="recently-added" element={<RecentlyAddedPage />} />
         <Route path="statistics" element={<StatisticsPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route path="search" element={<SearchPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="*" element={<ComingSoonPage />} />

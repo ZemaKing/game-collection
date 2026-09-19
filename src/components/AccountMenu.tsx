@@ -1,4 +1,4 @@
-import { LogIn, LogOut } from 'lucide-react'
+import { LogIn, LogOut, User } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
   DropdownMenu,
@@ -38,6 +38,12 @@ export function AccountMenu() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem asChild>
+          <Link to="/profile">
+            <User size={16} />
+            <span className="flex-1">{t('nav.profile')}</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => signOut()}>
           <LogOut size={16} />
           <span className="flex-1">{t('auth.signOut')}</span>

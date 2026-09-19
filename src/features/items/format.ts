@@ -14,6 +14,11 @@ export function formatDate(isoDate: string, locale: Locale): string {
   return formatter.format(new Date(isoDate))
 }
 
+/** "September 2026" — takes a local-time `Date`, so a plain calendar date never shifts a day across timezones. */
+export function formatMonthYear(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], { month: 'long', year: 'numeric' }).format(date)
+}
+
 const RELATIVE_UNITS: { limit: number; divisor: number; unit: Intl.RelativeTimeFormatUnit }[] = [
   { limit: 60, divisor: 1, unit: 'minute' },
   { limit: 60 * 24, divisor: 60, unit: 'hour' },

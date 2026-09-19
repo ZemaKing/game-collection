@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 25 — Settings & Preferences (Post-MVP)  
+Current Phase: Phase 26 — Profile & Collection Overview (Post-MVP)  
 MVP Status: Complete
 
 ## MVP Progress
@@ -49,7 +49,7 @@ MVP Status: Complete
 
 - [x] Phase 24 — Statistics & Collection Insights
 - [x] Phase 25 — Settings & Preferences
-- [ ] Phase 26 — Profile & Collection Overview
+- [x] Phase 26 — Profile & Collection Overview
 - [ ] Phase 27 — Responsive Refinement Pass
 - [ ] Phase 28 — Accessibility Pass
 - [ ] Phase 29 — Performance Pass
@@ -978,25 +978,25 @@ Complete the Profile destination already represented in mobile navigation.
 
 ### Tasks
 
-- [ ] Build profile/collection overview route
-- [ ] Show avatar, collection name, collection-since date, and high-level stats
-- [ ] Link to Recently Added, Statistics, and Settings
-- [ ] Distinguish public collection overview from owner-only account actions
-- [ ] Add logout action for authenticated owner
+- [x] Build profile/collection overview route — public `/profile` (`ProfilePage.tsx`), the destination the mobile Profile tab already pointed at. It reuses `useStatistics` (the same single `all_items` pass as `/statistics`), so its numbers can't disagree with the Statistics page; no new query or table. `MetricTile` moved from `StatisticsPage` into `statistics/charts.tsx` so both pages share it
+- [x] Show avatar, collection name, collection-since date, and high-level stats — there is no profile table (single-owner site, and adding one would need a migration and RLS for little gain), so the avatar is the sidebar's brand glyph in an accent circle and the name is the existing `sidebar.title`. "Collecting since" is the earliest added date of any item (`collectionSince` in `statistics.ts`: collection date when set, else `created_at`, same rule as the additions chart), shown as month + year and hidden for an empty collection. Stats: total, average completeness, added in the last 30 days, fully complete, plus a per-type count grid linking to each type's listing
+- [x] Link to Recently Added, Statistics, and Settings — "Explore" cards on the page. `/profile` also joined `collectionNavItems` (sidebar + mobile menu) and the owner's account dropdown, so desktop/tablet reach it too
+- [x] Distinguish public collection overview from owner-only account actions — the overview is identical for everyone; only the "Account" section differs. Owner: signed-in email, an Owner badge in the header, Add New Item and Sign Out. Visitor: a note that only the owner can edit, and a Sign In link. RLS still does the real enforcement
+- [x] Add logout action for authenticated owner — Sign Out button in the Account section (same `signOut` as the account menu; the page simply re-renders as the visitor view)
 
 ### UI / UX
 
-- [ ] Desktop integrates naturally with the application shell
-- [ ] Tablet uses compact overview cards
-- [ ] Mobile provides a complete destination for the Profile tab
+- [x] Desktop integrates naturally with the application shell — centered `max-w-4xl` column in the normal content area; the Profile row is highlighted in the sidebar
+- [x] Tablet uses compact overview cards — 2-column metric tiles, 3-column type grid and 3 explore cards at ~820px
+- [x] Mobile provides a complete destination for the Profile tab — stacked cards, 2-column tiles, Profile tab highlighted, content clears the bottom bar
 
 ### Definition of Done
 
-- [ ] Profile has a clear purpose and works for both public and owner contexts
+- [x] Profile has a clear purpose and works for both public and owner contexts — verified live against the dev data (28 items, since March 2025) at 1440px, 820px and 375px in the visitor view: no horizontal overflow, Serbian strings, dark theme. The owner-only Account section (email, Add, Sign Out) was **not** exercised in a browser — that needs a real sign-in — and light theme and English were not re-checked visually. `statistics.test.ts` gained 3 tests for `collectionSince` (empty, back-dated collection date, `created_at` fallback); build, lint and all 42 tests pass
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

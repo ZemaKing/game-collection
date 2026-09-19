@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   PersonStanding,
   Star,
+  User,
   type LucideIcon,
 } from 'lucide-react'
 import type { ComponentType } from 'react'
@@ -66,4 +67,5 @@ export function visiblePlatformNavItems(slugs: readonly string[]) {
 export const collectionNavItems: NavItem[] = [
   { labelKey: 'nav.recentlyAdded', to: '/recently-added', icon: Clock },
   { labelKey: 'nav.statistics', to: '/statistics', icon: BarChart3 },
+  { labelKey: 'nav.profile', to: '/profile', icon: User },
 ]
