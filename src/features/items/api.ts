@@ -30,6 +30,19 @@ export async function fetchTags(): Promise<Tag[]> {
   return data
 }
 
+/**
+ * Distinct stored edition names present in the collection (games, special
+ * editions, steelbooks), optionally limited to one item type so single-type
+ * listings only offer editions that can match.
+ */
+export async function fetchAvailableEditions(itemType?: ItemType): Promise<string[]> {
+  let query = supabase.from('all_items').select('edition_name').not('edition_name', 'is', null)
+  if (itemType) query = query.eq('item_type', itemType)
+  const { data, error } = await query
+  if (error) throw error
+  return Array.from(new Set((data ?? []).map((row) => row.edition_name as string).filter(Boolean)))
+}
+
 /** Distinct release years present in the collection, newest first. */
 export async function fetchAvailableYears(): Promise<number[]> {
   const { data, error } = await supabase
@@ -62,6 +75,7 @@ export interface FetchItemsParams {
   platformIds: string[]
   genreIds: string[]
   tagIds: string[]
+  editions: string[]
   years: number[]
   conditions: ItemCondition[]
   collectionDateFrom: string | null
@@ -143,6 +157,7 @@ export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsRe
   if (params.search.trim()) query = query.ilike('title', `%${params.search.trim()}%`)
   if (params.itemTypes.length) query = query.in('item_type', params.itemTypes)
   if (params.platformIds.length) query = query.in('platform_id', params.platformIds)
+  if (params.editions.length) query = query.in('edition_name', params.editions)
   if (params.conditions.length) query = query.in('condition', params.conditions)
   if (params.collectionDateFrom) query = query.gte('collection_date', params.collectionDateFrom)
   if (params.collectionDateTo) query = query.lte('collection_date', params.collectionDateTo)

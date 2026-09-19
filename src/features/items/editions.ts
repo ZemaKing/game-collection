@@ -170,6 +170,46 @@ export function resolveEdition(
   return null
 }
 
+export interface EditionGroup {
+  /** Stable id: the known edition's key, or `custom:<normalized name>`. */
+  id: string
+  /** Every distinct stored `edition_name` that resolves to this edition (e.g. "GOTY" and "Game of the Year Edition"). */
+  names: string[]
+  /** One stored name to render the label/glyph from. */
+  name: string
+  edition: EditionDef | null
+}
+
+/**
+ * Collapses the distinct stored edition names into filter options: spellings of
+ * the same known edition become one option; free-text names stay separate.
+ * Known editions come first in selector order, then custom names A–Z.
+ */
+export function groupEditionNames(names: string[]): EditionGroup[] {
+  const groups = new Map<string, EditionGroup>()
+  for (const name of names) {
+    const edition = resolveEdition(name)
+    const id = edition ? edition.key : `custom:${normalize(name)}`
+    const existing = groups.get(id)
+    if (existing) existing.names.push(name)
+    else groups.set(id, { id, names: [name], name, edition })
+  }
+  const known = EDITIONS.map((e) => groups.get(e.key)).filter((g): g is EditionGroup => !!g)
+  const custom = [...groups.values()]
+    .filter((g) => !g.edition)
+    .sort((a, b) => a.name.localeCompare(b.name))
+  return [...known, ...custom]
+}
+
+/** Localized display text for an edition name, e.g. "Deluxe Edition" / "Deluxe Izdanje". */
+export function editionDisplayName(
+  name: string,
+  t: (key: TranslationKey) => string,
+): string {
+  const edition = resolveEdition(name)
+  return edition ? `${t(edition.nameKey)} ${t('edition.suffix')}` : name
+}
+
 /** Item types that carry an edition (`edition_name`): games, special editions and steelbooks. */
 export function hasEditionField(itemType: string): boolean {
   return (

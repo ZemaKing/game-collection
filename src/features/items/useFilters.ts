@@ -10,6 +10,7 @@ export interface Filters {
   platformIds: string[]
   genreIds: string[]
   tagIds: string[]
+  editions: string[]
   years: number[]
   conditions: ItemCondition[]
   collectionDateFrom: string | null
@@ -23,6 +24,7 @@ export const DEFAULT_FILTERS: Filters = {
   platformIds: [],
   genreIds: [],
   tagIds: [],
+  editions: [],
   years: [],
   conditions: [],
   collectionDateFrom: null,
@@ -36,6 +38,7 @@ const PARAM_KEYS = {
   platformIds: 'platform',
   genreIds: 'genre',
   tagIds: 'tag',
+  editions: 'edition',
   years: 'year',
   conditions: 'condition',
   collectionDateFrom: 'from',
@@ -62,6 +65,7 @@ function parseFilters(params: URLSearchParams): Filters {
     platformIds: params.get(PARAM_KEYS.platformIds)?.split(',').filter(Boolean) ?? [],
     genreIds: params.get(PARAM_KEYS.genreIds)?.split(',').filter(Boolean) ?? [],
     tagIds: params.get(PARAM_KEYS.tagIds)?.split(',').filter(Boolean) ?? [],
+    editions: params.get(PARAM_KEYS.editions)?.split(',').filter(Boolean) ?? [],
     years,
     conditions,
     collectionDateFrom: params.get(PARAM_KEYS.collectionDateFrom) || null,
@@ -77,6 +81,7 @@ function serializeFilters(filters: Filters, preserve: URLSearchParams): URLSearc
   next.delete(PARAM_KEYS.platformIds)
   next.delete(PARAM_KEYS.genreIds)
   next.delete(PARAM_KEYS.tagIds)
+  next.delete(PARAM_KEYS.editions)
   next.delete(PARAM_KEYS.years)
   next.delete(PARAM_KEYS.conditions)
   next.delete(PARAM_KEYS.collectionDateFrom)
@@ -88,6 +93,7 @@ function serializeFilters(filters: Filters, preserve: URLSearchParams): URLSearc
   if (filters.platformIds.length) next.set(PARAM_KEYS.platformIds, filters.platformIds.join(','))
   if (filters.genreIds.length) next.set(PARAM_KEYS.genreIds, filters.genreIds.join(','))
   if (filters.tagIds.length) next.set(PARAM_KEYS.tagIds, filters.tagIds.join(','))
+  if (filters.editions.length) next.set(PARAM_KEYS.editions, filters.editions.join(','))
   if (filters.years.length) next.set(PARAM_KEYS.years, filters.years.join(','))
   if (filters.conditions.length) next.set(PARAM_KEYS.conditions, filters.conditions.join(','))
   if (filters.collectionDateFrom) next.set(PARAM_KEYS.collectionDateFrom, filters.collectionDateFrom)

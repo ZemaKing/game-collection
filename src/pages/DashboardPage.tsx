@@ -8,6 +8,7 @@ import { ErrorState } from '@/components/ui/ErrorState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { SummaryPanel } from '@/features/dashboard/SummaryPanel'
 import {
+  fetchAvailableEditions,
   fetchAvailableYears,
   fetchDashboardSummary,
   fetchGenreSummary,
@@ -56,6 +57,7 @@ function DashboardPage() {
   const [genres, setGenres] = useState<Genre[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [years, setYears] = useState<number[]>([])
+  const [editions, setEditions] = useState<string[]>([])
   const [summary, setSummary] = useState<DashboardSummary | null>(null)
   const [genreSummary, setGenreSummary] = useState<GenreSummaryRow[]>([])
   const [recentItems, setRecentItems] = useState<AllItemRow[]>([])
@@ -81,16 +83,18 @@ function DashboardPage() {
       fetchGenres(),
       fetchTags(),
       fetchAvailableYears(),
+      fetchAvailableEditions(),
       fetchDashboardSummary(),
       fetchGenreSummary(),
       fetchRecentlyAdded(5),
     ])
-      .then(([platformsData, genresData, tagsData, yearsData, summaryData, genreSummaryData, recentData]) => {
+      .then(([platformsData, genresData, tagsData, yearsData, editionsData, summaryData, genreSummaryData, recentData]) => {
         if (cancelled) return
         setPlatforms(platformsData)
         setGenres(genresData)
         setTags(tagsData)
         setYears(yearsData)
+        setEditions(editionsData)
         setSummary(summaryData)
         setGenreSummary(genreSummaryData)
         setRecentItems(recentData)
@@ -113,6 +117,7 @@ function DashboardPage() {
     filters.platformIds.length > 0 ||
     filters.genreIds.length > 0 ||
     filters.tagIds.length > 0 ||
+    filters.editions.length > 0 ||
     filters.years.length > 0 ||
     filters.conditions.length > 0 ||
     filters.collectionDateFrom !== null ||
@@ -159,6 +164,7 @@ function DashboardPage() {
             genres={genres}
             tags={tags}
             years={years}
+            editions={editions}
           />
         </div>
       )}
@@ -242,6 +248,7 @@ function DashboardPage() {
                 genres={genres}
                 tags={tags}
                 years={years}
+                editions={editions}
               />
             </div>
           )}

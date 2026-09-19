@@ -97,6 +97,7 @@ function RecentlyAddedPage() {
       platformIds: [],
       genreIds: [],
       tagIds: [],
+      editions: [],
       years: [],
       conditions: [],
       collectionDateFrom: null,

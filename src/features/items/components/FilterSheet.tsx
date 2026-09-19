@@ -1,6 +1,6 @@
 import * as RadixDialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
-import { useState, type ComponentType, type ReactNode } from 'react'
+import { useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import { CheckIcon, CloseIcon } from '@/components/icons/ActionIcons'
 import { Button, ButtonIcon } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/buttonStyles'
@@ -19,6 +19,8 @@ import {
   GENRE_META,
   PLATFORM_ICONS,
 } from '@/features/items/constants'
+import { EditionGlyph } from '@/features/items/components/EditionBadge'
+import { editionDisplayName, groupEditionNames } from '@/features/items/editions'
 import type { Genre, Platform } from '@/features/items/types'
 import type { Tag } from '@/features/items/api'
 import { DEFAULT_FILTERS, type Filters } from '@/features/items/useFilters'
@@ -34,12 +36,14 @@ function CheckboxRow({
   onChange,
   icon: Icon,
   iconColor,
+  glyph,
 }: {
   label: string
   checked: boolean
   onChange: () => void
   icon?: ComponentType<{ size?: number; className?: string }>
   iconColor?: string
+  glyph?: ReactNode
 }) {
   return (
     <label className="flex cursor-pointer items-center gap-2.5 rounded-md px-1 py-1.5 text-sm text-text hover:bg-card-hover">
@@ -49,7 +53,7 @@ function CheckboxRow({
         onChange={onChange}
         className="size-4 shrink-0 rounded border-border accent-accent"
       />
-      {Icon && <Icon size={15} className={`shrink-0 ${iconColor}`} />}
+      {glyph ?? (Icon && <Icon size={15} className={`shrink-0 ${iconColor}`} />)}
       {label}
     </label>
   )
@@ -72,10 +76,13 @@ interface FilterSheetProps {
   showTypeFilter: boolean
   showPlatformFilter: boolean
   showGenreFilter: boolean
+  showEditionFilter: boolean
   platforms: Platform[]
   genres: Genre[]
   tags: Tag[]
   years: number[]
+  /** Distinct stored edition names present in the collection. */
+  editions: string[]
 }
 
 export function FilterSheet({
@@ -86,12 +93,15 @@ export function FilterSheet({
   showTypeFilter,
   showPlatformFilter,
   showGenreFilter,
+  showEditionFilter,
   platforms,
   genres,
   tags,
   years,
+  editions,
 }: FilterSheetProps) {
   const { t } = useLocale()
+  const editionGroups = useMemo(() => groupEditionNames(editions), [editions])
   const [draft, setDraft] = useState<Filters>(filters)
 
   // Re-seed the draft from the applied filters every time the sheet opens,
@@ -236,6 +246,32 @@ export function FilterSheet({
                       />
                     )
                   })}
+                </div>
+              </FilterSection>
+            )}
+
+            {showEditionFilter && editionGroups.length > 0 && (
+              <FilterSection title={t('filters.editions')}>
+                <div className="flex flex-col">
+                  {editionGroups.map((group) => (
+                    <CheckboxRow
+                      key={group.id}
+                      label={editionDisplayName(group.name, t)}
+                      glyph={<EditionGlyph edition={group.edition} size={12} />}
+                      checked={group.names.some((name) => draft.editions.includes(name))}
+                      onChange={() =>
+                        setDraft((d) => {
+                          const selected = group.names.some((name) => d.editions.includes(name))
+                          return {
+                            ...d,
+                            editions: selected
+                              ? d.editions.filter((v) => !group.names.includes(v))
+                              : [...d.editions, ...group.names],
+                          }
+                        })
+                      }
+                    />
+                  ))}
                 </div>
               </FilterSection>
             )}

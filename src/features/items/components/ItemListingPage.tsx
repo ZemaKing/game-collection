@@ -2,6 +2,7 @@ import { Gamepad2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
+  fetchAvailableEditions,
   fetchAvailableYears,
   fetchGenres,
   fetchPlatforms,
@@ -11,6 +12,7 @@ import {
 import { PlusIcon } from '@/components/icons/ActionIcons'
 import { Button } from '@/components/ui/Button'
 import { ITEM_TYPE_META, PLATFORM_ICONS } from '@/features/items/constants'
+import { hasEditionField } from '@/features/items/editions'
 import { useFilters } from '@/features/items/useFilters'
 import { useItemListing } from '@/features/items/useItemListing'
 import { useListingPrefs } from '@/features/items/useListingPrefs'
@@ -62,16 +64,24 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
   const [genres, setGenres] = useState<Genre[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [years, setYears] = useState<number[]>([])
+  const [editions, setEditions] = useState<string[]>([])
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([fetchPlatforms(), fetchGenres(), fetchTags(), fetchAvailableYears()])
-      .then(([platformsData, genresData, tagsData, yearsData]) => {
+    Promise.all([
+      fetchPlatforms(),
+      fetchGenres(),
+      fetchTags(),
+      fetchAvailableYears(),
+      fetchAvailableEditions(itemType),
+    ])
+      .then(([platformsData, genresData, tagsData, yearsData, editionsData]) => {
         if (cancelled) return
         setPlatforms(platformsData)
         setGenres(genresData)
         setTags(tagsData)
         setYears(yearsData)
+        setEditions(editionsData)
       })
       .catch(() => {
         // Filter option lists are supplementary; the grid below surfaces load errors.
@@ -79,7 +89,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [itemType])
 
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p])), [platforms])
 
@@ -94,6 +104,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
     filters.platformIds.length > 0 ||
     filters.genreIds.length > 0 ||
     filters.tagIds.length > 0 ||
+    filters.editions.length > 0 ||
     filters.years.length > 0 ||
     filters.conditions.length > 0 ||
     filters.collectionDateFrom !== null ||
@@ -121,9 +132,11 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
         genres={genres}
         tags={tags}
         years={years}
+        editions={editions}
         showTypeFilter={!itemType}
         showPlatformFilter={!platform}
         showGenreFilter={showGenreFilter}
+        showEditionFilter={!itemType || hasEditionField(itemType)}
       />
 
       {deletedBannerTitle && (

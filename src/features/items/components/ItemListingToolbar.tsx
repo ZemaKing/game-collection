@@ -16,7 +16,7 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react'
-import { useEffect, useMemo, useState, type ComponentType } from 'react'
+import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import { CloseIcon } from '@/components/icons/ActionIcons'
 import { ButtonIcon } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/buttonStyles'
@@ -32,6 +32,8 @@ import {
   ITEM_TYPE_META,
   PLATFORM_ICONS,
 } from '@/features/items/constants'
+import { editionDisplayName, groupEditionNames } from '@/features/items/editions'
+import { EditionGlyph } from '@/features/items/components/EditionBadge'
 import { FilterSheet } from '@/features/items/components/FilterSheet'
 import type { ViewMode } from '@/features/items/useListingPrefs'
 import type { Filters } from '@/features/items/useFilters'
@@ -65,6 +67,8 @@ interface Chip {
   onRemove: () => void
   icon?: ComponentType<{ size?: number; className?: string }>
   iconColor?: string
+  /** Pre-rendered leading element (e.g. an edition glyph); shown instead of `icon`. */
+  glyph?: ReactNode
 }
 
 interface ItemListingToolbarProps {
@@ -77,12 +81,16 @@ interface ItemListingToolbarProps {
   genres: Genre[]
   tags: Tag[]
   years: number[]
+  /** Distinct stored edition names present in the collection. */
+  editions: string[]
   /** Hide the item-type facet on single-type listing pages. */
   showTypeFilter?: boolean
   /** Hide the platform facet on per-platform listing pages. */
   showPlatformFilter?: boolean
   /** Hide the genre facet where it can never match (non-game type pages). */
   showGenreFilter?: boolean
+  /** Hide the edition facet where it can never match (artbook/figure/stuff pages). */
+  showEditionFilter?: boolean
 }
 
 export function ItemListingToolbar({
@@ -95,9 +103,11 @@ export function ItemListingToolbar({
   genres,
   tags,
   years,
+  editions,
   showTypeFilter = true,
   showPlatformFilter = true,
   showGenreFilter = true,
+  showEditionFilter = true,
 }: ItemListingToolbarProps) {
   const { t } = useLocale()
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -124,6 +134,8 @@ export function ItemListingToolbar({
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p])), [platforms])
   const genreById = useMemo(() => new Map(genres.map((g) => [g.id, g])), [genres])
   const tagById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags])
+
+  const editionGroups = useMemo(() => groupEditionNames(editions), [editions])
 
   const chips: Chip[] = [
     ...(showTypeFilter ? filters.itemTypes : []).map((type: ItemType) => ({
@@ -179,6 +191,14 @@ export function ItemListingToolbar({
         iconColor: meta?.color ?? 'text-muted',
       }
     }),
+    ...(showEditionFilter ? editionGroups : [])
+      .filter((group) => group.names.some((name) => filters.editions.includes(name)))
+      .map((group) => ({
+        key: `edition:${group.id}`,
+        label: editionDisplayName(group.name, t),
+        onRemove: () => setFilters({ editions: filters.editions.filter((v) => !group.names.includes(v)) }),
+        glyph: <EditionGlyph edition={group.edition} size={12} />,
+      })),
     ...(filters.collectionDateFrom || filters.collectionDateTo
       ? [
           {
@@ -330,7 +350,7 @@ export function ItemListingToolbar({
                       key={chip.key}
                       className="inline-flex items-center gap-1.5 rounded-full bg-card-hover px-3 py-1.5 text-sm font-medium text-text"
                     >
-                      {ChipIcon && <ChipIcon size={14} className={chip.iconColor ?? 'text-muted'} />}
+                      {chip.glyph ?? (ChipIcon && <ChipIcon size={14} className={chip.iconColor ?? 'text-muted'} />)}
                       {chip.label}
                       <button
                         type="button"
@@ -357,10 +377,12 @@ export function ItemListingToolbar({
         showTypeFilter={showTypeFilter}
         showPlatformFilter={showPlatformFilter}
         showGenreFilter={showGenreFilter}
+        showEditionFilter={showEditionFilter}
         platforms={platforms}
         genres={genres}
         tags={tags}
         years={years}
+        editions={editions}
       />
     </div>
   )
