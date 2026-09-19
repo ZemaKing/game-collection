@@ -1,6 +1,7 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { DatePickerField } from '@/components/ui/DatePickerField'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Input } from '@/components/ui/Input'
 import { MultiSelect } from '@/components/ui/MultiSelect'
@@ -117,13 +118,12 @@ export function ItemForm({
     }
     if (field.kind === 'date') {
       return (
-        <Input
+        <DatePickerField
           key={field.name}
-          type="date"
           label={label}
           name={field.name}
           value={value as string}
-          onChange={(e) => setField(field.name, e.target.value as never)}
+          onChange={(next) => setField(field.name, next as never)}
           error={error}
         />
       )

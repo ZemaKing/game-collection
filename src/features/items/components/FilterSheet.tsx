@@ -1,6 +1,8 @@
 import * as RadixDialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { useState, type ComponentType, type ReactNode } from 'react'
+import { DatePickerField } from '@/components/ui/DatePickerField'
+import { parseIsoDate } from '@/lib/isoDate'
 import {
   ITEM_CONDITIONS,
   ITEM_TYPES,
@@ -228,22 +230,20 @@ export function FilterSheet({
 
             <FilterSection title={t('filters.collectionDate')}>
               <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  aria-label={t('filters.collectionDateFrom')}
+                <DatePickerField
+                  ariaLabel={t('filters.collectionDateFrom')}
+                  name="collectionDateFrom"
                   value={draft.collectionDateFrom ?? ''}
-                  onChange={(e) =>
-                    setDraft((d) => ({ ...d, collectionDateFrom: e.target.value || null }))
-                  }
-                  className="w-full rounded-md border border-border bg-bg px-2 py-1.5 text-sm text-text"
+                  onChange={(next) => setDraft((d) => ({ ...d, collectionDateFrom: next || null }))}
+                  maxDate={draft.collectionDateTo ? parseIsoDate(draft.collectionDateTo) : undefined}
                 />
                 <span className="text-muted">–</span>
-                <input
-                  type="date"
-                  aria-label={t('filters.collectionDateTo')}
+                <DatePickerField
+                  ariaLabel={t('filters.collectionDateTo')}
+                  name="collectionDateTo"
                   value={draft.collectionDateTo ?? ''}
-                  onChange={(e) => setDraft((d) => ({ ...d, collectionDateTo: e.target.value || null }))}
-                  className="w-full rounded-md border border-border bg-bg px-2 py-1.5 text-sm text-text"
+                  onChange={(next) => setDraft((d) => ({ ...d, collectionDateTo: next || null }))}
+                  minDate={draft.collectionDateFrom ? parseIsoDate(draft.collectionDateFrom) : undefined}
                 />
               </div>
             </FilterSection>
