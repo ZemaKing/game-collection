@@ -38,6 +38,17 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
     return <ErrorState message={t('listing.error', { message: state.message })} onRetry={state.reload} />
   }
 
+  // The form copies its initial relationships once at mount and a save replaces
+  // the stored links with whatever it holds, so it must not mount before they
+  // are known — nor on a failed fetch, where it would delete them all.
+  if (relationships.status === 'loading') {
+    return <ItemDetailSkeleton />
+  }
+
+  if (relationships.status === 'error') {
+    return <ErrorState message={t('form.relationshipsError')} onRetry={relationships.reload} />
+  }
+
   const { detail, tags } = state
   const initialValues = detailToFormState(
     detail,

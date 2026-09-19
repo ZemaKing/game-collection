@@ -190,6 +190,8 @@ const translations = {
     'form.unsavedChangesBody': 'Imate nesačuvane izmene. Ako nastavite, one će biti izgubljene.',
     'form.discardChanges': 'Odbaci izmene',
     'form.keepEditing': 'Nastavi izmenu',
+    'form.relationshipsError':
+      'Nije moguće učitati povezane stavke. Izmena je onemogućena da se postojeće veze ne bi izgubile.',
     'form.selectDate': 'Izaberite datum',
     'form.today': 'Danas',
     'form.clear': 'Obriši',
@@ -493,6 +495,8 @@ const translations = {
     'form.unsavedChangesBody': 'You have unsaved changes. If you continue, they will be lost.',
     'form.discardChanges': 'Discard Changes',
     'form.keepEditing': 'Keep Editing',
+    'form.relationshipsError':
+      "Couldn't load the related items. Editing is disabled so the existing links aren't lost.",
     'form.selectDate': 'Select date',
     'form.today': 'Today',
     'form.clear': 'Clear',

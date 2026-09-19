@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
+import { escapeLikePattern } from '@/features/items/likePattern'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 
 const MATCH_LIMIT = 10
@@ -6,7 +7,8 @@ const MATCH_LIMIT = 10
 /**
  * "Likely duplicate" = same item type + same title, case/whitespace
  * insensitive (`ilike` with no wildcards is an exact case-insensitive
- * match). Deliberately title-only, no platform/publisher narrowing —
+ * match; `%`, `_` and `\` in the title are escaped so they can't act as
+ * wildcards). Deliberately title-only, no platform/publisher narrowing —
  * confirmed with the owner during planning as the simplest rule that still
  * catches the common case (re-adding an item already in the collection).
  */
@@ -18,7 +20,7 @@ export async function findLikelyDuplicates(itemType: ItemType, title: string): P
     .from('all_items')
     .select('*')
     .eq('item_type', itemType)
-    .ilike('title', normalized)
+    .ilike('title', escapeLikePattern(normalized))
     .limit(MATCH_LIMIT)
   if (error) throw error
   return data ?? []
