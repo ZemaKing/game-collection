@@ -28,7 +28,7 @@ Local Supabase env vars live in `.env.local` (see `.env.local.example`): `VITE_S
 
 Games autofill (Phase 21) uses `RAWG_API_KEY` — server-only, no `VITE_` prefix, so it never reaches the client bundle. It's read by the `/api/*` Vercel serverless functions and, for local dev, by a Vite dev-server middleware in `vite.config.ts` that mounts the same routes. Must also be set in the Vercel project's environment variables for preview/production (as of Phase 23 it was still missing in production, so autofill returns 500 there).
 
-Only pure-function unit tests exist (`completeness.test.ts`, `statistics.test.ts`); there is no component/E2E test setup. `tsc -b` type-checks both `src/` (`tsconfig.app.json`) and `api/` + `vite.config.ts` (`tsconfig.node.json`, which uses `erasableSyntaxOnly` — no enums/parameter properties in `api/`).
+Tests are Vitest: pure-function unit tests (`*.test.ts`) plus component tests (`*.test.tsx`) that opt in to jsdom with a `// @vitest-environment jsdom` docblock and render through `renderWithProviders`/`makeItem` in `src/test/render.tsx` (English locale, router, optional signed-in auth context; Supabase env vars are stubbed in the `test` block of `vite.config.ts`). There is no E2E setup yet.
 
 ## Architecture
 

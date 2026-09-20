@@ -2,7 +2,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { defineConfig, loadEnv, type Plugin } from 'vite'
+import { loadEnv, type Plugin } from 'vite'
+import { defineConfig } from 'vitest/config'
 import { getRawgGameDetails, RawgApiError, searchRawgGames } from './api/_rawg.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -102,6 +103,10 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), tailwindcss(), rawgDevApiPlugin(env.RAWG_API_KEY)],
+    test: {
+      setupFiles: ['./src/test/setup.ts'],
+      env: { VITE_SUPABASE_URL: 'http://localhost:54321', VITE_SUPABASE_ANON_KEY: 'test-anon-key' },
+    },
     resolve: {
       alias: {
         '@': path.resolve(dirname, './src'),

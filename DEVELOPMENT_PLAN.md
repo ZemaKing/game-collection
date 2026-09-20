@@ -1163,7 +1163,7 @@ Protect the complete product with a maintainable automated test suite.
 ### Tasks
 
 - [~] Unit test normalization, filters, search helpers, duplicate rules, and completeness (done: completeness, LIKE escaping, form schemas, formatting, i18n key/placeholder parity, statistics, settings; filters/search/duplicate logic still coupled to Supabase hooks)
-- [ ] Component test cards/rows, filter controls, forms, dialogs, viewer, and state components
+- [~] Component test cards/rows, filter controls, forms, dialogs, viewer, and state components (done: ItemCard grid/list + owner menu, ConfirmDialog, SortMenu, Empty/Error states, CompletenessBadge; still open: filter sheet, item form, media viewer)
 - [ ] Integration test Supabase query/mutation hooks and authorization behavior
 - [ ] E2E test public browse/search/filter/detail flows
 - [ ] E2E test owner login and create/edit/delete/image/status flows
@@ -1183,7 +1183,7 @@ Protect the complete product with a maintainable automated test suite.
 
 ### Results (partial)
 
-- 57 unit tests across 7 files; `.github/workflows/ci.yml` runs lint, tests and build (typecheck via `tsc -b`) on push to main and on PRs. Marking CI as a required check is a GitHub branch-protection setting still to be enabled by the owner.
+- 71 tests across 9 files (unit + component); `.github/workflows/ci.yml` runs lint, tests and build (typecheck via `tsc -b`) on push to main and on PRs. Marking CI as a required check is a GitHub branch-protection setting still to be enabled by the owner.
 - Not started: component tests, Supabase integration tests, and Playwright E2E across Desktop/Tablet/Mobile (each needs new dev dependencies and a test Supabase project or mocks).
 
 ### Phase Status
