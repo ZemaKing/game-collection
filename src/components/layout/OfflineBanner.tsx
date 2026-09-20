@@ -10,7 +10,7 @@ export function OfflineBanner() {
   if (isOnline) return null
 
   return (
-    <div className="flex items-center justify-center gap-2 bg-danger px-4 py-2 text-sm font-medium text-white">
+    <div role="status" className="flex items-center justify-center gap-2 bg-danger-solid px-4 py-2 text-sm font-medium text-white">
       <WifiOff size={14} />
       {t('common.offline')}
     </div>

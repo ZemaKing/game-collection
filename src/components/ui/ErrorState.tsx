@@ -12,7 +12,7 @@ interface ErrorStateProps {
 export function ErrorState({ message, onRetry, secondaryAction }: ErrorStateProps) {
   const { t } = useLocale()
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
+    <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
       <span>{message}</span>
       {(onRetry || secondaryAction) && (
         <span className="flex shrink-0 items-center gap-3">

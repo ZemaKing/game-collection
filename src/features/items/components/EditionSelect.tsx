@@ -7,6 +7,8 @@ import {
   useState,
   type KeyboardEvent,
 } from 'react'
+import { FieldError, FieldLabel } from '@/components/ui/FieldParts'
+import { triggerA11yProps, useFieldIds } from '@/components/ui/useFieldIds'
 import {
   Popover,
   PopoverContent,
@@ -50,6 +52,7 @@ export function EditionSelect({
 }: EditionSelectProps) {
   const { t } = useLocale()
   const listId = useId()
+  const ids = useFieldIds()
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
   const [open, setOpen] = useState(false)
@@ -127,16 +130,16 @@ export function EditionSelect({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-label font-semibold text-text">{label}</span>
+      <FieldLabel id={ids.labelId}>{label}</FieldLabel>
       <Popover open={open} onOpenChange={openChanged}>
         <PopoverTrigger asChild>
           <button
             type="button"
             name={name}
             data-field={name}
-            aria-invalid={error ? true : undefined}
+            {...triggerA11yProps({ ...ids, error })}
             aria-haspopup="listbox"
-            className={`flex min-h-[38px] items-center justify-between gap-2 rounded-md border bg-bg px-2 py-1.5 text-left text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent ${error ? 'border-danger' : 'border-border'}`}
+            className={`flex min-h-[38px] items-center justify-between gap-2 rounded-md border bg-bg px-2 py-1.5 text-left text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent ${error ? 'border-danger' : 'border-input'}`}
           >
             <span className="flex min-w-0 flex-1 items-center">
               {value ? (
@@ -180,7 +183,7 @@ export function EditionSelect({
               }}
               onKeyDown={onKeyDown}
               placeholder={t('edition.searchPlaceholder')}
-              className="w-full rounded-md border border-border bg-bg py-1.5 pr-2 pl-8 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded-md border border-input bg-bg py-1.5 pr-2 pl-8 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
           <ul
@@ -242,7 +245,7 @@ export function EditionSelect({
           </ul>
         </PopoverContent>
       </Popover>
-      {error && <span className="text-xs text-danger">{error}</span>}
+      {error && <FieldError id={ids.errorId}>{error}</FieldError>}
     </div>
   )
 }

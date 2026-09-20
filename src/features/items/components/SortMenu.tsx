@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { Calendar, Check, ChevronDown, Clock, RefreshCw, Type as TypeIcon, type LucideIcon } from 'lucide-react'
 import {
   DropdownMenu,
@@ -26,23 +27,28 @@ const SORT_ICONS: Record<SortKey, LucideIcon> = {
 interface SortMenuProps {
   value: SortKey
   onChange: (value: SortKey) => void
-  /** Lets an external `<label htmlFor>` name the trigger button. */
+  /** Id for the trigger button. */
   id?: string
+  /** Id of a visible label element; the button's name becomes "<label> <current sort>". */
+  labelledBy?: string
   /** Extra classes for the trigger, e.g. a fixed width. */
   className?: string
 }
 
 /** The sort dropdown (icon + label per option, check on the current one), shared by the listing toolbar and Settings. */
-export function SortMenu({ value, onChange, id, className = '' }: SortMenuProps) {
+export function SortMenu({ value, onChange, id, labelledBy, className = '' }: SortMenuProps) {
   const { t } = useLocale()
+  const generatedId = useId()
+  const triggerId = id ?? generatedId
   const CurrentIcon = SORT_ICONS[value]
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          id={id}
+          id={triggerId}
           type="button"
+          aria-labelledby={labelledBy ? `${labelledBy} ${triggerId}` : undefined}
           className={`flex items-center gap-2 rounded-xl border border-border bg-bg px-3.5 py-2.5 text-sm font-semibold text-text hover:bg-card-hover ${className}`}
         >
           <CurrentIcon size={16} className="shrink-0 text-muted" />

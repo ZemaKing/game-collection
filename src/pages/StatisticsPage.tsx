@@ -188,19 +188,19 @@ function StatisticsPage() {
             />
             <MetricTile
               icon={Gauge}
-              iconColor="text-sky-400"
+              iconColor="text-sky-600 dark:text-sky-400"
               label={t('stats.averageCompleteness')}
               value={`${stats.completeness.average}%`}
             />
             <MetricTile
               icon={CalendarPlus}
-              iconColor="text-emerald-400"
+              iconColor="text-emerald-600 dark:text-emerald-400"
               label={t('stats.addedRecently', { days: String(RECENT_WINDOW_DAYS) })}
               value={stats.addedLastWindow}
             />
             <MetricTile
               icon={CheckCircle2}
-              iconColor="text-amber-400"
+              iconColor="text-amber-600 dark:text-amber-400"
               label={t('stats.fullyComplete')}
               value={stats.completeness.complete}
             />

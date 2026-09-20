@@ -162,7 +162,7 @@ export function GameAutofillPanel({ form, genres, platforms, onApply }: GameAuto
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t('autofill.searchPlaceholder')}
-        className="rounded-md border border-border bg-bg px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+        className="rounded-md border border-input bg-bg px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
       />
 
       {query.trim() !== '' && !selected && (

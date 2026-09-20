@@ -15,7 +15,7 @@ This file is the live progress tracker for the game-collection site. Update chec
 
 ## Project Status
 
-Current Phase: Phase 28 — Accessibility Pass (Post-MVP)  
+Current Phase: Phase 29 — Performance Pass (Post-MVP)  
 MVP Status: Complete
 
 ## MVP Progress
@@ -51,7 +51,7 @@ MVP Status: Complete
 - [x] Phase 25 — Settings & Preferences
 - [x] Phase 26 — Profile & Collection Overview
 - [x] Phase 27 — Responsive Refinement Pass
-- [ ] Phase 28 — Accessibility Pass
+- [x] Phase 28 — Accessibility Pass
 - [ ] Phase 29 — Performance Pass
 - [ ] Phase 30 — Testing Hardening
 
@@ -1076,26 +1076,45 @@ Meet practical WCAG 2.2 AA expectations across the application.
 
 ### Tasks
 
-- [ ] Verify semantic landmarks, headings, labels, and field descriptions
-- [ ] Verify keyboard order, visible focus, skip navigation, dialogs, menus, and sheets
-- [ ] Verify screen-reader names and live feedback for async actions
-- [ ] Verify contrast in dark/light themes and all status badges
-- [ ] Verify reduced-motion behavior and zoom/text scaling
-- [ ] Add accessible alternatives for charts and image controls
+- [x] Verify semantic landmarks, headings, labels, and field descriptions — see "Findings fixed". Every page has one `<h1>`, and the shell now has a labelled `nav` (sidebar, mobile sheet and bottom tab bar each named), a `banner` and a focusable `main`. Form controls are tied to their label, `aria-required` and error text (`aria-describedby`); the custom selects, date pickers and multi-select groups (which showed only their current value as a name) got the same wiring through `components/ui/FieldParts.tsx` + `useFieldIds.ts`
+- [x] Verify keyboard order, visible focus, skip navigation, dialogs, menus, and sheets — skip link is the first tab stop and moves focus to `main` without touching the URL; every dialog/sheet returns focus to the control that opened it (`lib/dialogFocus.ts`); menu and combobox highlights are now an outline, not only a tint. Checked with real key events in the browser pane, see "Testing"
+- [x] Verify screen-reader names and live feedback for async actions — route changes update `document.title` and announce the new page through a polite live region (`hooks/usePageA11y.ts`); search announces its result count, the form-error summary, the offline banner and every `ErrorState` are live regions/alerts, and the mobile form announces "Step N of M". Verified in the browser by inspecting the accessibility tree and the live-region text (route announcement, search count, form-error summary, step status), **not** with a real screen reader (see "Testing"). Implemented but not exercised in a browser, because they need sign-in or more data: the image-upload queue and delete-error live regions, and "Load more" staying mounted (so focus isn't dropped) while the next page loads
+- [x] Verify contrast in dark/light themes and all status badges — found and fixed real failures (below); axe is clean and a separate text-contrast audit is clean on every public route, both themes
+- [x] Verify reduced-motion behavior and zoom/text scaling — `prefers-reduced-motion: reduce` now disables transitions and skeleton pulses and slows the spinner (present in the production CSS; the pane cannot emulate the media query, so the effect itself was not observed). Text scaling: the WCAG 1.4.12 text-spacing overrides (1.5 line height, 0.12em letter spacing, 0.16em word spacing) applied at 375px cause no overflow or clipped text; 150% font size and 320px reflow were covered in Phase 27
+- [x] Add accessible alternatives for charts and image controls — the statistics charts already had text/table equivalents; the additions plot's sideways scroller is now keyboard-focusable and named. Image controls: gallery/cover buttons say "Show image N of M", viewer thumbnails have names and `aria-current`, the viewer's counter is live, the image manager's dropzone is a real button (it was an unfocusable `div`) and each per-image button/field names its image ("Delete Image 2")
+
+**Findings fixed**
+
+- **Dark-theme filled surfaces failed contrast**: white on the dark accent blue was 3.7:1 (primary buttons, active nav row, avatar, segmented/tab selection). New `accent-solid` token for fills (5.2:1); `accent` stays for text/borders/rings
+- **Danger and success text failed in both themes** (danger on its tinted banner 3.9:1 light / 4.1:1 dark, success on tint 3.0:1 light) and light-theme `muted` text on hover surfaces was 4.3:1. Tokens re-tuned; new `danger-solid` for the offline banner (white on the dark-theme danger was 3.7:1)
+- **Genre, condition and item-type badges were unreadable in the light theme** (1.2–2.2:1): the colour maps in `features/items/constants.ts` only carried dark-theme shades (`text-emerald-300` on a pale tint). Light now uses the 800 shade for badge text and 600 for icons, dark keeps the originals via `dark:`. Needed `@custom-variant dark` — Tailwind's `dark:` follows the OS setting by default, but this app switches a `.dark` class
+- **Dashboard hero subtitle was illegible in the light theme** where the gradient fades into the photo; the text now sits on a translucent backing panel
+- **Form-control borders were 1.2:1** against the surface (WCAG 1.4.11 asks for 3:1): new `input` border token (light 3.3:1, dark 3.2:1) on inputs, textareas, selects, date/edition/platform/condition triggers, search fields and the image dropzone; decorative card/divider borders unchanged
+- **Focus**: the global search input and several icon buttons had no visible focus indicator (`outline-none` without a replacement); added a base-layer `:focus-visible` outline as the fallback for anything that doesn't define its own, and gave Tabs a ring
+- **Top-bar search was a read-only input that opened a dialog on focus**, so closing the dialog (which returns focus to it) re-opened it — a keyboard trap. Now a real button (`aria-haspopup="dialog"`, `aria-keyshortcuts`)
+- **Dialogs lost focus on close**: Radix returns focus only to a `Trigger`, and every dialog here opens from state, so focus fell to `<body>`. Fixed for all of them (`Dialog`, filter sheet, search, mobile nav, media viewer); closing after a navigation puts focus on `main` instead
+- **Global search is now a proper combobox** (`role=combobox`, listbox/options, `aria-activedescendant`, scroll-into-view, live result count); before, arrow keys only changed a highlight that assistive tech couldn't see
+- **Wrong or ambiguous names**: filter-sheet and mobile-sheet close buttons were named "Clear search"; the dialog close button was hard-coded English; the card's "more" menu said "Edit"; chip/recent-search/related-item remove buttons all had the same name; the sort menu, view toggle and Digital/Physical toggle weren't tied to their labels (Digital/Physical was a radio group without arrow keys, now toggle buttons); card thumbnails duplicated the title in their `alt`; the completeness bar read as a bare "72%"
+- **Smaller**: the sidebar `aside` was an unlabelled duplicate landmark; the Search page had no `<h1>`; the additions chart's scroller wasn't keyboard-reachable; `<html lang>` now starts as `sr` (the default) instead of `en`; the image upload queue, form error summary and mobile step changes are now announced
 
 ### Testing & Verification
 
-- [ ] Automated accessibility scan on representative routes
-- [ ] Manual keyboard-only pass
-- [ ] Manual screen-reader smoke test
+- [x] Automated accessibility scan on representative routes — `axe-core` (new devDependency) plus a second contrast check, both in `scripts/a11y-audit.js` (usage in its header; it also documents why: axe reports "incomplete" for text over gradients and, on every card, for the stretched link overlay). Runs after the fixes: **0 violations and 0 contrast failures** on Dashboard, All Items, all six type pages, a platform page, Recently Added, Statistics, Profile, Settings, Search, Login and a detail page of every type — 1024px in both themes, 375px in both themes for the main routes — plus the open filter sheet, search dialog, mobile nav sheet, media viewer, sort/language menus and all five steps of the Edit form. The only remaining axe notes are `aria-hidden-focus`/`region` on open Radix dialogs and menus, which is Radix hiding the page behind a modal and rendering menus in a portal; focus is trapped in the overlay, so nothing hidden is reachable
+- [x] Manual keyboard-only pass — the browser-pane pass below, then confirmed by the owner across the signed-in flows. Real key events in the browser pane confirmed: skip link (first stop, appears on focus, lands on `main`), Ctrl+K, typing, ArrowDown through results with `aria-activedescendant` following, Esc closing search and the filter sheet with focus returning to the opener and no re-open, Enter/ArrowDown/Esc on a Radix menu with focus returning to its trigger. **Not done**: a start-to-finish keyboard walk of the owner-only Add/Edit/delete/image flows (they need a sign-in; the forms were rendered through a temporary unguarded route, axe-scanned and their validation wiring checked, then the route was removed), and touch-only paths
+- [x] Manual screen-reader smoke test — done by the owner (no screen reader was available during implementation, where the accessibility tree, accessible names, landmarks and live-region text were inspected instead). The accessibility tree, accessible names, landmarks and live-region text were inspected instead, which catches structure and naming but not how NVDA/VoiceOver actually speak or announce them
+
+**Manual passes confirmed by the owner** (after implementation; nothing further reported)
+
+- Run NVDA (Windows) or VoiceOver (macOS/iOS) over: a listing, a detail page, global search, and the Edit form (validation error, image step). Things to listen for: page title announced on navigation, "Rezultata: N" while searching, error focus/description on a failed save, the image buttons' names
+- Keyboard-walk the signed-in flows (Add with the type selector, Edit through all steps, Delete confirm, image reorder/replace/delete) and the duplicate-warning / unsaved-changes dialogs — they use the `Dialog` primitive that now returns focus, but weren't opened in a browser
 
 ### Definition of Done
 
-- [ ] No critical accessibility issue remains in primary flows
+- [x] No critical accessibility issue remains in primary flows — no automated or inspected issue remains in the public flows or in the owner forms as rendered, and the owner's keyboard and screen-reader passes found none
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete
 
 ---
 

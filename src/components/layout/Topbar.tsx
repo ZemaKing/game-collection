@@ -35,23 +35,24 @@ export function Topbar() {
         <Menu size={18} />
       </button>
 
-      <div className="relative hidden max-w-md flex-1 sm:block">
-        <Search
-          size={16}
-          className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted"
-        />
-        <input
-          type="search"
-          readOnly
-          onClick={() => setSearchOpen(true)}
-          onFocus={() => setSearchOpen(true)}
-          placeholder={t('topbar.searchPlaceholder')}
-          className="w-full cursor-pointer rounded-full border border-border bg-bg py-2 pr-16 pl-9 text-sm text-text placeholder:text-muted focus:outline-none"
-        />
-        <kbd className="absolute top-1/2 right-3 -translate-y-1/2 rounded border border-border px-1.5 py-0.5 text-xs text-muted">
+      {/* A button, not a read-only input: focusing an input that opens a dialog would re-open it
+          whenever the dialog returns focus here on close. */}
+      <button
+        type="button"
+        onClick={() => setSearchOpen(true)}
+        aria-haspopup="dialog"
+        aria-keyshortcuts="Control+K Meta+K"
+        className="relative hidden max-w-md flex-1 items-center rounded-full border border-input bg-bg py-2 pr-16 pl-9 text-left text-sm text-muted hover:bg-card-hover sm:flex"
+      >
+        <Search size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2" />
+        <span className="truncate">{t('topbar.searchPlaceholder')}</span>
+        <kbd
+          aria-hidden="true"
+          className="absolute top-1/2 right-3 -translate-y-1/2 rounded border border-border px-1.5 py-0.5 text-xs text-muted"
+        >
           Ctrl K
         </kbd>
-      </div>
+      </button>
 
       <Link
         to="/search"
@@ -70,7 +71,7 @@ export function Topbar() {
           title={t('nav.settings')}
           className={({ isActive }) =>
             `flex size-[40px] shrink-0 items-center justify-center rounded-full border border-border text-text hover:bg-card-hover ${
-              isActive ? 'bg-accent text-accent-fg hover:bg-accent' : 'bg-surface'
+              isActive ? 'bg-accent-solid text-accent-fg hover:bg-accent-solid' : 'bg-surface'
             }`
           }
         >

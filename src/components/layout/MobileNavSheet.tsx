@@ -4,7 +4,9 @@ import type { ComponentType } from 'react'
 import { NavLink } from 'react-router-dom'
 import { ITEM_TYPE_COLORS } from '@/features/items/constants'
 import type { ItemType } from '@/features/items/types'
+import { useRef } from 'react'
 import { useLocale } from '@/hooks/useLocale'
+import { focusMainOnClose, restoreFocusOnClose } from '@/lib/dialogFocus'
 import { usePlatformNavItems } from '@/hooks/usePlatformNavItems'
 import {
   collectionNavItems,
@@ -37,7 +39,7 @@ function NavRow({
       onClick={onNavigate}
       className={({ isActive }) =>
         `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-          isActive ? 'bg-accent text-accent-fg' : 'text-muted hover:bg-card-hover hover:text-text'
+          isActive ? 'bg-accent-solid text-accent-fg' : 'text-muted hover:bg-card-hover hover:text-text'
         }`
       }
     >
@@ -60,23 +62,36 @@ function SectionLabel({ children }: { children: string }) {
 export function MobileNavSheet({ open, onOpenChange }: MobileNavSheetProps) {
   const { t } = useLocale()
   const platformNavItems = usePlatformNavItems()
-  const close = () => onOpenChange(false)
+  // Following a nav link closes the sheet; then focus belongs on the new page, not the menu button.
+  const navigatedRef = useRef(false)
+  const close = () => {
+    navigatedRef.current = true
+    onOpenChange(false)
+  }
 
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
-        <RadixDialog.Content className="fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col overflow-y-auto bg-surface p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] text-text shadow-xl outline-none">
+        <RadixDialog.Content
+          aria-describedby={undefined}
+          onCloseAutoFocus={(event) => {
+            const navigated = navigatedRef.current
+            navigatedRef.current = false
+            if (navigated) focusMainOnClose(event)
+            else restoreFocusOnClose(event)
+          }}
+          className="fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col overflow-y-auto bg-surface p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] text-text shadow-xl outline-none">
           <div className="flex shrink-0 items-center justify-between px-1 py-2">
             <RadixDialog.Title className="sidebar-brand text-text">
               {t('sidebar.title')}
             </RadixDialog.Title>
-            <RadixDialog.Close aria-label={t('search.clear')} className="flex size-10 items-center justify-center rounded-full text-muted hover:text-text">
+            <RadixDialog.Close aria-label={t('a11y.close')} className="flex size-10 items-center justify-center rounded-full text-muted hover:text-text">
               <X size={20} />
             </RadixDialog.Close>
           </div>
 
-          <nav className="flex flex-1 flex-col gap-1">
+          <nav aria-label={t('a11y.primaryNav')} className="flex flex-1 flex-col gap-1">
             <div className="flex flex-col gap-1">
               {primaryNavItems.map((item) => (
                 <NavRow

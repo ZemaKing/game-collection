@@ -65,7 +65,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
     void addFiles(Array.from(fileList))
   }
 
-  function handleDrop(event: DragEvent<HTMLDivElement>) {
+  function handleDrop(event: DragEvent<HTMLButtonElement>) {
     event.preventDefault()
     setIsDraggingOver(false)
     handleFilesSelected(event.dataTransfer.files)
@@ -93,12 +93,13 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
     <div className="flex flex-col gap-4">
       {error && <ErrorState message={error} onRetry={reload} />}
       {validationErrors.map((issue, index) => (
-        <p key={`${issue.code}-${issue.fileName}-${index}`} className="text-xs text-danger">
+        <p key={`${issue.code}-${issue.fileName}-${index}`} role="alert" className="text-xs text-danger">
           {errorMessage(t, issue.code, issue.fileName)}
         </p>
       ))}
 
-      <div
+      <button
+        type="button"
         onDragOver={(event) => {
           event.preventDefault()
           setIsDraggingOver(true)
@@ -106,14 +107,15 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
         onDragLeave={() => setIsDraggingOver(false)}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors ${
-          isDraggingOver ? 'border-accent bg-accent/5' : 'border-border hover:bg-card-hover'
+        className={`flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors ${
+          isDraggingOver ? 'border-accent bg-accent/5' : 'border-input hover:bg-card-hover'
         }`}
       >
         <ImageUp size={24} className="text-muted" />
-        <p className="text-sm font-medium text-text">{t('images.uploadButton')}</p>
-        <p className="text-xs text-muted">{t('images.dropHint')}</p>
-        <input
+        <span className="block text-sm font-medium text-text">{t('images.uploadButton')}</span>
+        <span className="block text-xs text-muted">{t('images.dropHint')}</span>
+      </button>
+      <input
           ref={fileInputRef}
           type="file"
           accept={ALLOWED_IMAGE_MIME_TYPES.join(',')}
@@ -124,10 +126,9 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
             event.target.value = ''
           }}
         />
-      </div>
 
       {uploadQueue.length > 0 && (
-        <ul className="flex flex-col gap-1.5">
+        <ul aria-live="polite" className="flex flex-col gap-1.5">
           {uploadQueue.map((item) => (
             <li
               key={item.id}
@@ -151,9 +152,10 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   <button
                     type="button"
                     onClick={() => dismissQueueItem(item.id)}
-                    className="text-muted hover:text-text"
+                    className="rounded px-1 py-0.5 text-muted hover:text-text pointer-coarse:px-2 pointer-coarse:py-2"
                   >
                     {t('images.dismiss')}
+                    <span className="sr-only"> {item.name}</span>
                   </button>
                 )}
               </span>
@@ -176,7 +178,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   className="aspect-[4/5] w-full rounded-lg"
                 />
                 {image.is_cover && (
-                  <span className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-tiny font-medium text-accent-fg">
+                  <span className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-full bg-accent-solid px-2 py-0.5 text-tiny font-medium text-accent-fg">
                     <Star size={10} fill="currentColor" />
                     {t('images.cover')}
                   </span>
@@ -193,6 +195,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                 name={`alt-${image.id}`}
                 defaultValue={image.alt_text ?? ''}
                 placeholder={t('images.altTextPlaceholder')}
+                aria-label={t('a11y.removeNamed', { action: t('images.altTextLabel'), name: t('a11y.imageN', { n: String(index + 1) }) })}
                 onBlur={(event) => void saveAltText(image, event.target.value)}
               />
 
@@ -205,20 +208,21 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   onClick={() => void makeCover(image)}
                 >
                   {t('images.setCover')}
+                  <span className="sr-only"> {t('a11y.imageN', { n: String(index + 1) })}</span>
                 </Button>
                 <Button
                   size="xs"
                   icon={ArrowUpIcon}
                   disabled={index === 0}
                   onClick={() => void moveImage(image, -1)}
-                  aria-label={t('images.moveUp')}
+                  aria-label={t('a11y.removeNamed', { action: t('images.moveUp'), name: t('a11y.imageN', { n: String(index + 1) }) })}
                 />
                 <Button
                   size="xs"
                   icon={ArrowDownIcon}
                   disabled={index === images.length - 1}
                   onClick={() => void moveImage(image, 1)}
-                  aria-label={t('images.moveDown')}
+                  aria-label={t('a11y.removeNamed', { action: t('images.moveDown'), name: t('a11y.imageN', { n: String(index + 1) }) })}
                 />
                 <Button
                   size="xs"
@@ -229,6 +233,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   }}
                 >
                   {t('images.replace')}
+                  <span className="sr-only"> {t('a11y.imageN', { n: String(index + 1) })}</span>
                 </Button>
                 <Button
                   size="xs"
@@ -238,6 +243,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   onClick={() => setDeleteTarget(image)}
                 >
                   {t('images.delete')}
+                  <span className="sr-only"> {t('a11y.imageN', { n: String(index + 1) })}</span>
                 </Button>
               </div>
             </div>

@@ -52,7 +52,7 @@ export function SegmentedControl<T extends string>({ value, onChange, options, l
             onClick={() => onChange(option.value)}
             onKeyDown={(event) => handleKeyDown(event, index)}
             className={`flex min-h-9 items-center justify-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent ${
-              selected ? 'bg-accent text-accent-fg' : 'text-muted hover:text-text'
+              selected ? 'bg-accent-solid text-accent-fg' : 'text-muted hover:text-text'
             }`}
           >
             {Icon && <Icon size={16} className="shrink-0" />}

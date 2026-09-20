@@ -30,11 +30,12 @@ function NavRow({
       className={({ isActive }) =>
         `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors xl:justify-start justify-center ${
           isActive
-            ? 'bg-accent text-accent-fg'
+            ? 'bg-accent-solid text-accent-fg'
             : 'text-muted hover:bg-card-hover hover:text-text'
         }`
       }
       title={label}
+      aria-label={label}
     >
       {({ isActive }) => (
         <>
@@ -60,9 +61,9 @@ export function Sidebar() {
   const { user } = useAuth()
 
   return (
-    <aside className="hidden w-20 shrink-0 flex-col border-r border-border bg-surface p-3 md:flex xl:w-64">
+    <div className="hidden w-20 shrink-0 flex-col border-r border-border bg-surface p-3 md:flex xl:w-64">
       <div className="flex items-center justify-center gap-2 px-1 py-3 xl:justify-start">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-fg">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-solid text-accent-fg">
           <Gamepad2 size={18} />
         </div>
         <span className="sidebar-brand hidden text-text xl:inline">
@@ -70,7 +71,7 @@ export function Sidebar() {
         </span>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
+      <nav aria-label={t('a11y.primaryNav')} className="flex flex-1 flex-col gap-1 overflow-y-auto">
         <div className="flex flex-col gap-1">
           {primaryNavItems.map((item) => (
             <NavRow
@@ -102,6 +103,7 @@ export function Sidebar() {
         <Link
           to="/items/new"
           title={t('sidebar.addNewItem')}
+          aria-label={t('sidebar.addNewItem')}
           className="group mt-3 flex items-center justify-center gap-3 rounded-xl border border-accent px-3 py-2.5 text-sm font-semibold text-text transition-colors hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent xl:justify-start"
         >
           <Plus size={20} className="shrink-0 text-accent" />
@@ -112,6 +114,6 @@ export function Sidebar() {
           />
         </Link>
       )}
-    </aside>
+    </div>
   )
 }

@@ -26,7 +26,7 @@ export function DropdownMenuItem({
 }: ComponentProps<typeof RadixDropdownMenu.Item>) {
   return (
     <RadixDropdownMenu.Item
-      className={`flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-card-hover ${className}`}
+      className={`flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-card-hover data-[highlighted]:ring-2 data-[highlighted]:ring-inset data-[highlighted]:ring-accent ${className}`}
       {...props}
     />
   )

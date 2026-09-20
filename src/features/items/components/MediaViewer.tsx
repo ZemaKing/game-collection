@@ -5,6 +5,7 @@ import { ItemImage } from '@/features/items/components/ItemImage'
 import type { ItemImageRow } from '@/features/items/detailTypes'
 import type { ItemType } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
+import { restoreFocusOnClose } from '@/lib/dialogFocus'
 
 interface MediaViewerProps {
   images: ItemImageRow[]
@@ -84,14 +85,16 @@ export function MediaViewer({
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black" />
         <RadixDialog.Content
-          className="fixed inset-0 z-50 flex flex-col bg-black pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] outline-none"
+          aria-describedby={undefined}
+          onCloseAutoFocus={restoreFocusOnClose}
+          className="fixed inset-0 z-50 flex flex-col bg-black pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] outline-none [&_button:focus-visible]:outline-white"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
           <RadixDialog.Title className="sr-only">{itemTitle}</RadixDialog.Title>
 
           <div className="flex items-center justify-between gap-3 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white sm:p-4 sm:pt-[max(1rem,env(safe-area-inset-top))]">
-            <span className="text-sm font-medium">
+            <span aria-live="polite" aria-atomic="true" className="text-sm font-medium">
               {t('viewer.imageCount', { current: String(index + 1), total: String(images.length) })}
             </span>
             <div className="flex items-center gap-1">
@@ -164,6 +167,8 @@ export function MediaViewer({
                 <button
                   key={image.id}
                   type="button"
+                  aria-label={t('a11y.showImage', { current: String(i + 1), total: String(images.length) })}
+                  aria-current={i === index ? 'true' : undefined}
                   onClick={() => {
                     setZoomed(false)
                     setIndex(i)
@@ -175,7 +180,7 @@ export function MediaViewer({
                   <ItemImage
                     storagePath={image.storage_path}
                     itemType={itemType}
-                    alt={image.alt_text ?? itemTitle}
+                    alt=""
                     className="h-full w-full"
                   />
                 </button>

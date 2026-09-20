@@ -17,11 +17,13 @@ export function CompletenessBadge({ percent, compact = false, full = false }: Co
       className={`inline-flex items-center gap-1.5 ${full ? 'w-full' : 'shrink-0'} ${compact ? 'text-xs' : 'text-sm'} font-medium text-muted`}
     >
       <span
+        aria-hidden="true"
         className={`overflow-hidden rounded-full bg-card-hover ${full ? 'h-1.5 flex-1' : compact ? 'h-1.5 w-8' : 'h-2 w-16'}`}
       >
         <span className="block h-full rounded-full bg-accent" style={{ width: `${percent}%` }} />
       </span>
-      {percent}%
+      <span className="sr-only">{t('completeness.tooltip', { percent: String(percent) })}</span>
+      <span aria-hidden="true">{percent}%</span>
     </span>
   )
 }

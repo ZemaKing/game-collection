@@ -117,7 +117,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
           {TitleIcon && <TitleIcon size={22} className="text-muted" />}
           {titleText}
         </h1>
-        <p className="mt-1 text-sm text-muted">
+        <p aria-live="polite" className="mt-1 text-sm text-muted">
           {t('listing.itemsCount', { count: String(totalCount) })}
         </p>
       </div>
@@ -140,7 +140,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
       />
 
       {deletedBannerTitle && (
-        <p className="flex items-center justify-between gap-3 rounded-lg border border-success bg-success-bg px-4 py-3 text-sm text-success">
+        <p role="status" className="flex items-center justify-between gap-3 rounded-lg border border-success bg-success-bg px-4 py-3 text-sm text-success">
           {t('detail.deleteSuccess', { title: deletedBannerTitle })}
           <button
             type="button"
@@ -206,8 +206,16 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
         </div>
       )}
 
-      {hasMore && !loading && (
-        <Button icon={PlusIcon} className="self-center" onClick={() => setPage((p) => p + 1)}>
+      {/* Stays mounted while the next page loads, so a keyboard user's focus isn't dropped. */}
+      {hasMore && (
+        <Button
+          icon={PlusIcon}
+          className="self-center aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+          aria-disabled={loading || undefined}
+          onClick={() => {
+            if (!loading) setPage((p) => p + 1)
+          }}
+        >
           {t('listing.loadMore')}
         </Button>
       )}

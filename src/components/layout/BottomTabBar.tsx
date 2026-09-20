@@ -23,7 +23,9 @@ export function BottomTabBar() {
   if (isItemFormRoute) return null
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around gap-1 border-t border-border bg-surface px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden">
+    <nav
+      aria-label={t('a11y.quickNav')}
+      className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around gap-1 border-t border-border bg-surface px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden">
       <TabLink {...tabs[0]} />
       <TabLink {...tabs[1]} />
 
@@ -31,7 +33,7 @@ export function BottomTabBar() {
         <Link
           to="/items/new"
           aria-label={t('bottomTab.addNewItem')}
-          className="-mt-6 flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-fg shadow-lg"
+          className="-mt-6 flex size-12 shrink-0 items-center justify-center rounded-full bg-accent-solid text-accent-fg shadow-lg"
         >
           <Plus size={22} />
         </Link>

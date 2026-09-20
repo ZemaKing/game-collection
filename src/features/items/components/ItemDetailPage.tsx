@@ -163,12 +163,13 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
               setViewerIndex(coverIndex)
               setViewerOpen(true)
             }}
+            aria-label={t('a11y.showImage', { current: String(coverIndex + 1), total: String(images.length) })}
             className="cursor-zoom-in rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <ItemImage
               storagePath={coverImage.storage_path}
               itemType={itemType}
-              alt={coverImage.alt_text ?? detail.title}
+              alt=""
               className="aspect-[4/5] w-full rounded-xl"
               iconSize={64}
             />
@@ -197,12 +198,13 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
                     setViewerIndex(i)
                     setViewerOpen(true)
                   }}
+                  aria-label={t('a11y.showImage', { current: String(i + 1), total: String(images.length) })}
                   className="overflow-hidden rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   <ItemImage
                     storagePath={image.storage_path}
                     itemType={itemType}
-                    alt={image.alt_text ?? detail.title}
+                    alt=""
                     className="aspect-[4/5] w-full"
                   />
                 </button>
@@ -245,7 +247,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
         </div>
 
         {deleteError && (
-          <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
+          <p role="alert" className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
             {t('detail.deleteError', { message: deleteError })}
           </p>
         )}

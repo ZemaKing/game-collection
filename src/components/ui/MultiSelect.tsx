@@ -1,4 +1,6 @@
 import { Star, type LucideIcon } from 'lucide-react'
+import { FieldLabel } from '@/components/ui/FieldParts'
+import { useFieldIds } from '@/components/ui/useFieldIds'
 import { useLocale } from '@/hooks/useLocale'
 
 export interface MultiSelectOption {
@@ -35,6 +37,7 @@ export function MultiSelect<T extends MultiSelectOption>({
   optionMeta,
 }: MultiSelectProps<T>) {
   const { t } = useLocale()
+  const { labelId } = useFieldIds()
 
   function toggle(id: string) {
     onChange(values.includes(id) ? values.filter((v) => v !== id) : [...values, id])
@@ -46,11 +49,16 @@ export function MultiSelect<T extends MultiSelectOption>({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-label font-semibold text-text">{label}</span>
+      <FieldLabel id={labelId}>{label}</FieldLabel>
       {options.length === 0 ? (
         <p className="text-xs text-muted">{emptyLabel}</p>
       ) : (
-        <div data-field={name} className="flex flex-wrap gap-2 rounded-md border border-border bg-bg p-2">
+        <div
+          role="group"
+          aria-labelledby={labelId}
+          data-field={name}
+          className="flex flex-wrap gap-2 rounded-md border border-input bg-bg p-2"
+        >
           {options.map((option) => {
             const checked = values.includes(option.id)
             const isPrimary = primary && checked && values[0] === option.id
@@ -59,13 +67,13 @@ export function MultiSelect<T extends MultiSelectOption>({
             return (
               <span
                 key={option.id}
-                className={`relative flex items-center gap-1 rounded-full border pl-2.5 pr-2.5 py-1 pointer-coarse:py-2.5 text-xs font-medium transition-colors focus-within:ring-2 focus-within:ring-accent/50 ${
+                className={`relative flex items-center gap-1 rounded-full border pl-2.5 pr-2.5 py-1 pointer-coarse:py-2.5 text-xs font-medium transition-colors focus-within:ring-2 focus-within:ring-accent ${
                   meta
                     ? checked
                       ? `${meta.colorClass} border-current bg-card-hover`
                       : 'border-border text-text hover:bg-card-hover'
                     : checked
-                      ? 'border-accent bg-accent text-accent-fg'
+                      ? 'border-accent bg-accent-solid text-accent-fg'
                       : 'border-border text-text hover:bg-card-hover'
                 }`}
               >

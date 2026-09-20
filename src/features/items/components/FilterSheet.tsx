@@ -25,6 +25,7 @@ import type { Genre, Platform } from '@/features/items/types'
 import type { Tag } from '@/features/items/api'
 import { DEFAULT_FILTERS, type Filters } from '@/features/items/useFilters'
 import { useLocale } from '@/hooks/useLocale'
+import { restoreFocusOnClose } from '@/lib/dialogFocus'
 
 function toggleValue<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
@@ -126,13 +127,13 @@ export function FilterSheet({
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black/30" />
-        <RadixDialog.Content className="fixed inset-0 z-50 flex flex-col bg-card text-text shadow-xl outline-none sm:inset-y-0 sm:left-auto sm:right-0 sm:w-96 sm:max-w-[90vw] sm:border-l sm:border-border">
+        <RadixDialog.Content aria-describedby={undefined} onCloseAutoFocus={restoreFocusOnClose} className="fixed inset-0 z-50 flex flex-col bg-card text-text shadow-xl outline-none sm:inset-y-0 sm:left-auto sm:right-0 sm:w-96 sm:max-w-[90vw] sm:border-l sm:border-border">
           <div className="flex shrink-0 items-center justify-between border-b border-border p-4 pt-[max(1rem,env(safe-area-inset-top))]">
             <RadixDialog.Title className="text-lg font-semibold text-text">
               {t('filters.title')}
             </RadixDialog.Title>
             <RadixDialog.Close
-              aria-label={t('search.clear')}
+              aria-label={t('a11y.close')}
               className="-mr-2 flex size-10 items-center justify-center rounded-full text-muted hover:text-text"
             >
               <X size={20} />

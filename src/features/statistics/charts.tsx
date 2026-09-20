@@ -106,7 +106,14 @@ export function ColumnChart({ entries, caption, columnHeader, valueHeader }: Col
 
   return (
     <figure className="m-0">
-      <div ref={scrollRef} className="-mx-1 overflow-x-auto px-1 pb-1">
+      {/* Focusable so keyboard users can scroll the plot sideways when it overflows (WCAG 2.1.1). */}
+      <div
+        ref={scrollRef}
+        tabIndex={0}
+        role="group"
+        aria-label={caption}
+        className="-mx-1 overflow-x-auto rounded-md px-1 pb-1"
+      >
         <div aria-hidden="true" className="flex min-w-[28rem] items-stretch gap-1.5">
           {entries.map((entry) => (
             <div key={entry.key} className="flex min-w-0 flex-1 flex-col items-center gap-1">

@@ -194,7 +194,7 @@ export function ItemCard({
           <ItemImage
             storagePath={item.cover_image_path}
             itemType={item.item_type}
-            alt={item.title}
+            alt=""
             className="h-full w-full rounded-md"
             deferrable
           />
@@ -287,7 +287,7 @@ export function ItemCard({
   return (
     <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card hover:border-accent">
       <div className="relative">
-        <ItemImage storagePath={item.cover_image_path} itemType={item.item_type} alt={item.title} className="aspect-[4/5] w-full" deferrable />
+        <ItemImage storagePath={item.cover_image_path} itemType={item.item_type} alt="" className="aspect-[4/5] w-full" deferrable />
         <FormatOverlayBadge slug={item.format_slug} />
         {platformName && (
           <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1">
@@ -309,7 +309,7 @@ export function ItemCard({
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  aria-label={t('form.edit')}
+                  aria-label={t('a11y.moreActions', { title: item.title })}
                   onClick={(e) => e.stopPropagation()}
                   className="relative z-10 -mt-2 -mr-2 flex size-9 shrink-0 items-center justify-center rounded-full text-muted hover:bg-card-hover hover:text-text"
                 >

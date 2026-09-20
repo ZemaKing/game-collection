@@ -45,7 +45,7 @@ function Row({
   return (
     <div className="flex flex-col gap-3 py-3 first:pt-2 last:pb-1 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
       <div className="min-w-0 sm:max-w-md">
-        <label htmlFor={htmlFor} className="text-sm font-semibold text-text">
+        <label id={htmlFor ? `${htmlFor}-label` : undefined} htmlFor={htmlFor} className="text-sm font-semibold text-text">
           {label}
         </label>
         {help && <p className="mt-0.5 text-xs text-muted">{help}</p>}
@@ -128,6 +128,7 @@ function SettingsPage() {
         <Row label={t('settings.defaultSort')} help={t('settings.defaultSortHelp')} htmlFor="settings-default-sort">
           <SortMenu
             id="settings-default-sort"
+            labelledBy="settings-default-sort-label"
             value={settings.defaultSort}
             onChange={(defaultSort) => updateSettings({ defaultSort })}
             className="w-full sm:w-56"

@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Theme is a `.dark` class on <html> (ThemeProvider), so `dark:` must follow it rather than the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-bg: var(--app-bg);
   --color-surface: var(--app-surface);
@@ -11,9 +14,12 @@
   --color-accent: var(--app-accent);
   --color-accent-hover: var(--app-accent-hover);
   --color-accent-fg: var(--app-accent-fg);
+  --color-accent-solid: var(--app-accent-solid);
+  --color-input: var(--app-input-border);
   --color-success: var(--app-success);
   --color-success-bg: var(--app-success-bg);
   --color-danger: var(--app-danger);
+  --color-danger-solid: var(--app-danger-solid);
   --color-danger-bg: var(--app-danger-bg);
 
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -52,14 +58,17 @@
   --app-card-hover: #f1f5f9;
   --app-border: #e2e8f0;
   --app-text: #0f172a;
-  --app-muted: #64748b;
+  --app-muted: #5b6a80;
   --app-accent: #2563eb;
   --app-accent-hover: #1d4ed8;
   --app-accent-fg: #ffffff;
-  --app-success: #16a34a;
+  --app-accent-solid: #2563eb;
+  --app-success: #15803d;
   --app-success-bg: #dcfce7;
-  --app-danger: #e11d48;
+  --app-danger: #be123c;
+  --app-danger-solid: #be123c;
   --app-danger-bg: #ffe4e6;
+  --app-input-border: #7d8ba0;
 }
 
 .dark {
@@ -73,10 +82,51 @@
   --app-accent: #3b82f6;
   --app-accent-hover: #60a5fa;
   --app-accent-fg: #ffffff;
+  --app-accent-solid: #2563eb;
   --app-success: #22c55e;
   --app-success-bg: rgba(34, 197, 94, 0.15);
-  --app-danger: #f43f5e;
+  --app-danger: #fb7185;
+  --app-danger-solid: #be123c;
   --app-danger-bg: rgba(244, 63, 94, 0.15);
+  --app-input-border: #5f6a80;
+}
+
+/*
+ * Colour roles (WCAG AA, checked in both themes):
+ *  - `accent` is for text, borders and rings; `accent-solid` is for filled surfaces
+ *    carrying `accent-fg` (white) text. The dark-theme accent is too light for white
+ *    text (3.7:1), so fills use the deeper blue (5.2:1).
+ *  - `danger` is for text on the page/card/tinted-banner background; `danger-solid`
+ *    is for filled danger surfaces with white text.
+ *  - `input` is the border of form controls, 3:1 against the surface (WCAG 1.4.11),
+ *    unlike the decorative `border` used for card and divider lines.
+ */
+
+@layer base {
+  /* Fallback focus indicator for anything without its own (links, cards, custom controls). */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * "Reduce motion": no smooth scrolling or transitions, static skeletons. The loading
+ * spinner stays (it conveys progress) but turns slowly.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-pulse {
+    animation: none !important;
+  }
+  .animate-spin {
+    animation-duration: 2s !important;
+  }
 }
 
 * {
@@ -180,6 +230,8 @@ body {
 /* Selector rows: tinted by the row's own edition on hover / keyboard focus / selection. */
 .edition-option[data-active='true'] {
   background: color-mix(in srgb, var(--ed) 12%, transparent);
+  outline: 2px solid var(--ed);
+  outline-offset: -2px;
 }
 .edition-option[aria-selected='true'] {
   box-shadow: inset 2px 0 0 var(--ed);

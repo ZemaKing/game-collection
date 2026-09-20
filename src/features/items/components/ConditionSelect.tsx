@@ -1,4 +1,6 @@
 import { Check, ChevronDown } from 'lucide-react'
+import { FieldError, FieldLabel } from '@/components/ui/FieldParts'
+import { triggerA11yProps, useFieldIds } from '@/components/ui/useFieldIds'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu'
 import { CONDITION_COLORS, CONDITION_ICONS } from '@/features/items/constants'
 import type { ItemCondition } from '@/features/items/types'
@@ -40,21 +42,21 @@ export function ConditionSelect({
 }: ConditionSelectProps) {
   const { t } = useLocale()
   const selected = options.find((option) => option === value)
+  const ids = useFieldIds()
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-label font-semibold text-text">
+      <FieldLabel id={ids.labelId} required={required}>
         {label}
-        {required && <span className="text-danger"> *</span>}
-      </span>
+      </FieldLabel>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             type="button"
             name={name}
             data-field={name}
-            aria-invalid={error ? true : undefined}
-            className={`flex items-center justify-between gap-2 rounded-md border bg-bg px-3 py-2 text-left text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent ${error ? 'border-danger' : 'border-border'}`}
+            {...triggerA11yProps({ ...ids, error, required })}
+            className={`flex items-center justify-between gap-2 rounded-md border bg-bg px-3 py-2 text-left text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent ${error ? 'border-danger' : 'border-input'}`}
           >
             <span className="flex min-w-0 items-center gap-2">
               {selected && <ConditionGlyph condition={selected} />}
@@ -81,7 +83,7 @@ export function ConditionSelect({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      {error && <span className="text-xs text-danger">{error}</span>}
+      {error && <FieldError id={ids.errorId}>{error}</FieldError>}
     </div>
   )
 }

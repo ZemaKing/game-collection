@@ -32,7 +32,7 @@ export function AccountMenu() {
         <button
           type="button"
           title={t('topbar.collector')}
-          className="flex size-[40px] shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-fg"
+          className="flex size-[40px] shrink-0 items-center justify-center rounded-full bg-accent-solid text-sm font-semibold text-accent-fg"
         >
           C
         </button>

@@ -3,6 +3,8 @@ import { ITEM_TYPE_META } from '@/features/items/constants'
 import type { RelatedItemRef } from '@/features/items/forms/useSaveItem'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 import { useSearch } from '@/features/search/useSearch'
+import { FieldLabel } from '@/components/ui/FieldParts'
+import { useFieldIds } from '@/components/ui/useFieldIds'
 import { useLocale } from '@/hooks/useLocale'
 
 export type RelatedItemSelection = RelatedItemRef & { title: string }
@@ -34,6 +36,7 @@ export function RelationshipPicker({
   allowedTypes,
 }: RelationshipPickerProps) {
   const { t } = useLocale()
+  const { labelId } = useFieldIds()
   const [query, setQuery] = useState('')
   const { results, loading } = useSearch(query)
 
@@ -54,7 +57,7 @@ export function RelationshipPicker({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-label font-semibold text-text">{label}</span>
+      <FieldLabel id={labelId}>{label}</FieldLabel>
 
       {selected.length > 0 && (
         <ul className="flex flex-wrap gap-2">
@@ -70,10 +73,10 @@ export function RelationshipPicker({
                 <button
                   type="button"
                   onClick={() => remove(item.itemId)}
-                  aria-label={t('form.removeRelatedItem')}
-                  className="text-muted hover:text-text"
+                  aria-label={`${t('form.removeRelatedItem')}: ${item.title}`}
+                  className="px-1 text-muted hover:text-text pointer-coarse:px-2.5 pointer-coarse:py-1"
                 >
-                  ×
+                  <span aria-hidden="true">×</span>
                 </button>
               </li>
             )
@@ -82,18 +85,19 @@ export function RelationshipPicker({
       )}
 
       <input
+        aria-labelledby={labelId}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t('form.relationshipSearchPlaceholder')}
-        className="rounded-md border border-border bg-bg px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+        className="rounded-md border border-input bg-bg px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
       />
 
       {query.trim() !== '' && (
         <div className="max-h-48 overflow-y-auto rounded-md border border-border bg-card">
           {loading ? (
-            <p className="px-3 py-2 text-xs text-muted">{t('listing.loading')}</p>
+            <p role="status" className="px-3 py-2 text-xs text-muted">{t('listing.loading')}</p>
           ) : candidates.length === 0 ? (
-            <p className="px-3 py-2 text-xs text-muted">{t('search.noResults', { query })}</p>
+            <p role="status" className="px-3 py-2 text-xs text-muted">{t('search.noResults', { query })}</p>
           ) : (
             candidates.map((row) => {
               const Icon = ITEM_TYPE_META[row.item_type].icon

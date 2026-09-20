@@ -1,5 +1,7 @@
 import { FORMAT_TAG_META } from '@/features/items/constants'
 import type { Tag } from '@/features/items/api'
+import { FieldLabel } from '@/components/ui/FieldParts'
+import { useFieldIds } from '@/components/ui/useFieldIds'
 import { useLocale } from '@/hooks/useLocale'
 
 interface FormatToggleProps {
@@ -14,16 +16,17 @@ interface FormatToggleProps {
 /** Segmented Digital / Physical switch. Clicking the active segment clears the choice. */
 export function FormatToggle({ label, name, values, onChange, options }: FormatToggleProps) {
   const { t } = useLocale()
+  const { labelId } = useFieldIds()
   const selectedId = options.find((option) => values.includes(option.id))?.id ?? null
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-label font-semibold text-text">{label}</span>
+      <FieldLabel id={labelId}>{label}</FieldLabel>
       <div
-        role="radiogroup"
-        aria-label={label}
+        role="group"
+        aria-labelledby={labelId}
         data-field={name}
-        className="inline-flex w-full rounded-md border border-border bg-bg p-1 sm:w-fit"
+        className="inline-flex w-full rounded-md border border-input bg-bg p-1 sm:w-fit"
       >
         {options.map((option) => {
           const meta = FORMAT_TAG_META[option.slug]
@@ -34,10 +37,9 @@ export function FormatToggle({ label, name, values, onChange, options }: FormatT
             <button
               key={option.id}
               type="button"
-              role="radio"
-              aria-checked={checked}
+              aria-pressed={checked}
               onClick={() => onChange(checked ? [] : [option.id])}
-              className={`flex flex-1 items-center justify-center gap-1.5 rounded px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 sm:flex-none ${
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:flex-none ${
                 checked ? 'bg-card-hover text-text shadow-sm' : 'text-muted hover:text-text'
               }`}
             >

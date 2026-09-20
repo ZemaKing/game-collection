@@ -66,4 +66,12 @@ Only pure-function unit tests exist (`completeness.test.ts`, `statistics.test.ts
 
 **Settings & theming**: every persisted display preference (theme light/dark, language, default view, default sort, visible platforms, image loading) lives in one validated `settings` localStorage entry owned by `SettingsProvider` (`features/settings/settings.ts` holds the pure parse/load/save logic; read it with `useSettings`). `ThemeProvider`/`useTheme` and `LocaleProvider`/`useLocale` are thin views over it — add new preferences to `Settings`, `DEFAULT_SETTINGS` and `parseSettings` (each field falls back independently) rather than new localStorage keys. Settings are deliberately local-only, not synced to Supabase. `ErrorBoundary` sits outside the providers and reads the language via `loadSettings`.
 
+**Accessibility conventions** (Phase 28 — keep these when adding UI):
+- Colour roles in `index.css`: `accent` is for text/borders/rings, `accent-solid` is for *fills* carrying `accent-fg` text (dark-theme `accent` is too light for white text); `danger`/`danger-solid` likewise; `border-input` (not `border-border`) is the border of form controls (3:1). Badge colour maps in `features/items/constants.ts` carry both shades (`text-x-800 dark:text-x-300`); `dark:` is wired to the `.dark` class via `@custom-variant`, not the OS setting.
+- Form fields use `Input`/`Textarea`, or for custom triggers `FieldLabel`/`FieldError` (`components/ui/FieldParts.tsx`) plus `useFieldIds`/`triggerA11yProps` (`useFieldIds.ts`) so label, `aria-required` and the error message are attached to the control.
+- Dialogs/sheets opened from state must pass `onCloseAutoFocus={restoreFocusOnClose}` (`lib/dialogFocus.ts`; `DialogContent` already does) or focus falls to `<body>` on close.
+- Every routed page needs exactly one `<h1>`: `usePageA11y` (in `AppShell`) derives `document.title` and the route announcement from it.
+- Icon-only buttons need an accessible name that says *what* (include the item/image), and new strings for that go under `a11y.*` in both locale maps.
+- Audit: `scripts/a11y-audit.js` (axe-core + a contrast check) is loaded into a page from the dev server — see its header. Note the Browser pane has no system focus, so scripted `.focus()` fires no `focusin`; test focus behaviour with real clicks/keypresses.
+
 **UI primitives** (`src/components/ui/`): thin wrappers around Radix primitives (`Dialog`, `DropdownMenu`, `Tabs`) plus `Input`, `Textarea`, `Select`, `MultiSelect`, `ConfirmDialog` — prefer these over reaching for Radix directly in feature code.

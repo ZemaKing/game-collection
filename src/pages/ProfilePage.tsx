@@ -75,7 +75,7 @@ function ProfilePage() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       <header className="flex items-center gap-4 rounded-lg border border-border bg-surface p-4 md:gap-5 md:p-6">
-        <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-accent text-accent-fg md:size-20">
+        <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-accent-solid text-accent-fg md:size-20">
           <Gamepad2 size={32} />
         </div>
         <div className="min-w-0">
@@ -110,19 +110,19 @@ function ProfilePage() {
             />
             <MetricTile
               icon={Gauge}
-              iconColor="text-sky-400"
+              iconColor="text-sky-600 dark:text-sky-400"
               label={t('stats.averageCompleteness')}
               value={`${stats.completeness.average}%`}
             />
             <MetricTile
               icon={CalendarPlus}
-              iconColor="text-emerald-400"
+              iconColor="text-emerald-600 dark:text-emerald-400"
               label={t('stats.addedRecently', { days: String(RECENT_WINDOW_DAYS) })}
               value={stats.addedLastWindow}
             />
             <MetricTile
               icon={CheckCircle2}
-              iconColor="text-amber-400"
+              iconColor="text-amber-600 dark:text-amber-400"
               label={t('stats.fullyComplete')}
               value={stats.completeness.complete}
             />

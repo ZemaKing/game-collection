@@ -2,6 +2,8 @@ import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-reac
 import { useState, type ComponentProps } from 'react'
 import { DayPicker } from 'react-day-picker'
 import { enGB, srLatn } from 'react-day-picker/locale'
+import { FieldError, FieldLabel } from '@/components/ui/FieldParts'
+import { triggerA11yProps, useFieldIds } from '@/components/ui/useFieldIds'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { useLocale } from '@/hooks/useLocale'
 import { formatIsoDate, parseIsoDate } from '@/lib/isoDate'
@@ -33,8 +35,8 @@ const dayPickerClassNames: ComponentProps<typeof DayPicker>['classNames'] = {
   day_button:
     'flex size-8 items-center justify-center rounded-md text-sm text-text outline-none hover:bg-card-hover focus-visible:ring-2 focus-visible:ring-accent',
   today: 'font-semibold text-accent',
-  selected: 'rounded-md bg-accent text-accent-fg hover:bg-accent-hover',
-  outside: 'text-muted opacity-50',
+  selected: 'rounded-md bg-accent-solid text-accent-fg hover:bg-accent-hover',
+  outside: 'text-muted',
   disabled: 'pointer-events-none text-muted opacity-40',
   hidden: 'invisible',
 }
@@ -75,6 +77,7 @@ export function DatePickerField({
   maxDate,
 }: DatePickerFieldProps) {
   const { locale, t } = useLocale()
+  const ids = useFieldIds()
   const [open, setOpen] = useState(false)
   const selected = parseIsoDate(value)
   const dayPickerLocale = locale === 'sr' ? srLatn : enGB
@@ -94,10 +97,13 @@ export function DatePickerField({
 
   return (
     <div className="flex flex-col gap-1.5">
-      {label && (
-        <span className="text-label font-semibold text-text">
+      {label ? (
+        <FieldLabel id={ids.labelId} required={required}>
           {label}
-          {required && <span className="text-danger"> *</span>}
+        </FieldLabel>
+      ) : (
+        <span id={ids.labelId} className="sr-only">
+          {ariaLabel}
         </span>
       )}
       <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
@@ -107,9 +113,8 @@ export function DatePickerField({
             name={name}
             data-field={name}
             disabled={disabled}
-            aria-invalid={error ? true : undefined}
-            aria-label={ariaLabel ?? label}
-            className={`flex items-center justify-between gap-2 rounded-md border bg-bg px-3 py-2 text-left text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-60 ${error ? 'border-danger' : 'border-border'}`}
+            {...triggerA11yProps({ ...ids, error, required })}
+            className={`flex items-center justify-between gap-2 rounded-md border bg-bg px-3 py-2 text-left text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-60 ${error ? 'border-danger' : 'border-input'}`}
           >
             <span className={displayValue ? '' : 'text-muted'}>
               {displayValue || placeholder || t('form.selectDate')}
@@ -153,7 +158,7 @@ export function DatePickerField({
           </div>
         </PopoverContent>
       </Popover>
-      {error && <span className="text-xs text-danger">{error}</span>}
+      {error && <FieldError id={ids.errorId}>{error}</FieldError>}
     </div>
   )
 }

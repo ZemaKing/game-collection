@@ -21,7 +21,7 @@ export function TabsTrigger({
 }: ComponentProps<typeof RadixTabs.Trigger>) {
   return (
     <RadixTabs.Trigger
-      className={`rounded-md px-3 py-1.5 text-sm font-medium text-muted outline-none data-[state=active]:bg-accent data-[state=active]:text-accent-fg ${className}`}
+      className={`rounded-md px-3 py-1.5 text-sm font-medium text-muted outline-none focus-visible:ring-2 focus-visible:ring-accent data-[state=active]:bg-accent-solid data-[state=active]:text-accent-fg ${className}`}
       {...props}
     />
   )

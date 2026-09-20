@@ -357,14 +357,17 @@ export function ItemForm({
       )}
 
       {Object.keys(errors).length > 0 && (
-        <p className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
+        <p role="alert" className="rounded-lg border border-danger bg-danger-bg px-4 py-3 text-sm text-danger">
           {t('form.hasErrors')}
         </p>
       )}
 
       {isMobile ? (
         <section className="flex flex-col gap-4 pb-20">
-          <div className="flex items-center gap-1.5">
+          <p role="status" className="sr-only">
+            {t('a11y.stepStatus', { current: String(stepIndex + 1), total: String(steps.length), title: t(steps[stepIndex].titleKey) })}
+          </p>
+          <div aria-hidden="true" className="flex items-center gap-1.5">
             {steps.map((step, i) => (
               <span
                 key={step.titleKey}

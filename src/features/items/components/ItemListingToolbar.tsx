@@ -11,7 +11,7 @@ import {
   Tag as TagIcon,
   X,
 } from 'lucide-react'
-import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react'
+import { useEffect, useId, useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import { CloseIcon } from '@/components/icons/ActionIcons'
 import { ButtonIcon } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/buttonStyles'
@@ -85,6 +85,8 @@ export function ItemListingToolbar({
   showEditionFilter = true,
 }: ItemListingToolbarProps) {
   const { t } = useLocale()
+  const sortLabelId = useId()
+  const viewLabelId = useId()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [expanded, setExpanded] = useState(true)
   const [searchDraft, setSearchDraft] = useState(filters.search)
@@ -127,7 +129,7 @@ export function ItemListingToolbar({
         label: platform?.name ?? id,
         onRemove: () => setFilters({ platformIds: filters.platformIds.filter((v) => v !== id) }),
         icon: platform ? (PLATFORM_ICONS[platform.slug] ?? Gamepad2) : Gamepad2,
-        iconColor: 'text-sky-400',
+        iconColor: 'text-sky-600 dark:text-sky-400',
       }
     }),
     ...(showGenreFilter ? filters.genreIds : []).map((id) => {
@@ -201,7 +203,7 @@ export function ItemListingToolbar({
           <span className="flex items-center gap-2">
             <span className="font-semibold text-text">{t('filters.title')}</span>
             {chips.length > 0 && (
-              <span className="flex size-5 items-center justify-center rounded-full bg-accent text-xs font-semibold text-accent-fg">
+              <span className="flex size-5 items-center justify-center rounded-full bg-accent-solid text-xs font-semibold text-accent-fg">
                 {chips.length}
               </span>
             )}
@@ -222,7 +224,7 @@ export function ItemListingToolbar({
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            aria-label={t('filters.title')}
+            aria-label={t('a11y.togglePanel')}
             aria-expanded={expanded}
             className="flex size-8 items-center justify-center rounded-full text-muted hover:bg-card-hover hover:text-text"
           >
@@ -237,29 +239,30 @@ export function ItemListingToolbar({
             <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input
               type="search"
+              aria-label={t('filters.searchPlaceholder')}
               value={searchDraft}
               onChange={(e) => setSearchDraft(e.target.value)}
               placeholder={t('filters.searchPlaceholder')}
-              className="w-full rounded-full border border-border bg-bg py-2.5 pl-10 pr-4 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded-full border border-input bg-bg py-2.5 pl-10 pr-4 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
 
           <div className="flex items-end gap-3">
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <span className="text-sm font-semibold text-text">{t('sort.label')}</span>
-              <SortMenu value={filters.sort} onChange={(sort) => setFilters({ sort })} />
+              <span id={sortLabelId} className="text-sm font-semibold text-text">{t('sort.label')}</span>
+              <SortMenu value={filters.sort} onChange={(sort) => setFilters({ sort })} labelledBy={sortLabelId} />
             </div>
 
             <div className="flex shrink-0 flex-col items-start gap-1.5">
-              <span className="text-sm font-semibold text-text">{t('view.label')}</span>
-              <div className="inline-flex items-center gap-1 rounded-xl border border-border bg-bg p-1">
+              <span id={viewLabelId} className="text-sm font-semibold text-text">{t('view.label')}</span>
+              <div role="group" aria-labelledby={viewLabelId} className="inline-flex items-center gap-1 rounded-xl border border-border bg-bg p-1">
                 <button
                   type="button"
                   aria-label={t('view.grid')}
                   aria-pressed={view === 'grid'}
                   onClick={() => setView('grid')}
                   className={`flex size-9 items-center justify-center rounded-lg ${
-                    view === 'grid' ? 'bg-accent text-accent-fg' : 'text-muted hover:text-text'
+                    view === 'grid' ? 'bg-accent-solid text-accent-fg' : 'text-muted hover:text-text'
                   }`}
                 >
                   <LayoutGrid size={16} />
@@ -270,7 +273,7 @@ export function ItemListingToolbar({
                   aria-pressed={view === 'list'}
                   onClick={() => setView('list')}
                   className={`flex size-9 items-center justify-center rounded-lg ${
-                    view === 'list' ? 'bg-accent text-accent-fg' : 'text-muted hover:text-text'
+                    view === 'list' ? 'bg-accent-solid text-accent-fg' : 'text-muted hover:text-text'
                   }`}
                 >
                   <ListIcon size={16} />
@@ -304,8 +307,8 @@ export function ItemListingToolbar({
                       <button
                         type="button"
                         onClick={chip.onRemove}
-                        aria-label={t('filters.removeChip')}
-                        className="text-muted hover:text-text"
+                        aria-label={t('a11y.removeFilter', { label: chip.label })}
+                        className="-mr-1 rounded-full p-1 text-muted hover:text-text pointer-coarse:p-2"
                       >
                         <X size={12} />
                       </button>

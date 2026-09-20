@@ -131,11 +131,13 @@ function DashboardPage() {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        <div className="relative flex flex-col gap-1 p-4 sm:p-5 lg:p-6">
-          <h1 className="text-xl font-bold text-text drop-shadow-sm sm:text-2xl lg:text-3xl">
+        {/* The photo is busy and the fade to the page colour is only partial, so the text sits on its
+            own translucent backing: contrast no longer depends on which part of the image is behind it. */}
+        <div className="relative m-2 flex max-w-[calc(100%-1rem)] flex-col gap-1 rounded-xl bg-bg/80 px-3 py-2 backdrop-blur-sm sm:m-3 sm:px-4 lg:m-4 lg:px-5">
+          <h1 className="text-xl font-bold text-text sm:text-2xl lg:text-3xl">
             {t('home.welcome')}
           </h1>
-          <p className="text-xs text-muted drop-shadow-sm sm:text-sm">{t('home.subtitle')}</p>
+          <p className="text-xs text-text sm:text-sm">{t('home.subtitle')}</p>
         </div>
       </div>
 
