@@ -5,7 +5,7 @@ export const locales: { value: Locale; label: string }[] = [
   { value: 'en', label: 'English' },
 ]
 
-const translations = {
+export const translations = {
   sr: {
     'common.retry': 'Pokušaj ponovo',
     'common.offline': 'Nema internet konekcije. Prikazani podaci mogu biti zastareli.',

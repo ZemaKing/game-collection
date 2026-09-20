@@ -1162,14 +1162,14 @@ Protect the complete product with a maintainable automated test suite.
 
 ### Tasks
 
-- [ ] Unit test normalization, filters, search helpers, duplicate rules, and completeness
+- [~] Unit test normalization, filters, search helpers, duplicate rules, and completeness (done: completeness, LIKE escaping, form schemas, formatting, i18n key/placeholder parity, statistics, settings; filters/search/duplicate logic still coupled to Supabase hooks)
 - [ ] Component test cards/rows, filter controls, forms, dialogs, viewer, and state components
 - [ ] Integration test Supabase query/mutation hooks and authorization behavior
 - [ ] E2E test public browse/search/filter/detail flows
 - [ ] E2E test owner login and create/edit/delete/image/status flows
 - [ ] E2E test duplicate warning and unsaved changes guard
 - [ ] Add stable fixtures and deterministic test data
-- [ ] Run critical tests in CI
+- [x] Run critical tests in CI
 
 ### Testing & Verification
 
@@ -1180,6 +1180,11 @@ Protect the complete product with a maintainable automated test suite.
 ### Definition of Done
 
 - [ ] Core collection and CRUD workflows are protected by reliable automated tests
+
+### Results (partial)
+
+- 57 unit tests across 7 files; `.github/workflows/ci.yml` runs lint, tests and build (typecheck via `tsc -b`) on push to main and on PRs. Marking CI as a required check is a GitHub branch-protection setting still to be enabled by the owner.
+- Not started: component tests, Supabase integration tests, and Playwright E2E across Desktop/Tablet/Mobile (each needs new dev dependencies and a test Supabase project or mocks).
 
 ### Phase Status
 
