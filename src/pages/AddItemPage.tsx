@@ -16,7 +16,7 @@ function isItemType(value: string | null): value is ItemType {
 }
 
 /** A distinct component (not a branch inside AddItemPage) so `useSaveItem` is always called unconditionally. */
-function CreateItemForm({ itemType }: { itemType: ItemType }) {
+function CreateItemForm({ itemType, initialGameId }: { itemType: ItemType; initialGameId?: string }) {
   const { t } = useLocale()
   const navigate = useNavigate()
   const { save, isSaving, error, errorKind } = useSaveItem(itemType)
@@ -47,7 +47,11 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
   async function handleSubmit(result: ItemFormSubmitResult) {
     setCheckingDuplicates(true)
     try {
-      const matches = await findLikelyDuplicates(itemType, String(result.values.title ?? ''))
+      const matches = await findLikelyDuplicates(
+        itemType,
+        String(result.values.title ?? ''),
+        typeof result.values.game_id === 'string' ? result.values.game_id : undefined,
+      )
       if (matches.length > 0) {
         setDuplicates(matches)
         setPendingSubmit(result)
@@ -71,14 +75,14 @@ function CreateItemForm({ itemType }: { itemType: ItemType }) {
             {t('form.addTitle', { type: t(meta.labelKey) })}
           </>
         }
-        initialValues={EMPTY_ITEM_FORM_STATE}
+        initialValues={initialGameId ? { ...EMPTY_ITEM_FORM_STATE, game_id: initialGameId } : EMPTY_ITEM_FORM_STATE}
         initialRelatedItems={[]}
         isSaving={isSaving || checkingDuplicates}
         submitError={error}
         submitErrorKind={errorKind}
         submitLabel={t('form.createSubmit')}
         onSubmit={(result) => void handleSubmit(result)}
-        onCancel={() => navigate('/items/new')}
+        onCancel={() => navigate(initialGameId ? `/${ITEM_TYPE_ROUTES.game}/${initialGameId}` : '/items/new')}
       />
       <DuplicateWarningDialog
         open={duplicates.length > 0}
@@ -107,7 +111,10 @@ function AddItemPage() {
     return <TypeSelector />
   }
 
-  return <CreateItemForm key={typeParam} itemType={typeParam} />
+  // "Add DLC" on a game's page links here with `&game=<id>` so the base game is already chosen.
+  const gameParam = typeParam === 'dlc' ? searchParams.get('game') : null
+
+  return <CreateItemForm key={typeParam} itemType={typeParam} initialGameId={gameParam ?? undefined} />
 }
 
 export default AddItemPage

@@ -1,4 +1,4 @@
-import type { Genre, ItemCondition, ItemType, Platform } from '@/features/items/types'
+import type { DlcType, Genre, ItemCondition, ItemType, Platform } from '@/features/items/types'
 
 /**
  * Full record for a single item's detail page, fetched from its specific
@@ -46,6 +46,11 @@ export interface ItemDetail {
 
   // Stuff
   category: string | null
+
+  // DLCs
+  /** The base game this DLC belongs to — always set for DLCs (`dlcs.game_id` is NOT NULL). */
+  base_game_id: string | null
+  dlc_type: DlcType | null
 }
 
 export interface ItemImageRow {

@@ -20,6 +20,7 @@ const TYPE_KEYS: Record<ItemType, string[]> = {
   artbook: ['publisher', 'page_count', 'isbn', 'language'],
   figure: ['manufacturer', 'character_name', 'scale', 'material', 'height_cm'],
   stuff: ['category', 'manufacturer'],
+  dlc: ['game_id', 'dlc_type', 'completed'],
 }
 
 function buildPayload(itemType: ItemType, values: Record<string, unknown>): Record<string, unknown> {

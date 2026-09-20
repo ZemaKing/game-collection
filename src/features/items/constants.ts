@@ -19,6 +19,7 @@ import {
   Map,
   Music2,
   Package,
+  PackagePlus,
   PartyPopper,
   PersonStanding,
   PlayingCards,
@@ -49,6 +50,7 @@ import type { ItemCondition, ItemType } from '@/features/items/types'
 
 export const ITEM_TYPES: ItemType[] = [
   'game',
+  'dlc',
   'special_edition',
   'steelbook',
   'artbook',
@@ -66,6 +68,7 @@ export const ITEM_TYPE_META: Record<
   artbook: { icon: BookOpen, labelKey: 'nav.artbooks' },
   figure: { icon: PersonStanding, labelKey: 'nav.figures' },
   stuff: { icon: Boxes, labelKey: 'nav.stuff' },
+  dlc: { icon: PackagePlus, labelKey: 'nav.dlcs' },
 }
 
 /**
@@ -81,6 +84,7 @@ export const ITEM_TYPE_COLORS: Record<ItemType, { icon: string; badge: string; h
   artbook: { icon: 'text-orange-600 dark:text-orange-400', badge: 'bg-orange-500/15 text-orange-800 dark:text-orange-300', hoverBorder: 'hover:border-orange-400/60', hoverBorderSolid: 'hover:border-orange-400' },
   figure: { icon: 'text-rose-600 dark:text-rose-400', badge: 'bg-rose-500/15 text-rose-800 dark:text-rose-300', hoverBorder: 'hover:border-rose-400/60', hoverBorderSolid: 'hover:border-rose-400' },
   stuff: { icon: 'text-slate-600 dark:text-slate-400', badge: 'bg-slate-500/15 text-slate-800 dark:text-slate-300', hoverBorder: 'hover:border-slate-400/60', hoverBorderSolid: 'hover:border-slate-400' },
+  dlc: { icon: 'text-fuchsia-600 dark:text-fuchsia-400', badge: 'bg-fuchsia-500/15 text-fuchsia-800 dark:text-fuchsia-300', hoverBorder: 'hover:border-fuchsia-400/60', hoverBorderSolid: 'hover:border-fuchsia-400' },
 }
 
 /** URL path segments, matching the sidebar links in `lib/navigation.ts`. */
@@ -91,6 +95,7 @@ export const ITEM_TYPE_ROUTES: Record<ItemType, string> = {
   artbook: 'artbooks',
   figure: 'figures',
   stuff: 'stuff',
+  dlc: 'dlcs',
 }
 
 /** Table names in `supabase/migrations`, used by write paths (`useSaveItem`). */
@@ -101,6 +106,7 @@ export const ITEM_TABLE_NAMES: Record<ItemType, string> = {
   artbook: 'artbooks',
   figure: 'figures',
   stuff: 'stuff',
+  dlc: 'dlcs',
 }
 
 export const CONDITION_LABEL_KEYS: Record<ItemCondition, TranslationKey> = {

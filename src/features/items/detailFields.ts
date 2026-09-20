@@ -71,6 +71,16 @@ export const DETAIL_FIELDS: Record<ItemType, DetailFieldDef[]> = {
     collectionDateField,
     conditionField,
   ],
+  dlc: [
+    platformField,
+    {
+      labelKey: 'dlc.type',
+      value: (d, t) => (d.dlc_type ? t(d.dlc_type === 'expansion' ? 'dlc.typeExpansion' : 'dlc.typeDlc') : null),
+    },
+    releaseDateField,
+    collectionDateField,
+    conditionField,
+  ],
   stuff: [
     { labelKey: 'detail.category', value: (d) => d.category },
     { labelKey: 'detail.manufacturer', value: (d) => d.manufacturer },

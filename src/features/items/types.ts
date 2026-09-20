@@ -5,6 +5,9 @@ export type ItemType =
   | 'artbook'
   | 'figure'
   | 'stuff'
+  | 'dlc'
+
+export type DlcType = 'dlc' | 'expansion'
 
 export type ItemCondition = 'sealed' | 'mint' | 'good' | 'fair' | 'poor'
 
@@ -38,8 +41,10 @@ export interface AllItemRow {
   genre_name: string | null
   /** Edition text for games / special editions / steelbooks; absent until the edition migration is applied. */
   edition_name?: string | null
-  /** Games only: the owner has played it through. Absent until the completed migration is applied. */
+  /** Games and DLCs: the owner has played it through. Absent until the completed migration is applied. */
   completed?: boolean
+  /** DLCs only: id of the base game this DLC belongs to (also the item's `subtitle` source). */
+  parent_game_id?: string | null
   /** Slug of the item's Digital / Physical tag, if set. Not part of the view — attached by `withFormats`. */
   format_slug?: string | null
   created_at: string

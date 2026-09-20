@@ -1,12 +1,28 @@
 import { describe, expect, it } from 'vitest'
-import { ITEM_SCHEMAS, artbookSchema, figureSchema, gameSchema } from '@/features/items/forms/schemas'
+import { ITEM_SCHEMAS, artbookSchema, dlcSchema, figureSchema, gameSchema } from '@/features/items/forms/schemas'
 
 describe('item form schemas', () => {
   it('requires a non-blank title for every item type', () => {
     for (const schema of Object.values(ITEM_SCHEMAS)) {
-      expect(schema.safeParse({ title: '   ' }).success).toBe(false)
-      expect(schema.safeParse({ title: 'Ok' }).success).toBe(true)
+      // `game_id` is only required (and only kept) for DLCs; the other schemas ignore it.
+      expect(schema.safeParse({ title: '   ', game_id: 'g1' }).success).toBe(false)
+      expect(schema.safeParse({ title: 'Ok', game_id: 'g1' }).success).toBe(true)
     }
+  })
+
+  it('requires a base game for a DLC', () => {
+    const missing = dlcSchema.safeParse({ title: 'Wrath of the Druids', game_id: '  ' })
+    expect(missing.success).toBe(false)
+    expect(missing.error?.issues[0].message).toBe('errors.baseGameRequired')
+    expect(dlcSchema.safeParse({ title: 'Wrath of the Druids' }).success).toBe(false)
+  })
+
+  it('defaults a DLC to type "dlc", not completed, and rejects unknown types', () => {
+    const parsed = dlcSchema.parse({ title: 'The Siege of Paris', game_id: 'g1' })
+    expect(parsed.dlc_type).toBe('dlc')
+    expect(parsed.completed).toBe(false)
+    expect(dlcSchema.parse({ title: 'A', game_id: 'g1', dlc_type: 'expansion' }).dlc_type).toBe('expansion')
+    expect(dlcSchema.safeParse({ title: 'A', game_id: 'g1', dlc_type: 'season' }).success).toBe(false)
   })
 
   it('trims the title and turns blank optional text into undefined', () => {

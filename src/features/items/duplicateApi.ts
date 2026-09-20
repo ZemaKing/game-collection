@@ -12,16 +12,22 @@ const MATCH_LIMIT = 10
  * confirmed with the owner during planning as the simplest rule that still
  * catches the common case (re-adding an item already in the collection).
  */
-export async function findLikelyDuplicates(itemType: ItemType, title: string): Promise<AllItemRow[]> {
+export async function findLikelyDuplicates(
+  itemType: ItemType,
+  title: string,
+  /** DLCs only: titles like "Season Pass" legitimately repeat across games, so match within the base game. */
+  parentGameId?: string,
+): Promise<AllItemRow[]> {
   const normalized = title.trim()
   if (!normalized) return []
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('all_items')
     .select('*')
     .eq('item_type', itemType)
     .ilike('title', escapeLikePattern(normalized))
-    .limit(MATCH_LIMIT)
+  if (itemType === 'dlc' && parentGameId) query = query.eq('parent_game_id', parentGameId)
+  const { data, error } = await query.limit(MATCH_LIMIT)
   if (error) throw error
   return data ?? []
 }

@@ -22,11 +22,13 @@ import { CompletedRibbon } from '@/features/items/components/CompletedMarks'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
 import { EditionBadge } from '@/features/items/components/EditionBadge'
+import { GameDlcSection } from '@/features/items/components/GameDlcSection'
 import { ItemDetailSkeleton } from '@/features/items/components/ItemDetailSkeleton'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import { ItemNotFound } from '@/features/items/components/ItemNotFound'
 import { RelatedItemsSection } from '@/features/items/components/RelatedItemsSection'
 import { useDeleteItem } from '@/features/items/useDeleteItem'
+import { useBaseGame, useGameDlcs } from '@/features/items/useDlcLinks'
 import { useItemDetail } from '@/features/items/useItemDetail'
 import { useItemRelationships } from '@/features/items/useItemRelationships'
 import type { ItemType, Platform } from '@/features/items/types'
@@ -91,6 +93,10 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   const location = useLocation()
   const state = useItemDetail(itemType, id)
   const relationships = useItemRelationships(itemType, id)
+  const gameDlcs = useGameDlcs(itemType === 'game' ? id : undefined)
+  const baseGame = useBaseGame(
+    itemType === 'dlc' && state.status === 'loaded' ? state.detail.base_game_id : undefined,
+  )
   const { remove, isDeleting, error: deleteError } = useDeleteItem(itemType)
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [viewerOpen, setViewerOpen] = useState(false)
@@ -258,6 +264,18 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
           )}
         </header>
 
+        {itemType === 'dlc' && detail.base_game_id && detail.game_title && (
+          <p className="-mt-3 text-sm text-muted">
+            {t('detail.baseGame')}:{' '}
+            <Link
+              to={`/${ITEM_TYPE_ROUTES.game}/${detail.base_game_id}`}
+              className="font-semibold text-accent hover:text-accent-hover hover:underline"
+            >
+              {detail.game_title}
+            </Link>
+          </p>
+        )}
+
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-muted">{t('completeness.heading')}</span>
           <CompletenessBadge percent={completeness.percent} />
@@ -385,6 +403,16 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
           </section>
         )}
 
+        {itemType === 'game' && <GameDlcSection gameId={detail.id} dlcs={gameDlcs.data} canEdit={!!user} />}
+
+        {itemType === 'dlc' && baseGame.data && (
+          <RelatedItemsSection
+            titleKey="detail.baseGame"
+            items={[{ ...baseGame.data, relationshipType: 'base_game' }]}
+            platformById={platformById}
+          />
+        )}
+
         {itemType === 'special_edition' ? (
           <>
             <RelatedItemsSection
@@ -424,10 +452,15 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         title={t('detail.deleteConfirmTitle')}
-        description={t('detail.deleteConfirmBody', {
-          images: String(images.length),
-          relationships: String(relationshipCount),
-        })}
+        description={
+          t('detail.deleteConfirmBody', {
+            images: String(images.length),
+            relationships: String(relationshipCount),
+          }) +
+          (itemType === 'game' && gameDlcs.data.length > 0
+            ? ` ${t('dlc.deleteWarning', { count: String(gameDlcs.data.length) })}`
+            : '')
+        }
         confirmLabel={t('form.delete')}
         cancelLabel={t('filters.cancel')}
         onConfirm={() => void handleDelete()}

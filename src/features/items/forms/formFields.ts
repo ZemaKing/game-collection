@@ -11,6 +11,8 @@ export type FieldKind =
   | 'conditionSelect'
   | 'editionSelect'
   | 'completedToggle'
+  | 'gameSelect'
+  | 'dlcTypeToggle'
 
 export interface FormFieldDef {
   name: keyof ItemFormState
@@ -135,6 +137,21 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         { name: 'scale', labelKey: 'detail.scale', kind: 'text' },
         { name: 'material', labelKey: 'detail.material', kind: 'text' },
         { name: 'height_cm', labelKey: 'detail.height', kind: 'number' },
+      ],
+    },
+    notesSection,
+  ],
+  dlc: [
+    {
+      titleKey: 'form.sectionBasicInfo',
+      fields: [
+        titleField,
+        { name: 'game_id', labelKey: 'detail.baseGame', kind: 'gameSelect', required: true },
+        { name: 'dlc_type', labelKey: 'dlc.type', kind: 'dlcTypeToggle' },
+        releaseDateField,
+        collectionDateField,
+        conditionField,
+        { name: 'completed', labelKey: 'completed.label', kind: 'completedToggle' },
       ],
     },
     notesSection,

@@ -10,6 +10,9 @@ const ArtbookEditPage = lazy(() => import('@/pages/ArtbookEditPage'))
 const ArtbooksPage = lazy(() => import('@/pages/ArtbooksPage'))
 const ComingSoonPage = lazy(() => import('@/pages/ComingSoonPage'))
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'))
+const DlcDetailPage = lazy(() => import('@/pages/DlcDetailPage'))
+const DlcEditPage = lazy(() => import('@/pages/DlcEditPage'))
+const DlcsPage = lazy(() => import('@/pages/DlcsPage'))
 const FigureDetailPage = lazy(() => import('@/pages/FigureDetailPage'))
 const FigureEditPage = lazy(() => import('@/pages/FigureEditPage'))
 const FiguresPage = lazy(() => import('@/pages/FiguresPage'))
@@ -54,6 +57,16 @@ function App() {
           element={
             <RequireAuth>
               <GameEditPage />
+            </RequireAuth>
+          }
+        />
+        <Route path="dlcs" element={<DlcsPage />} />
+        <Route path="dlcs/:id" element={<DlcDetailPage />} />
+        <Route
+          path="dlcs/:id/edit"
+          element={
+            <RequireAuth>
+              <DlcEditPage />
             </RequireAuth>
           }
         />

@@ -27,6 +27,8 @@ const DETAIL_NULLS: Omit<ItemDetail, 'id' | 'item_type' | 'title' | 'created_at'
   material: null,
   height_cm: null,
   category: null,
+  base_game_id: null,
+  dlc_type: null,
 }
 
 async function fetchGameDetail(id: string): Promise<ItemDetail | null> {
@@ -191,6 +193,38 @@ async function fetchStuffDetail(id: string): Promise<ItemDetail | null> {
   }
 }
 
+async function fetchDlcDetail(id: string): Promise<ItemDetail | null> {
+  // A DLC has no platform of its own — it shows its base game's.
+  const { data, error } = await supabase
+    .from('dlcs')
+    .select('*, games(id, title, platforms(id, name, slug))')
+    .eq('id', id)
+    .maybeSingle()
+  if (error) throw error
+  if (!data) return null
+
+  const game = data.games as unknown as { title: string; platforms: Platform | null } | null
+
+  return {
+    ...DETAIL_NULLS,
+    id: data.id,
+    item_type: 'dlc',
+    title: data.title,
+    description: data.description,
+    notes: data.notes,
+    release_date: data.release_date,
+    collection_date: data.collection_date,
+    condition: data.condition,
+    created_at: data.created_at,
+    updated_at: data.updated_at,
+    platform: game?.platforms ?? null,
+    completed: data.completed,
+    game_title: game?.title ?? null,
+    base_game_id: data.game_id,
+    dlc_type: data.dlc_type,
+  }
+}
+
 export async function fetchItemDetail(itemType: ItemType, id: string): Promise<ItemDetail | null> {
   switch (itemType) {
     case 'game':
@@ -205,6 +239,8 @@ export async function fetchItemDetail(itemType: ItemType, id: string): Promise<I
       return fetchFigureDetail(id)
     case 'stuff':
       return fetchStuffDetail(id)
+    case 'dlc':
+      return fetchDlcDetail(id)
   }
 }
 

@@ -128,7 +128,7 @@ function ProfilePage() {
             />
           </div>
 
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {ITEM_TYPES.map((type) => {
               const { icon: Icon, labelKey } = ITEM_TYPE_META[type]
               return (

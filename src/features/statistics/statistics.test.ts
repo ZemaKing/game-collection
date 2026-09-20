@@ -61,6 +61,7 @@ describe('computeStatistics', () => {
       artbook: 0,
       figure: 1,
       stuff: 0,
+      dlc: 0,
     })
   })
 

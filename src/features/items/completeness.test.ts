@@ -80,6 +80,14 @@ describe('calculateCompleteness', () => {
   })
 })
 
+describe('DLC completeness', () => {
+  it('ignores subtitle and platform, which a DLC only inherits from its base game', () => {
+    expect(calculateCompleteness('dlc', EMPTY_FACTS)).toEqual({ percent: 0, filled: 0, total: 5 })
+    expect(calculateCompleteness('dlc', { ...EMPTY_FACTS, hasSubtitle: true, hasPlatform: true }).percent).toBe(0)
+    expect(calculateCompleteness('dlc', FULL_FACTS).percent).toBe(100)
+  })
+})
+
 describe('completenessFactsFromRow', () => {
   function row(overrides: Partial<AllItemRow>): AllItemRow {
     return {
@@ -153,6 +161,8 @@ describe('completenessFactsFromDetail', () => {
       material: null,
       height_cm: null,
       category: null,
+      base_game_id: null,
+      dlc_type: null,
       ...overrides,
     }
   }

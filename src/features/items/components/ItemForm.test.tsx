@@ -13,6 +13,17 @@ vi.mock('@/features/items/forms/useItemLookups', () => ({
 vi.mock('@/features/items/components/RelationshipPicker', () => ({ RelationshipPicker: () => null }))
 vi.mock('@/features/items/components/GameAutofillPanel', () => ({ GameAutofillPanel: () => null }))
 vi.mock('@/features/items/components/ImageManager', () => ({ ImageManager: () => null }))
+// The base-game picker loads every game from Supabase; a stand-in keeps the DLC tests offline.
+vi.mock('@/features/items/components/GameSelect', () => ({
+  GameSelect: ({ onChange, error }: { onChange: (id: string) => void; error?: string }) => (
+    <div>
+      <button type="button" onClick={() => onChange('game-1')}>
+        Pick base game
+      </button>
+      {error && <p>{error}</p>}
+    </div>
+  ),
+}))
 
 function setup(overrides: Partial<Parameters<typeof ItemForm>[0]> = {}) {
   const onSubmit = vi.fn()
@@ -62,6 +73,23 @@ describe('ItemForm', () => {
     await userEvent.click(saveButton())
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
     expect(onSubmit.mock.calls[0][0].values.completed).toBe(true)
+  })
+
+  it('blocks a DLC without a base game, then submits it once one is picked', async () => {
+    const { onSubmit } = setup({ itemType: 'dlc', title: 'Add DLC' })
+    await userEvent.type(titleInput(), 'Wrath of the Druids')
+    await userEvent.click(saveButton())
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect((await screen.findAllByText('A base game is required.')).length).toBeGreaterThan(0)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Pick base game' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Expansion' }))
+    await userEvent.click(saveButton())
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    const { values } = onSubmit.mock.calls[0][0]
+    expect(values.game_id).toBe('game-1')
+    expect(values.dlc_type).toBe('expansion')
+    expect(values.title).toBe('Wrath of the Druids')
   })
 
   it('cancels straight away when nothing changed', async () => {

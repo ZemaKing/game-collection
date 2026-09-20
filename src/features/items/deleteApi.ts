@@ -14,6 +14,14 @@ import { supabase } from '@/lib/supabaseClient'
  * survivor with orphaned children still pointing at it.
  */
 export async function deleteItem(itemType: ItemType, itemId: string): Promise<void> {
+  // A DLC can't outlive its game (`dlcs.game_id ... on delete cascade`), but the cascade can't remove the
+  // DLCs' storage objects, so delete them first through the normal path.
+  if (itemType === 'game') {
+    const { data: dlcs, error: dlcsError } = await supabase.from('dlcs').select('id').eq('game_id', itemId)
+    if (dlcsError) throw dlcsError
+    for (const dlc of dlcs ?? []) await deleteItem('dlc', dlc.id)
+  }
+
   const { data: images, error: imagesFetchError } = await supabase
     .from('item_images')
     .select('storage_path')

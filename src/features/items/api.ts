@@ -92,6 +92,18 @@ export interface FetchItemsResult {
 }
 
 /**
+ * A DLC has no genres of its own — it takes its base game's (see `all_items`) —
+ * so a genre match on games must also match those games' DLCs.
+ */
+export async function fetchDlcIdsForGames(gameIds: string[]): Promise<string[]> {
+  if (gameIds.length === 0) return []
+  const { data, error } = await supabase.from('dlcs').select('id').in('game_id', gameIds)
+  // Best effort: a failure here should only drop the DLC matches, not break the whole genre filter/search.
+  if (error) return []
+  return (data ?? []).map((row) => row.id)
+}
+
+/**
  * Resolves the genre/tag facets to a restricted set of item ids (intersected
  * when both facets are active), since neither can be expressed as a column
  * filter directly against the polymorphic/joined `all_items` view. Returns
@@ -110,7 +122,8 @@ async function resolveGenreTagRestriction(
       .select('game_id')
       .in('genre_id', genreIds)
     if (error) throw error
-    genreItemIds = new Set((data ?? []).map((r) => r.game_id))
+    const gameIds = (data ?? []).map((r) => r.game_id)
+    genreItemIds = new Set([...gameIds, ...(await fetchDlcIdsForGames(gameIds))])
   }
 
   let tagItemIds: Set<string> | null = null

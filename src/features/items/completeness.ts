@@ -60,6 +60,8 @@ const APPLICABLE_FIELDS: Record<ItemType, (keyof CompletenessFacts)[]> = {
   artbook: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
   figure: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
   stuff: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
+  // A DLC's subtitle and platform both come from its (mandatory) base game, so neither says anything about the DLC itself.
+  dlc: ['hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
 }
 
 export interface CompletenessResult {
@@ -109,6 +111,7 @@ const DETAIL_SUBTITLE_BY_TYPE: Record<ItemType, (detail: ItemDetail) => string |
   artbook: (d) => d.publisher,
   figure: (d) => d.manufacturer,
   stuff: (d) => d.category,
+  dlc: (d) => d.game_title,
 }
 
 /** Adapter for the detail page, which fetches the full type-specific row. */

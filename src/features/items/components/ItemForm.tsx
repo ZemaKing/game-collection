@@ -17,7 +17,9 @@ import {
 } from '@/features/items/constants'
 import { ConditionSelect } from '@/features/items/components/ConditionSelect'
 import { CompletionToggle } from '@/features/items/components/CompletionToggle'
+import { DlcTypeToggle } from '@/features/items/components/DlcTypeToggle'
 import { EditionSelect } from '@/features/items/components/EditionSelect'
+import { GameSelect } from '@/features/items/components/GameSelect'
 import { GameAutofillPanel } from '@/features/items/components/GameAutofillPanel'
 import { ImageManager } from '@/features/items/components/ImageManager'
 import { PlatformSelect } from '@/features/items/components/PlatformSelect'
@@ -132,6 +134,31 @@ export function ItemForm({
     const error = errorKey ? t(errorKey as TranslationKey) : undefined
     const label = t(field.labelKey)
 
+    if (field.kind === 'gameSelect') {
+      return (
+        <GameSelect
+          key={field.name}
+          label={label}
+          name={field.name}
+          value={form.game_id}
+          onChange={(next) => setField('game_id', next)}
+          error={error}
+          required={field.required}
+        />
+      )
+    }
+    if (field.kind === 'dlcTypeToggle') {
+      return (
+        <div key={field.name} className="sm:col-span-2">
+          <DlcTypeToggle
+            label={label}
+            name={field.name}
+            value={form.dlc_type}
+            onChange={(next) => setField('dlc_type', next)}
+          />
+        </div>
+      )
+    }
     if (field.kind === 'textarea') {
       return (
         <div key={field.name} className="sm:col-span-2">

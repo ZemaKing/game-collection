@@ -7,6 +7,7 @@ import {
   Gamepad2,
   LayoutDashboard,
   LayoutGrid,
+  PackagePlus,
   PersonStanding,
   Star,
   User,
@@ -29,7 +30,7 @@ export interface NavItem {
   labelKey: TranslationKey
   to: string
   icon: LucideIcon
-  /** Set on the six type-listing rows so they can pick up `ITEM_TYPE_COLORS`. */
+  /** Set on the seven type-listing rows so they can pick up `ITEM_TYPE_COLORS`. */
   itemType?: ItemType
 }
 
@@ -37,6 +38,7 @@ export const primaryNavItems: NavItem[] = [
   { labelKey: 'nav.dashboard', to: '/', icon: LayoutDashboard },
   { labelKey: 'nav.allItems', to: '/items', icon: LayoutGrid },
   { labelKey: 'nav.games', to: '/games', icon: Gamepad2, itemType: 'game' },
+  { labelKey: 'nav.dlcs', to: '/dlcs', icon: PackagePlus, itemType: 'dlc' },
   { labelKey: 'nav.specialEditions', to: '/special-editions', icon: Star, itemType: 'special_edition' },
   { labelKey: 'nav.steelbooks', to: '/steelbooks', icon: Archive, itemType: 'steelbook' },
   { labelKey: 'nav.artbooks', to: '/artbooks', icon: BookOpen, itemType: 'artbook' },

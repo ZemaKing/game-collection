@@ -1,4 +1,5 @@
 import type { ItemDetail } from '@/features/items/detailTypes'
+import type { DlcType } from '@/features/items/types'
 
 /**
  * Controlled-input shape for the Add/Edit form — every field is a plain
@@ -39,6 +40,9 @@ export interface ItemFormState {
   height_cm: string
 
   category: string
+
+  game_id: string
+  dlc_type: DlcType
 }
 
 export const EMPTY_ITEM_FORM_STATE: ItemFormState = {
@@ -73,6 +77,9 @@ export const EMPTY_ITEM_FORM_STATE: ItemFormState = {
   height_cm: '',
 
   category: '',
+
+  game_id: '',
+  dlc_type: 'dlc',
 }
 
 /** Builds Edit-mode initial form state from a fetched item + its tag/genre ids. */
@@ -107,5 +114,7 @@ export function detailToFormState(
     material: detail.material ?? '',
     height_cm: detail.height_cm != null ? String(detail.height_cm) : '',
     category: detail.category ?? '',
+    game_id: detail.base_game_id ?? '',
+    dlc_type: detail.dlc_type ?? 'dlc',
   }
 }

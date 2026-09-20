@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
+import { fetchDlcIdsForGames } from '@/features/items/api'
 import { FORMAT_TAG_SLUGS } from '@/features/items/constants'
 import type { AllItemRow } from '@/features/items/types'
 
@@ -67,13 +68,11 @@ async function searchByGenreName(pattern: string) {
     )
   if (gameGenresError || !gameGenres?.length) return { data: [], error: gameGenresError }
 
+  const gameIds = gameGenres.map((g) => g.game_id)
   return supabase
     .from('all_items')
     .select('*')
-    .in(
-      'id',
-      gameGenres.map((g) => g.game_id),
-    )
+    .in('id', [...gameIds, ...(await fetchDlcIdsForGames(gameIds))])
     .limit(RESULT_LIMIT)
 }
 

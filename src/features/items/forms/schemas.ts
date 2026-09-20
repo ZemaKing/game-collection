@@ -87,6 +87,13 @@ export const stuffSchema = z.object({
   manufacturer: optionalText,
 })
 
+export const dlcSchema = z.object({
+  ...commonFields,
+  game_id: z.string().trim().min(1, 'errors.baseGameRequired'),
+  dlc_type: z.enum(['dlc', 'expansion']).default('dlc'),
+  completed: z.boolean().default(false),
+})
+
 export const ITEM_SCHEMAS = {
   game: gameSchema,
   special_edition: specialEditionSchema,
@@ -94,6 +101,7 @@ export const ITEM_SCHEMAS = {
   artbook: artbookSchema,
   figure: figureSchema,
   stuff: stuffSchema,
+  dlc: dlcSchema,
 } satisfies Record<ItemType, z.ZodObject>
 
 export type GameFormValues = z.infer<typeof gameSchema>
@@ -102,6 +110,7 @@ export type SteelbookFormValues = z.infer<typeof steelbookSchema>
 export type ArtbookFormValues = z.infer<typeof artbookSchema>
 export type FigureFormValues = z.infer<typeof figureSchema>
 export type StuffFormValues = z.infer<typeof stuffSchema>
+export type DlcFormValues = z.infer<typeof dlcSchema>
 
 export type ItemFormValues =
   | GameFormValues
@@ -110,3 +119,4 @@ export type ItemFormValues =
   | ArtbookFormValues
   | FigureFormValues
   | StuffFormValues
+  | DlcFormValues
