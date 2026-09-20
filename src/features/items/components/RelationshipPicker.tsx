@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { COMPLETED_TEXT_CLASS, CompletedCheck } from '@/features/items/components/CompletedMarks'
 import { ITEM_TYPE_META } from '@/features/items/constants'
 import type { RelatedItemRef } from '@/features/items/forms/useSaveItem'
 import type { AllItemRow, ItemType } from '@/features/items/types'
@@ -109,7 +110,8 @@ export function RelationshipPicker({
                   className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text hover:bg-card-hover"
                 >
                   <Icon size={14} className="shrink-0 text-muted" />
-                  <span className="truncate">{row.title}</span>
+                  {row.completed && <CompletedCheck size={14} />}
+                  <span className={`truncate ${row.completed ? `font-semibold ${COMPLETED_TEXT_CLASS}` : ''}`}>{row.title}</span>
                 </button>
               )
             })

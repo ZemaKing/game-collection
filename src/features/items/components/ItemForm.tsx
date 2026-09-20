@@ -16,6 +16,7 @@ import {
   ITEM_CONDITIONS,
 } from '@/features/items/constants'
 import { ConditionSelect } from '@/features/items/components/ConditionSelect'
+import { CompletionToggle } from '@/features/items/components/CompletionToggle'
 import { EditionSelect } from '@/features/items/components/EditionSelect'
 import { GameAutofillPanel } from '@/features/items/components/GameAutofillPanel'
 import { ImageManager } from '@/features/items/components/ImageManager'
@@ -114,6 +115,18 @@ export function ItemForm({
   }
 
   function renderField(field: FormFieldDef) {
+    if (field.kind === 'completedToggle') {
+      return (
+        <div key={field.name} className="sm:col-span-2">
+          <CompletionToggle
+            label={t(field.labelKey)}
+            name={field.name}
+            value={form.completed}
+            onChange={(next) => setField('completed', next)}
+          />
+        </div>
+      )
+    }
     const value = form[field.name]
     const errorKey = errors[field.name]
     const error = errorKey ? t(errorKey as TranslationKey) : undefined

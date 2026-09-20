@@ -14,6 +14,7 @@ const DETAIL_NULLS: Omit<ItemDetail, 'id' | 'item_type' | 'title' | 'created_at'
   genres: [],
   developer: null,
   publisher: null,
+  completed: false,
   edition_name: null,
   game_title: null,
   steelbook_number: null,
@@ -61,6 +62,7 @@ async function fetchGameDetail(id: string): Promise<ItemDetail | null> {
     developer: data.developer,
     publisher: data.publisher,
     edition_name: data.edition_name ?? null,
+    completed: data.completed ?? false,
   }
 }
 

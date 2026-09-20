@@ -2,7 +2,15 @@ import type { ItemFormState } from '@/features/items/forms/formState'
 import type { ItemType } from '@/features/items/types'
 import type { TranslationKey } from '@/lib/i18n'
 
-export type FieldKind = 'text' | 'textarea' | 'date' | 'number' | 'platformSelect' | 'conditionSelect' | 'editionSelect'
+export type FieldKind =
+  | 'text'
+  | 'textarea'
+  | 'date'
+  | 'number'
+  | 'platformSelect'
+  | 'conditionSelect'
+  | 'editionSelect'
+  | 'completedToggle'
 
 export interface FormFieldDef {
   name: keyof ItemFormState
@@ -46,6 +54,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         releaseDateField,
         collectionDateField,
         conditionField,
+        { name: 'completed', labelKey: 'completed.label', kind: 'completedToggle' },
       ],
     },
     {

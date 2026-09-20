@@ -23,6 +23,7 @@ export interface ItemDetail {
   // Games
   developer: string | null
   publisher: string | null
+  completed: boolean
 
   // Games / special editions / steelbooks
   edition_name: string | null

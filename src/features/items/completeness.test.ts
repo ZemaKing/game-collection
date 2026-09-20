@@ -140,6 +140,7 @@ describe('completenessFactsFromDetail', () => {
       genres: [],
       developer: null,
       publisher: null,
+      completed: false,
       edition_name: null,
       game_title: null,
       steelbook_number: null,

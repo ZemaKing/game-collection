@@ -14,6 +14,7 @@ import {
   PLATFORM_ICONS,
   PLATFORM_SHORT_LABELS,
 } from '@/features/items/constants'
+import { COMPLETED_TEXT_CLASS, CompletedCheck } from '@/features/items/components/CompletedMarks'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { EditionBadge } from '@/features/items/components/EditionBadge'
 import { editionNameOf, hasEditionField } from '@/features/items/editions'
@@ -145,6 +146,16 @@ function PlatformBadge({ platformName, platformSlug }: { platformName: string; p
   )
 }
 
+/** Title line for list rows, with the completed check in front for finished games. */
+function ListTitle({ item }: { item: AllItemRow }) {
+  return (
+    <div className="flex min-w-0 items-center gap-1.5">
+      {item.completed && <CompletedCheck />}
+      <p className={`truncate text-sm font-semibold ${item.completed ? COMPLETED_TEXT_CLASS : 'text-text'}`}>{item.title}</p>
+    </div>
+  )
+}
+
 /**
  * The secondary line under the title in list rows: the subtitle text (developer,
  * publisher, ...) plus the item's `EditionBadge`. For special editions/steelbooks
@@ -203,7 +214,7 @@ export function ItemCard({
 
         {/* Mobile (<md): title, publisher, compact genre·platform·year line, completeness+condition. */}
         <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 md:hidden">
-          <p className="truncate text-sm font-semibold text-text">{item.title}</p>
+          <ListTitle item={item} />
           {editionNameOf(item) ? (
             <div className="flex min-w-0 items-center gap-1.5 text-xs text-muted">
               {typeLabel && <span className="shrink-0">{typeLabel} ·</span>}
@@ -232,7 +243,7 @@ export function ItemCard({
         <div className="hidden min-w-0 flex-1 flex-col justify-center gap-1.5 md:flex @4xl:hidden">
           <div className="flex min-w-0 items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-text">{item.title}</p>
+              <ListTitle item={item} />
               <Subtitle item={item} />
             </div>
             <div className="flex shrink-0 items-center gap-3">
@@ -254,7 +265,7 @@ export function ItemCard({
 
         {/* Desktop (lg+): original horizontal table columns. */}
         <div className="hidden min-w-0 flex-1 flex-col justify-center gap-1 py-1 @4xl:flex">
-          <p className="truncate text-sm font-semibold text-text">{item.title}</p>
+          <ListTitle item={item} />
           {publisher && <p className="truncate text-xs text-muted">{publisher}</p>}
           {editionName && (
             <div className="flex min-w-0">
@@ -303,7 +314,10 @@ export function ItemCard({
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-3">
         <div className="flex items-start justify-between gap-1">
-          <p className="line-clamp-2 flex-1 text-sm font-semibold text-text">{item.title}</p>
+          <p className={`line-clamp-2 flex-1 text-sm font-semibold ${item.completed ? COMPLETED_TEXT_CLASS : 'text-text'}`}>
+            {item.completed && <CompletedCheck size={15} className="mr-1.5 inline-block align-[-2px]" />}
+            {item.title}
+          </p>
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

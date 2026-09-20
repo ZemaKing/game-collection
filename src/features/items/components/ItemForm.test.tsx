@@ -54,6 +54,16 @@ describe('ItemForm', () => {
     expect(onSubmit.mock.calls[0][0].values.title).toBe('Hades')
   })
 
+  it('submits a game as completed once the toggle is switched', async () => {
+    const { onSubmit } = setup()
+    await userEvent.type(titleInput(), 'Hades')
+    expect(screen.getByRole('button', { name: 'Not Completed' }).getAttribute('aria-pressed')).toBe('true')
+    await userEvent.click(screen.getByRole('button', { name: 'Completed' }))
+    await userEvent.click(saveButton())
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit.mock.calls[0][0].values.completed).toBe(true)
+  })
+
   it('cancels straight away when nothing changed', async () => {
     const { onCancel } = setup()
     await userEvent.click(screen.getAllByRole('button', { name: /cancel/i })[0])

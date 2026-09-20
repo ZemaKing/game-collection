@@ -47,6 +47,7 @@ export const gameSchema = z.object({
   developer: optionalText,
   publisher: optionalText,
   genreIds: idArray,
+  completed: z.boolean().default(false),
 })
 
 export const specialEditionSchema = z.object({

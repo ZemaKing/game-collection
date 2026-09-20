@@ -16,6 +16,7 @@ import {
   ITEM_TYPE_META,
   ITEM_TYPE_ROUTES,
 } from '@/features/items/constants'
+import { COMPLETED_TEXT_CLASS, CompletedCheck } from '@/features/items/components/CompletedMarks'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 import { useRecentSearches } from '@/features/search/useRecentSearches'
 import { useSearch } from '@/features/search/useSearch'
@@ -274,11 +275,14 @@ export function SearchPanel({
                             <Icon size={16} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-text">
-                              <HighlightMatch
-                                text={item.title}
-                                query={trimmed}
-                              />
+                            <p className={`flex items-center gap-1.5 text-sm font-semibold ${item.completed ? COMPLETED_TEXT_CLASS : 'text-text'}`}>
+                              {item.completed && <CompletedCheck />}
+                              <span className="truncate">
+                                <HighlightMatch
+                                  text={item.title}
+                                  query={trimmed}
+                                />
+                              </span>
                             </p>
                             {item.subtitle && (
                               <p className="truncate text-xs text-muted">

@@ -21,6 +21,7 @@ export interface ItemFormState {
   developer: string
   publisher: string
   genreIds: string[]
+  completed: boolean
 
   edition_name: string
 
@@ -54,6 +55,7 @@ export const EMPTY_ITEM_FORM_STATE: ItemFormState = {
   developer: '',
   publisher: '',
   genreIds: [],
+  completed: false,
 
   edition_name: '',
 
@@ -92,6 +94,7 @@ export function detailToFormState(
     developer: detail.developer ?? '',
     publisher: detail.publisher ?? '',
     genreIds,
+    completed: detail.completed,
     edition_name: detail.edition_name ?? '',
     game_title: detail.game_title ?? '',
     steelbook_number: detail.steelbook_number ?? '',

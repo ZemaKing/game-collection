@@ -18,6 +18,7 @@ import {
   ITEM_TYPE_ROUTES,
   PLATFORM_ICONS,
 } from '@/features/items/constants'
+import { CompletedRibbon } from '@/features/items/components/CompletedMarks'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
 import { EditionBadge } from '@/features/items/components/EditionBadge'
@@ -161,33 +162,44 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
   return (
     <div className="flex flex-col gap-6 md:flex-row md:items-start">
       <div className="flex flex-col gap-3 md:w-64 md:shrink-0 lg:w-72 xl:w-80">
-        {coverImage ? (
-          <button
-            type="button"
-            onClick={() => {
-              setViewerIndex(coverIndex)
-              setViewerOpen(true)
-            }}
-            aria-label={t('a11y.showImage', { current: String(coverIndex + 1), total: String(images.length) })}
-            className="cursor-zoom-in rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
+        <div
+          className={`relative rounded-xl ${
+            detail.completed ? 'ring-2 ring-success shadow-[0_0_22px_rgba(34,197,94,0.4)]' : ''
+          }`}
+        >
+          {coverImage ? (
+            <button
+              type="button"
+              onClick={() => {
+                setViewerIndex(coverIndex)
+                setViewerOpen(true)
+              }}
+              aria-label={t('a11y.showImage', { current: String(coverIndex + 1), total: String(images.length) })}
+              className="block w-full cursor-zoom-in rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <ItemImage
+                storagePath={coverImage.storage_path}
+                itemType={itemType}
+                alt=""
+                className="aspect-[4/5] w-full rounded-xl"
+                iconSize={64}
+              />
+            </button>
+          ) : (
             <ItemImage
-              storagePath={coverImage.storage_path}
+              storagePath={null}
               itemType={itemType}
-              alt=""
+              alt={detail.title}
               className="aspect-[4/5] w-full rounded-xl"
               iconSize={64}
             />
-          </button>
-        ) : (
-          <ItemImage
-            storagePath={null}
-            itemType={itemType}
-            alt={detail.title}
-            className="aspect-[4/5] w-full rounded-xl"
-            iconSize={64}
-          />
-        )}
+          )}
+          {detail.completed && (
+            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl">
+              <CompletedRibbon />
+            </div>
+          )}
+        </div>
 
         <section>
           <h2 className="mb-2 text-sm font-semibold text-text">{t('detail.gallery')}</h2>
