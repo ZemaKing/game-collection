@@ -39,7 +39,7 @@ type Option =
   | { kind: 'custom'; text: string }
 
 /**
- * Searchable edition picker. Picking one of the 12 editions stores its
+ * Searchable edition picker. Picking one of the known editions stores its
  * canonical English name; typing something else offers it as a free-text
  * value, since `edition_name` is a plain text column (e.g. "Collector's").
  */

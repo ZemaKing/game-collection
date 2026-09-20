@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A personal game/collectibles tracker (games, special editions, steelbooks, artbooks, figures, "stuff") built with React 19 + TypeScript + Vite, Tailwind CSS v4, and Supabase (Postgres + Auth + Storage). Deployed to Vercel via GitHub CI/CD. See `game-details/Games-Website-Context.txt` for the original architecture rationale and `DEVELOPMENT_PLAN.md` for the phase-by-phase build log (also the canonical source of current project status — check "Project Status" / "MVP Progress" there before assuming a feature is unbuilt).
+A personal game/collectibles tracker (games, DLCs/expansions, special editions, steelbooks, artbooks, figures, "stuff") built with React 19 + TypeScript + Vite, Tailwind CSS v4, and Supabase (Postgres + Auth + Storage). Deployed to Vercel via GitHub CI/CD. See `game-details/Games-Website-Context.txt` for the original architecture rationale and `DEVELOPMENT_PLAN.md` for the phase-by-phase build log (also the canonical source of current project status — check "Project Status" / "MVP Progress" there before assuming a feature is unbuilt).
 
 Key product rules (from `DEVELOPMENT_PLAN.md` Working Rules — do not violate without asking):
 - Public visitors can browse the whole collection; only the authenticated owner (single-user admin) can create/update/delete.
@@ -28,13 +28,13 @@ Local Supabase env vars live in `.env.local` (see `.env.local.example`): `VITE_S
 
 Games autofill (Phase 21) uses `RAWG_API_KEY` — server-only, no `VITE_` prefix, so it never reaches the client bundle. It's read by the `/api/*` Vercel serverless functions and, for local dev, by a Vite dev-server middleware in `vite.config.ts` that mounts the same routes. Must also be set in the Vercel project's environment variables for preview/production (as of Phase 23 it was still missing in production, so autofill returns 500 there).
 
-Tests are Vitest: pure-function unit tests (`*.test.ts`) plus component tests (`*.test.tsx`) that opt in to jsdom with a `// @vitest-environment jsdom` docblock and render through `renderWithProviders`/`makeItem` in `src/test/render.tsx` (English locale, router, optional signed-in auth context; Supabase env vars are stubbed in the `test` block of `vite.config.ts`). There is no E2E setup yet.
+Tests are Vitest: pure-function unit tests (`*.test.ts`) plus component tests (`*.test.tsx`) that opt in to jsdom with a `// @vitest-environment jsdom` docblock and render through `renderWithProviders`/`makeItem` in `src/test/render.tsx` (English locale, router, optional signed-in auth context; Supabase env vars are stubbed in the `test` block of `vite.config.ts`). There is no E2E setup yet. CI (`.github/workflows/ci.yml`, Node 22) runs `npm run lint`, `npm run test`, `npm run build` on pushes to `main` and on PRs, so all three must pass.
 
 ## Architecture
 
 **Path alias**: `@/*` → `src/*` (configured in both `vite.config.ts` and `tsconfig.app.json`).
 
-**Six item types, one pattern.** `ItemType = 'game' | 'special_edition' | 'steelbook' | 'artbook' | 'figure' | 'stuff'` (`src/features/items/types.ts`). Each type has its own Supabase table plus a shared set of columns, and the app repeats the same five-route shape per type in `src/App.tsx`: list (`/games`), detail (`/games/:id`), edit (`/games/:id/edit`, auth-gated), plus a shared `/items` (all types) and `/items/new` add flow. When adding a feature to one item type, check whether it needs to be replicated across all six `*Page.tsx` / `*DetailPage.tsx` / `*EditPage.tsx` files in `src/pages/`.
+**Seven item types, one pattern.** `ItemType = 'game' | 'special_edition' | 'steelbook' | 'artbook' | 'figure' | 'stuff' | 'dlc'` (`src/features/items/types.ts`). Each type has its own Supabase table plus a shared set of columns, and the app repeats the same five-route shape per type in `src/App.tsx`: list (`/games`), detail (`/games/:id`), edit (`/games/:id/edit`, auth-gated), plus a shared `/items` (all types) and `/items/new` add flow. When adding a feature to one item type, check whether it needs to be replicated across all seven `*Page.tsx` / `*DetailPage.tsx` / `*EditPage.tsx` files in `src/pages/`.
 
 **Data layer (Supabase)**:
 - `src/lib/supabaseClient.ts` — single Supabase client instance.

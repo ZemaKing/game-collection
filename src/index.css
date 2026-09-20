@@ -198,6 +198,7 @@ body {
 [data-edition='ultimate'] { --ed-light: #dc2626; --ed-dark: #f87171; }
 [data-edition='premium'] { --ed-light: #db2777; --ed-dark: #f472b6; }
 [data-edition='complete'] { --ed-light: #15803d; --ed-dark: #4ade80; }
+[data-edition='game-bundle'] { --ed-light: #0f766e; --ed-dark: #2dd4bf; }
 [data-edition='definitive'] { --ed-light: #1d4ed8; --ed-dark: #6b8dfa; }
 [data-edition='game-of-the-year'] { --ed-light: #6d28d9; --ed-dark: #a78bfa; }
 [data-edition='anniversary'] { --ed-light: #c2410c; --ed-dark: #fb923c; }

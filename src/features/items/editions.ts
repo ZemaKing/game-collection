@@ -2,6 +2,7 @@ import {
   Award,
   BookOpen,
   Bookmark,
+  Boxes,
   Coins,
   Crown,
   Diamond,
@@ -27,6 +28,7 @@ export type EditionKey =
   | 'ultimate'
   | 'premium'
   | 'complete'
+  | 'game-bundle'
   | 'definitive'
   | 'game-of-the-year'
   | 'anniversary'
@@ -44,7 +46,7 @@ export interface EditionDef {
 }
 
 /**
- * The 12 supported editions, in selector order. Colors are not listed here —
+ * The supported editions, in selector order. Colors are not listed here —
  * they live in `index.css` as `[data-edition='<key>']` tokens so light/dark
  * variants sit next to the rest of the theme variables.
  */
@@ -105,6 +107,12 @@ export const EDITIONS: EditionDef[] = [
     nameKey: 'edition.complete',
   },
   {
+    key: 'game-bundle',
+    canonicalName: 'Game Bundle Edition',
+    icon: Boxes,
+    nameKey: 'edition.gameBundle',
+  },
+  {
     key: 'definitive',
     canonicalName: 'Definitive Edition',
     icon: BookOpen,
@@ -132,7 +140,7 @@ export const EDITIONS: EditionDef[] = [
   },
 ]
 
-/** Neutral look for free-text edition names that don't match one of the 12 (e.g. "Collector's Edition"). */
+/** Neutral look for free-text edition names that don't match a known edition (e.g. "Collector's Edition"). */
 export const CUSTOM_EDITION_ICON: LucideIcon = Bookmark
 
 const EDITION_LOOKUP = new Map<string, EditionDef>()
