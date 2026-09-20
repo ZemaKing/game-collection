@@ -10,7 +10,6 @@ export interface ItemDetail {
   item_type: ItemType
   title: string
   description: string | null
-  notes: string | null
   release_date: string | null
   collection_date: string | null
   condition: ItemCondition | null

@@ -26,10 +26,10 @@ describe('item form schemas', () => {
   })
 
   it('trims the title and turns blank optional text into undefined', () => {
-    const result = gameSchema.parse({ title: '  Hades  ', developer: '  ', notes: ' note ' })
+    const result = gameSchema.parse({ title: '  Hades  ', developer: '  ', description: ' about ' })
     expect(result.title).toBe('Hades')
     expect(result.developer).toBeUndefined()
-    expect(result.notes).toBe('note')
+    expect(result.description).toBe('about')
   })
 
   it('defaults id arrays to empty', () => {

@@ -37,11 +37,10 @@ const collectionDateField: FormFieldDef = {
 }
 const conditionField: FormFieldDef = { name: 'condition', labelKey: 'filters.condition', kind: 'conditionSelect' }
 
-const notesSection: FormSectionDef = {
-  titleKey: 'form.sectionNotes',
+const descriptionSection: FormSectionDef = {
+  titleKey: 'form.sectionDescription',
   fields: [
     { name: 'description', labelKey: 'detail.about', kind: 'textarea', rows: 5 },
-    { name: 'notes', labelKey: 'detail.notes', kind: 'textarea' },
   ],
 }
 
@@ -66,7 +65,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         { name: 'publisher', labelKey: 'detail.publisher', kind: 'text' },
       ],
     },
-    notesSection,
+    descriptionSection,
   ],
   special_edition: [
     {
@@ -80,7 +79,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         conditionField,
       ],
     },
-    notesSection,
+    descriptionSection,
   ],
   steelbook: [
     {
@@ -96,7 +95,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         conditionField,
       ],
     },
-    notesSection,
+    descriptionSection,
   ],
   artbook: [
     {
@@ -117,7 +116,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         { name: 'language', labelKey: 'detail.language', kind: 'text' },
       ],
     },
-    notesSection,
+    descriptionSection,
   ],
   figure: [
     {
@@ -139,7 +138,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         { name: 'height_cm', labelKey: 'detail.height', kind: 'number' },
       ],
     },
-    notesSection,
+    descriptionSection,
   ],
   dlc: [
     {
@@ -154,7 +153,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         { name: 'completed', labelKey: 'completed.label', kind: 'completedToggle' },
       ],
     },
-    notesSection,
+    descriptionSection,
   ],
   stuff: [
     {
@@ -168,6 +167,6 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         conditionField,
       ],
     },
-    notesSection,
+    descriptionSection,
   ],
 }

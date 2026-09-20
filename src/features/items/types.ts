@@ -33,7 +33,6 @@ export interface AllItemRow {
   release_date: string | null
   collection_date: string | null
   condition: ItemCondition | null
-  notes: string | null
   description: string | null
   cover_image_path: string | null
   /** First genre (by name) linked to the item, if any — games only. */

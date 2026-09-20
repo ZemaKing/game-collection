@@ -10,7 +10,7 @@ export interface RelatedItemRef {
   itemId: string
 }
 
-const COMMON_KEYS = ['title', 'release_date', 'collection_date', 'condition', 'notes', 'description']
+const COMMON_KEYS = ['title', 'release_date', 'collection_date', 'condition', 'description']
 
 /** Extra columns per table, beyond the common fields every item table shares (see Phase 4 migrations). */
 const TYPE_KEYS: Record<ItemType, string[]> = {

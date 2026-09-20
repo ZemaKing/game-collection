@@ -353,13 +353,6 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
           </section>
         )}
 
-        {detail.notes && (
-          <section>
-            <h2 className="heading-section mb-2 text-text">{t('detail.notes')}</h2>
-            <p className="text-sm text-muted">{detail.notes}</p>
-          </section>
-        )}
-
         {detail.genres.length > 0 && (
           <section>
             <h2 className="heading-section mb-2 text-text">{t('dashboard.genres')}</h2>

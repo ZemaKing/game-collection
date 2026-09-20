@@ -13,7 +13,6 @@ export interface ItemFormState {
   release_date: string
   collection_date: string
   condition: string
-  notes: string
   description: string
   tagIds: string[]
 
@@ -50,7 +49,6 @@ export const EMPTY_ITEM_FORM_STATE: ItemFormState = {
   release_date: '',
   collection_date: '',
   condition: '',
-  notes: '',
   description: '',
   tagIds: [],
 
@@ -94,7 +92,6 @@ export function detailToFormState(
     release_date: detail.release_date ?? '',
     collection_date: detail.collection_date ?? '',
     condition: detail.condition ?? '',
-    notes: detail.notes ?? '',
     description: detail.description ?? '',
     tagIds,
     platform_id: detail.platform?.id ?? '',

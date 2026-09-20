@@ -35,7 +35,6 @@ const commonFields = {
   release_date: optionalText,
   collection_date: optionalText,
   condition: optionalCondition,
-  notes: optionalText,
   description: optionalText,
   tagIds: idArray,
 }

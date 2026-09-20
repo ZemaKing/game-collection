@@ -41,7 +41,6 @@ export function makeItem(overrides: Partial<AllItemRow> = {}): AllItemRow {
     release_date: '2020-09-17',
     collection_date: null,
     condition: 'sealed',
-    notes: null,
     description: null,
     cover_image_path: null,
     genre_slug: null,
