@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { EditIcon, TrashIcon } from '@/components/icons/ActionIcons'
 import { Button, ButtonIcon } from '@/components/ui/Button'
@@ -24,7 +24,6 @@ import { EditionBadge } from '@/features/items/components/EditionBadge'
 import { ItemDetailSkeleton } from '@/features/items/components/ItemDetailSkeleton'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import { ItemNotFound } from '@/features/items/components/ItemNotFound'
-import { MediaViewer } from '@/features/items/components/MediaViewer'
 import { RelatedItemsSection } from '@/features/items/components/RelatedItemsSection'
 import { useDeleteItem } from '@/features/items/useDeleteItem'
 import { useItemDetail } from '@/features/items/useItemDetail'
@@ -32,6 +31,12 @@ import { useItemRelationships } from '@/features/items/useItemRelationships'
 import type { ItemType, Platform } from '@/features/items/types'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/hooks/useLocale'
+
+const MediaViewer = lazy(() =>
+  import('@/features/items/components/MediaViewer').then((m) => ({
+    default: m.MediaViewer,
+  })),
+)
 
 interface ItemDetailPageProps {
   itemType: ItemType
@@ -390,7 +395,9 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
         )}
       </div>
 
-      <MediaViewer
+      {viewerOpen && (
+        <Suspense fallback={null}>
+          <MediaViewer
         images={images}
         itemType={itemType}
         itemTitle={detail.title}
@@ -398,6 +405,8 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
         initialIndex={viewerIndex}
         onOpenChange={setViewerOpen}
       />
+        </Suspense>
+      )}
 
       <ConfirmDialog
         open={deleteDialogOpen}

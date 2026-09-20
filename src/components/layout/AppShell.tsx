@@ -1,9 +1,10 @@
-import { useRef, type MouseEvent } from 'react'
+import { Suspense, useRef, type MouseEvent } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { BottomTabBar } from '@/components/layout/BottomTabBar'
 import { OfflineBanner } from '@/components/layout/OfflineBanner'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
+import { Spinner } from '@/components/ui/Spinner'
 import { useLocale } from '@/hooks/useLocale'
 import { usePageA11y } from '@/hooks/usePageA11y'
 
@@ -40,7 +41,15 @@ export function AppShell() {
           tabIndex={-1}
           className={`min-h-0 flex-1 overflow-y-auto p-4 outline-none md:p-6 md:pb-6 ${isItemFormRoute ? '' : 'pb-[calc(5rem+env(safe-area-inset-bottom))]'}`}
         >
-          <Outlet />
+          <Suspense
+            fallback={
+              <div className="flex justify-center py-16 text-muted">
+                <Spinner size={24} />
+              </div>
+            }
+          >
+            <Outlet />
+          </Suspense>
         </main>
       </div>
       <BottomTabBar />

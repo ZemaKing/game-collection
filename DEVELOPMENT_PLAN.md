@@ -1127,7 +1127,7 @@ Keep the collection fast as its item and image counts grow.
 ### Tasks
 
 - [ ] Measure production Core Web Vitals and route performance
-- [ ] Lazy-load routes, media viewer, charts, and admin-only code
+- [x] Lazy-load routes, media viewer, charts, and admin-only code
 - [ ] Optimize image sizing, formats, loading priority, and caching
 - [ ] Review query payloads, indexes, pagination, and cache invalidation
 - [ ] Virtualize only lists proven to need it
@@ -1142,6 +1142,11 @@ Keep the collection fast as its item and image counts grow.
 ### Definition of Done
 
 - [ ] Primary browse/search/detail flows remain responsive at expected collection scale
+
+### Results (partial)
+
+- Route-level `React.lazy` + `Suspense` in `AppShell`; `MediaViewer` loads on first open. Initial JS: 986 kB (284 kB gzip) → 406 kB (129 kB gzip); pages, forms (~127 kB) and the date picker load on demand. Charts are hand-rolled, so they ride along with the Statistics route chunk.
+- Images already use `loading="lazy"` (per the Image loading setting) and immutable caching for `/assets`. Remaining tasks (Web Vitals measurement, query/index review, large-dataset and slow-network testing, budget) are still open.
 
 ### Phase Status
 

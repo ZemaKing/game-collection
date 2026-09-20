@@ -1,35 +1,37 @@
+import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import { RequireAuth } from '@/features/auth/RequireAuth'
-import AddItemPage from '@/pages/AddItemPage'
-import AllItemsPage from '@/pages/AllItemsPage'
-import ArtbookDetailPage from '@/pages/ArtbookDetailPage'
-import ArtbookEditPage from '@/pages/ArtbookEditPage'
-import ArtbooksPage from '@/pages/ArtbooksPage'
-import ComingSoonPage from '@/pages/ComingSoonPage'
-import DashboardPage from '@/pages/DashboardPage'
-import FigureDetailPage from '@/pages/FigureDetailPage'
-import FigureEditPage from '@/pages/FigureEditPage'
-import FiguresPage from '@/pages/FiguresPage'
-import GameDetailPage from '@/pages/GameDetailPage'
-import GameEditPage from '@/pages/GameEditPage'
-import GamesPage from '@/pages/GamesPage'
-import LoginPage from '@/pages/LoginPage'
-import PlatformPage from '@/pages/PlatformPage'
-import ProfilePage from '@/pages/ProfilePage'
-import RecentlyAddedPage from '@/pages/RecentlyAddedPage'
-import SearchPage from '@/pages/SearchPage'
-import SettingsPage from '@/pages/SettingsPage'
-import StatisticsPage from '@/pages/StatisticsPage'
-import SpecialEditionDetailPage from '@/pages/SpecialEditionDetailPage'
-import SpecialEditionEditPage from '@/pages/SpecialEditionEditPage'
-import SpecialEditionsPage from '@/pages/SpecialEditionsPage'
-import SteelbookDetailPage from '@/pages/SteelbookDetailPage'
-import SteelbookEditPage from '@/pages/SteelbookEditPage'
-import SteelbooksPage from '@/pages/SteelbooksPage'
-import StuffDetailPage from '@/pages/StuffDetailPage'
-import StuffEditPage from '@/pages/StuffEditPage'
-import StuffPage from '@/pages/StuffPage'
+
+const AddItemPage = lazy(() => import('@/pages/AddItemPage'))
+const AllItemsPage = lazy(() => import('@/pages/AllItemsPage'))
+const ArtbookDetailPage = lazy(() => import('@/pages/ArtbookDetailPage'))
+const ArtbookEditPage = lazy(() => import('@/pages/ArtbookEditPage'))
+const ArtbooksPage = lazy(() => import('@/pages/ArtbooksPage'))
+const ComingSoonPage = lazy(() => import('@/pages/ComingSoonPage'))
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'))
+const FigureDetailPage = lazy(() => import('@/pages/FigureDetailPage'))
+const FigureEditPage = lazy(() => import('@/pages/FigureEditPage'))
+const FiguresPage = lazy(() => import('@/pages/FiguresPage'))
+const GameDetailPage = lazy(() => import('@/pages/GameDetailPage'))
+const GameEditPage = lazy(() => import('@/pages/GameEditPage'))
+const GamesPage = lazy(() => import('@/pages/GamesPage'))
+const LoginPage = lazy(() => import('@/pages/LoginPage'))
+const PlatformPage = lazy(() => import('@/pages/PlatformPage'))
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'))
+const RecentlyAddedPage = lazy(() => import('@/pages/RecentlyAddedPage'))
+const SearchPage = lazy(() => import('@/pages/SearchPage'))
+const SettingsPage = lazy(() => import('@/pages/SettingsPage'))
+const StatisticsPage = lazy(() => import('@/pages/StatisticsPage'))
+const SpecialEditionDetailPage = lazy(() => import('@/pages/SpecialEditionDetailPage'))
+const SpecialEditionEditPage = lazy(() => import('@/pages/SpecialEditionEditPage'))
+const SpecialEditionsPage = lazy(() => import('@/pages/SpecialEditionsPage'))
+const SteelbookDetailPage = lazy(() => import('@/pages/SteelbookDetailPage'))
+const SteelbookEditPage = lazy(() => import('@/pages/SteelbookEditPage'))
+const SteelbooksPage = lazy(() => import('@/pages/SteelbooksPage'))
+const StuffDetailPage = lazy(() => import('@/pages/StuffDetailPage'))
+const StuffEditPage = lazy(() => import('@/pages/StuffEditPage'))
+const StuffPage = lazy(() => import('@/pages/StuffPage'))
 
 function App() {
   return (
