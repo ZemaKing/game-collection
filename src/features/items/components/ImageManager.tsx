@@ -81,7 +81,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,200px))] gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(160px,200px))] sm:gap-4">
         {Array.from({ length: 4 }, (_, i) => (
           <Skeleton key={i} className="aspect-[4/5] w-full rounded-xl" />
         ))}
@@ -167,7 +167,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
       {images.length === 0 ? (
         <EmptyState body={t('images.empty')} />
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,200px))] gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(160px,200px))] sm:gap-4">
           {images.map((image, index) => (
             <div key={image.id} className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-2">
               <div className="relative">
@@ -199,12 +199,13 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                 onBlur={(event) => void saveAltText(image, event.target.value)}
               />
 
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5 lg:flex lg:flex-wrap lg:items-center">
                 <Button
                   size="xs"
                   variant="primary"
                   icon={CheckIcon}
                   disabled={image.is_cover}
+                  className="col-span-2"
                   onClick={() => void makeCover(image)}
                 >
                   {t('images.setCover')}
@@ -213,6 +214,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                 <Button
                   size="xs"
                   icon={ArrowUpIcon}
+                  className="w-full lg:w-auto"
                   disabled={index === 0}
                   onClick={() => void moveImage(image, -1)}
                   aria-label={t('a11y.removeNamed', { action: t('images.moveUp'), name: t('a11y.imageN', { n: String(index + 1) }) })}
@@ -220,6 +222,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                 <Button
                   size="xs"
                   icon={ArrowDownIcon}
+                  className="w-full lg:w-auto"
                   disabled={index === images.length - 1}
                   onClick={() => void moveImage(image, 1)}
                   aria-label={t('a11y.removeNamed', { action: t('images.moveDown'), name: t('a11y.imageN', { n: String(index + 1) }) })}
@@ -227,6 +230,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                 <Button
                   size="xs"
                   icon={EditIcon}
+                  className="col-span-2"
                   onClick={() => {
                     replaceTargetRef.current = image
                     replaceInputRef.current?.click()
@@ -239,7 +243,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                   size="xs"
                   variant="danger"
                   icon={TrashIcon}
-                  className="ml-auto"
+                  className="col-span-2 lg:ml-auto"
                   onClick={() => setDeleteTarget(image)}
                 >
                   {t('images.delete')}
