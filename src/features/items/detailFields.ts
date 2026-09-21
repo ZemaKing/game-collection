@@ -45,9 +45,6 @@ export const DETAIL_FIELDS: Record<ItemType, DetailFieldDef[]> = {
   ],
   steelbook: [
     platformField,
-    { labelKey: 'detail.gameTitle', value: (d) => d.game_title },
-    { labelKey: 'detail.editionName', value: (d) => d.edition_name },
-    { labelKey: 'detail.steelbookNumber', value: (d) => d.steelbook_number },
     releaseDateField,
     collectionDateField,
     conditionField,

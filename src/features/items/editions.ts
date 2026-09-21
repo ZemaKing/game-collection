@@ -218,27 +218,24 @@ export function editionDisplayName(
   return edition ? `${t(edition.nameKey)} ${t('edition.suffix')}` : name
 }
 
-/** Item types that carry an edition (`edition_name`): games, special editions and steelbooks. */
+/** Item types that carry an edition (`edition_name`): games and special editions. */
 export function hasEditionField(itemType: string): boolean {
-  return (
-    itemType === 'game' ||
-    itemType === 'special_edition' ||
-    itemType === 'steelbook'
-  )
+  return itemType === 'game' || itemType === 'special_edition'
 }
 
 /**
  * The edition text of an `all_items` row. Falls back to `subtitle` for special
- * editions/steelbooks (where the view has always put the edition name) so their
+ * editions (where the view has always put the edition name) so their
  * badges keep working on a database that hasn't got the `edition_name` column yet.
+ * Steelbooks have no edition, even though the view still exposes a stale one.
  */
 export function editionNameOf(item: {
   item_type: string
   subtitle: string | null
   edition_name?: string | null
 }): string | null {
+  if (item.item_type === 'steelbook') return null
   if (item.edition_name) return item.edition_name
-  if (item.item_type === 'special_edition' || item.item_type === 'steelbook')
-    return item.subtitle || null
+  if (item.item_type === 'special_edition') return item.subtitle || null
   return null
 }

@@ -87,15 +87,11 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
       fields: [
         titleField,
         platformField,
-        { name: 'game_title', labelKey: 'detail.gameTitle', kind: 'text' },
-        { name: 'edition_name', labelKey: 'detail.editionName', kind: 'editionSelect' },
-        { name: 'steelbook_number', labelKey: 'detail.steelbookNumber', kind: 'text' },
         releaseDateField,
         collectionDateField,
         conditionField,
       ],
     },
-    descriptionSection,
   ],
   artbook: [
     {

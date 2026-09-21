@@ -16,7 +16,7 @@ const COMMON_KEYS = ['title', 'release_date', 'collection_date', 'condition', 'd
 const TYPE_KEYS: Record<ItemType, string[]> = {
   game: ['platform_id', 'edition_name', 'developer', 'publisher', 'completed'],
   special_edition: ['platform_id', 'edition_name'],
-  steelbook: ['platform_id', 'game_title', 'edition_name', 'steelbook_number'],
+  steelbook: ['platform_id'],
   artbook: ['publisher', 'page_count', 'isbn', 'language'],
   figure: ['manufacturer', 'character_name', 'scale', 'material', 'height_cm'],
   stuff: ['category', 'manufacturer'],

@@ -5,7 +5,7 @@ import type { ItemDetail } from '@/features/items/detailTypes'
  * Boolean facts feeding the completeness score. `hasSubtitle` stands in for
  * each type's single "key identifying field" — the same one the `all_items`
  * view already surfaces as `subtitle` (developer for games, edition_name for
- * special editions/steelbooks, publisher for artbooks, manufacturer for
+ * special editions, publisher for artbooks, manufacturer for
  * figures, category for stuff). Using that one proxy field (rather than
  * every type-specific column individually) is what lets the exact same
  * `calculateCompleteness` run identically from a full `ItemDetail` *and*
@@ -48,15 +48,8 @@ const APPLICABLE_FIELDS: Record<ItemType, (keyof CompletenessFacts)[]> = {
     'hasDescription',
     'hasCoverImage',
   ],
-  steelbook: [
-    'hasSubtitle',
-    'hasPlatform',
-    'hasReleaseDate',
-    'hasCollectionDate',
-    'hasCondition',
-    'hasDescription',
-    'hasCoverImage',
-  ],
+  // A steelbook has no edition/game/description of its own — just platform, dates, condition and a cover.
+  steelbook: ['hasPlatform', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasCoverImage'],
   artbook: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
   figure: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
   stuff: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
@@ -107,7 +100,7 @@ export function completenessFactsFromRow(
 const DETAIL_SUBTITLE_BY_TYPE: Record<ItemType, (detail: ItemDetail) => string | null> = {
   game: (d) => d.developer,
   special_edition: (d) => d.edition_name,
-  steelbook: (d) => d.edition_name,
+  steelbook: () => null,
   artbook: (d) => d.publisher,
   figure: (d) => d.manufacturer,
   stuff: (d) => d.category,

@@ -27,9 +27,8 @@ export interface ItemDetail {
   // Games / special editions / steelbooks
   edition_name: string | null
 
-  // Steelbooks
+  // DLCs
   game_title: string | null
-  steelbook_number: string | null
 
   // Artbooks
   page_count: number | null

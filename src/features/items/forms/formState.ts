@@ -26,7 +26,6 @@ export interface ItemFormState {
   edition_name: string
 
   game_title: string
-  steelbook_number: string
 
   page_count: string
   isbn: string
@@ -62,7 +61,6 @@ export const EMPTY_ITEM_FORM_STATE: ItemFormState = {
   edition_name: '',
 
   game_title: '',
-  steelbook_number: '',
 
   page_count: '',
   isbn: '',
@@ -101,7 +99,6 @@ export function detailToFormState(
     completed: detail.completed,
     edition_name: detail.edition_name ?? '',
     game_title: detail.game_title ?? '',
-    steelbook_number: detail.steelbook_number ?? '',
     page_count: detail.page_count != null ? String(detail.page_count) : '',
     isbn: detail.isbn ?? '',
     language: detail.language ?? '',

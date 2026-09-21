@@ -58,9 +58,6 @@ export const specialEditionSchema = z.object({
 export const steelbookSchema = z.object({
   ...commonFields,
   platform_id: optionalText,
-  game_title: optionalText,
-  edition_name: optionalText,
-  steelbook_number: optionalText,
 })
 
 export const artbookSchema = z.object({

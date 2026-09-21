@@ -64,8 +64,16 @@ describe('calculateCompleteness', () => {
 
   it('counts platform as applicable for game/special_edition/steelbook', () => {
     for (const itemType of PLATFORM_TYPES) {
-      expect(calculateCompleteness(itemType, EMPTY_FACTS).total).toBe(7)
+      expect(calculateCompleteness(itemType, { ...EMPTY_FACTS, hasPlatform: true }).filled).toBe(1)
     }
+  })
+
+  it('scores a steelbook on platform, dates, condition and cover only', () => {
+    expect(calculateCompleteness('steelbook', EMPTY_FACTS).total).toBe(5)
+    expect(
+      calculateCompleteness('steelbook', { ...EMPTY_FACTS, hasSubtitle: true, hasDescription: true }).percent,
+    ).toBe(0)
+    expect(calculateCompleteness('steelbook', FULL_FACTS).percent).toBe(100)
   })
 
   it('computes a partial percentage deterministically', () => {
@@ -149,7 +157,6 @@ describe('completenessFactsFromDetail', () => {
       completed: false,
       edition_name: null,
       game_title: null,
-      steelbook_number: null,
       page_count: null,
       isbn: null,
       language: null,
@@ -171,13 +178,10 @@ describe('completenessFactsFromDetail', () => {
     )
   })
 
-  it('reads the edition_name field as the subtitle proxy for special editions and steelbooks', () => {
+  it('reads the edition_name field as the subtitle proxy for special editions', () => {
     expect(
       completenessFactsFromDetail(detail({ item_type: 'special_edition', edition_name: 'Deluxe' }), false)
         .hasSubtitle,
-    ).toBe(true)
-    expect(
-      completenessFactsFromDetail(detail({ item_type: 'steelbook', edition_name: 'Deluxe' }), false).hasSubtitle,
     ).toBe(true)
   })
 

@@ -98,6 +98,8 @@ export function ItemForm({
   const [relatedItems, setRelatedItems] = useState<RelatedItemSelection[]>(initialRelatedItems)
   const [baseGames, setBaseGames] = useState<RelatedItemSelection[]>(initialBaseGames)
   const isSpecialEdition = itemType === 'special_edition'
+  // Steelbooks are always physical: the tag is fixed, shown read-only, and forced on save.
+  const isSteelbook = itemType === 'steelbook'
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [stepIndex, setStepIndex] = useState(0)
   const [pendingCoverFile, setPendingCoverFile] = useState<File | undefined>(undefined)
@@ -284,6 +286,7 @@ export function ItemForm({
             values={form.tagIds}
             onChange={(values) => setField('tagIds', values)}
             options={tags}
+            lockedSlug={isSteelbook ? 'physical' : undefined}
           />
           {showGenres && (
             <MultiSelect
@@ -355,8 +358,13 @@ export function ItemForm({
     }
 
     setErrors({})
+    const values = result.data as ItemFormSubmitResult['values']
+    if (isSteelbook) {
+      const physicalTag = tags.find((tag) => tag.slug === 'physical')
+      if (physicalTag) values.tagIds = [physicalTag.id]
+    }
     onSubmit({
-      values: result.data as ItemFormSubmitResult['values'],
+      values,
       relatedItems,
       baseGames: isSpecialEdition ? baseGames : undefined,
       coverImageFile: pendingCoverFile,

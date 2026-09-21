@@ -16,7 +16,6 @@ const DETAIL_NULLS: Omit<ItemDetail, 'id' | 'item_type' | 'title' | 'created_at'
   completed: false,
   edition_name: null,
   game_title: null,
-  steelbook_number: null,
   page_count: null,
   isbn: null,
   language: null,
@@ -105,16 +104,13 @@ async function fetchSteelbookDetail(id: string): Promise<ItemDetail | null> {
     id: data.id,
     item_type: 'steelbook',
     title: data.title,
-    description: data.description,
+    description: null,
     release_date: data.release_date,
     collection_date: data.collection_date,
     condition: data.condition,
     created_at: data.created_at,
     updated_at: data.updated_at,
     platform: (data.platforms as Platform | null) ?? null,
-    game_title: data.game_title,
-    edition_name: data.edition_name,
-    steelbook_number: data.steelbook_number,
   }
 }
 
