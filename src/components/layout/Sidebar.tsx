@@ -1,4 +1,4 @@
-import { ChevronRight, Gamepad2, Plus } from 'lucide-react'
+import { ChevronRight, Plus } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { ITEM_TYPE_COLORS } from '@/features/items/constants'
@@ -63,9 +63,7 @@ export function Sidebar() {
   return (
     <div className="hidden w-20 shrink-0 flex-col border-r border-border bg-surface p-3 md:flex xl:w-64">
       <div className="flex items-center justify-center gap-2 px-1 py-3 xl:justify-start">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-solid text-accent-fg">
-          <Gamepad2 size={18} />
-        </div>
+        <img src="/favicon.svg" alt="" className="size-9 shrink-0 object-contain" />
         <span className="sidebar-brand hidden text-text xl:inline">
           {t('sidebar.title')}
         </span>
