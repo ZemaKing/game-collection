@@ -50,9 +50,10 @@ const APPLICABLE_FIELDS: Record<ItemType, (keyof CompletenessFacts)[]> = {
   ],
   // A steelbook has no edition/game/description of its own — just platform, dates, condition and a cover.
   steelbook: ['hasPlatform', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasCoverImage'],
-  artbook: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
-  figure: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
-  stuff: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
+  // Artbooks, figures and stuff have no description.
+  artbook: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasCoverImage'],
+  figure: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasCoverImage'],
+  stuff: ['hasSubtitle', 'hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasCoverImage'],
   // A DLC's subtitle and platform both come from its (mandatory) base game, so neither says anything about the DLC itself.
   dlc: ['hasReleaseDate', 'hasCollectionDate', 'hasCondition', 'hasDescription', 'hasCoverImage'],
 }

@@ -45,20 +45,12 @@ describe('calculateCompleteness', () => {
     }
   })
 
-  it('ignores platform for types that never have them', () => {
-    const facts: CompletenessFacts = {
-      ...EMPTY_FACTS,
-      hasSubtitle: true,
-      hasReleaseDate: true,
-      hasCollectionDate: true,
-      hasCondition: true,
-      hasDescription: true,
-      hasCoverImage: true,
-    }
+
+  it('scores artbook, figure and stuff on everything except platform and description', () => {
     for (const itemType of NO_PLATFORM_TYPES) {
-      const result = calculateCompleteness(itemType, facts)
-      expect(result.total).toBe(6)
-      expect(result.percent).toBe(100)
+      expect(calculateCompleteness(itemType, EMPTY_FACTS).total).toBe(5)
+      expect(calculateCompleteness(itemType, { ...EMPTY_FACTS, hasPlatform: true, hasDescription: true }).percent).toBe(0)
+      expect(calculateCompleteness(itemType, FULL_FACTS).percent).toBe(100)
     }
   })
 

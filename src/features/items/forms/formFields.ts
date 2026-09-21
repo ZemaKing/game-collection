@@ -112,7 +112,6 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         { name: 'language', labelKey: 'detail.language', kind: 'text' },
       ],
     },
-    descriptionSection,
   ],
   figure: [
     {
@@ -134,7 +133,6 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         { name: 'height_cm', labelKey: 'detail.height', kind: 'number' },
       ],
     },
-    descriptionSection,
   ],
   dlc: [
     {
@@ -163,6 +161,5 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
         conditionField,
       ],
     },
-    descriptionSection,
   ],
 }
