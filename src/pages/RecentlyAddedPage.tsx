@@ -8,6 +8,7 @@ import { fetchItems, fetchPlatforms } from '@/features/items/api'
 import { ItemCard } from '@/features/items/components/ItemCard'
 import { ItemCardSkeleton } from '@/features/items/components/ItemCardSkeleton'
 import type { AllItemRow, Platform } from '@/features/items/types'
+import { useLoadMoreOnScroll, useScrollLoading } from '@/hooks/useLoadMoreOnScroll'
 import { useLocale } from '@/hooks/useLocale'
 import type { Locale, TranslationKey } from '@/lib/i18n'
 
@@ -126,6 +127,10 @@ function RecentlyAddedPage() {
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
   const groups = useMemo(() => groupByDay(items, t, locale), [items, t, locale])
   const hasMore = items.length < totalCount
+  const scrollLoading = useScrollLoading()
+  const loadMoreSentinel = useLoadMoreOnScroll(scrollLoading && hasMore && !loading && !error, () =>
+    setPage((p) => p + 1),
+  )
 
   return (
     <div className="flex flex-col gap-6">
@@ -177,7 +182,9 @@ function RecentlyAddedPage() {
         </div>
       )}
 
-      {hasMore && !loading && (
+      {scrollLoading && hasMore && !error && <div ref={loadMoreSentinel} aria-hidden="true" />}
+
+      {!scrollLoading && hasMore && !loading && (
         <Button icon={PlusIcon} className="self-center" onClick={() => setPage((p) => p + 1)}>
           {t('listing.loadMore')}
         </Button>

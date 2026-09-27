@@ -23,6 +23,7 @@ import type { Genre, ItemType, Platform } from '@/features/items/types'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { useAuth } from '@/hooks/useAuth'
+import { useLoadMoreOnScroll, useScrollLoading } from '@/hooks/useLoadMoreOnScroll'
 import { useLocale } from '@/hooks/useLocale'
 
 const PAGE_SIZE = 20
@@ -58,6 +59,10 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
     PAGE_SIZE,
     itemType,
     platform?.id,
+  )
+  const scrollLoading = useScrollLoading()
+  const loadMoreSentinel = useLoadMoreOnScroll(scrollLoading && hasMore && !loading && !error, () =>
+    setPage((p) => p + 1),
   )
 
   const [platforms, setPlatforms] = useState<Platform[]>([])
@@ -206,18 +211,22 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
         </div>
       )}
 
-      {/* Stays mounted while the next page loads, so a keyboard user's focus isn't dropped. */}
-      {hasMore && (
-        <Button
-          icon={PlusIcon}
-          className="self-center aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
-          aria-disabled={loading || undefined}
-          onClick={() => {
-            if (!loading) setPage((p) => p + 1)
-          }}
-        >
-          {t('listing.loadMore')}
-        </Button>
+      {scrollLoading ? (
+        hasMore && !error && <div ref={loadMoreSentinel} aria-hidden="true" />
+      ) : (
+        /* Stays mounted while the next page loads, so a keyboard user's focus isn't dropped. */
+        hasMore && (
+          <Button
+            icon={PlusIcon}
+            className="self-center aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+            aria-disabled={loading || undefined}
+            onClick={() => {
+              if (!loading) setPage((p) => p + 1)
+            }}
+          >
+            {t('listing.loadMore')}
+          </Button>
+        )
       )}
     </div>
   )
