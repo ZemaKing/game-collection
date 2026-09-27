@@ -1,14 +1,21 @@
 import { supabase } from '@/lib/supabaseClient'
 import { fetchDlcIdsForGames } from '@/features/items/api'
 import { FORMAT_TAG_SLUGS } from '@/features/items/constants'
+import { escapeLikePattern } from '@/features/items/likePattern'
+import { searchTokens, tokenPattern } from '@/features/search/searchQuery'
 import type { AllItemRow } from '@/features/items/types'
 
 const RESULT_LIMIT = 30
 
 /**
- * Normalized search over title, subtitle (covers edition name / developer /
- * publisher / manufacturer / category depending on item type — see the
- * `all_items` view), platform name, genre name, and tag name.
+ * Search over title, subtitle (covers edition name / developer / publisher /
+ * manufacturer / category depending on item type — see the `all_items` view),
+ * platform name, genre name, and tag name.
+ *
+ * Title and subtitle use the forgiving token match (`searchTokens`: every
+ * typed word must appear in the normalized text, ignoring punctuation, with
+ * Roman/Arabic numerals and acronyms interchangeable); platform, genre and tag
+ * names use a plain substring match of the whole query.
  *
  * Implemented as several small, parameterized queries merged client-side
  * rather than one hand-built PostgREST `.or()` string, so user input never
@@ -17,12 +24,13 @@ const RESULT_LIMIT = 30
 export async function searchItems(query: string): Promise<AllItemRow[]> {
   const q = query.trim()
   if (!q) return []
-  const pattern = `%${q}%`
+  const pattern = `%${escapeLikePattern(q)}%`
+  const tokens = searchTokens(q)
 
   const [titleMatches, subtitleMatches, platformMatches, genreMatches, tagMatches] =
     await Promise.all([
-      supabase.from('all_items').select('*').ilike('title', pattern).limit(RESULT_LIMIT),
-      supabase.from('all_items').select('*').ilike('subtitle', pattern).limit(RESULT_LIMIT),
+      searchByTokens('title_search', tokens),
+      searchByTokens('subtitle_search', tokens),
       searchByPlatformName(pattern),
       searchByGenreName(pattern),
       searchByTagName(pattern),
@@ -37,6 +45,14 @@ export async function searchItems(query: string): Promise<AllItemRow[]> {
   }
 
   return Array.from(merged.values()).slice(0, RESULT_LIMIT)
+}
+
+async function searchByTokens(column: 'title_search' | 'subtitle_search', tokens: string[]) {
+  // A query of only punctuation has no tokens; match nothing rather than everything.
+  if (!tokens.length) return { data: [], error: null }
+  let query = supabase.from('all_items').select('*')
+  for (const token of tokens) query = query.ilike(column, tokenPattern(token))
+  return query.limit(RESULT_LIMIT)
 }
 
 async function searchByPlatformName(pattern: string) {

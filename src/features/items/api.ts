@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabaseClient'
 import { FORMAT_TAG_SLUGS, ITEM_TYPES } from '@/features/items/constants'
 import { SORT_KEYS, type SortKey } from '@/features/items/sort'
+import { searchTokens, tokenPattern } from '@/features/search/searchQuery'
 import type { AllItemRow, Genre, ItemCondition, ItemType, Platform } from '@/features/items/types'
 
 export async function fetchPlatforms(): Promise<Platform[]> {
@@ -168,7 +169,8 @@ export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsRe
   const { column, ascending } = SORT_COLUMNS[params.sort]
   let query = supabase.from('all_items').select('*', { count: 'exact' })
 
-  if (params.search.trim()) query = query.ilike('title', `%${params.search.trim()}%`)
+  // Every typed word must appear in the normalized title (see `searchTokens`).
+  for (const token of searchTokens(params.search)) query = query.ilike('title_search', tokenPattern(token))
   if (params.itemTypes.length) query = query.in('item_type', params.itemTypes)
   if (params.platformIds.length) query = query.in('platform_id', params.platformIds)
   if (params.editions.length) query = query.in('edition_name', params.editions)
