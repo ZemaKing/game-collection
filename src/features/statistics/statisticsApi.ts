@@ -20,7 +20,7 @@ export async function fetchStatisticsData(): Promise<StatisticsData> {
       supabase
         .from('all_items')
         .select(
-          'id, item_type, subtitle, platform_id, release_date, collection_date, condition, description, cover_image_path, created_at',
+          'id, item_type, subtitle, platform_id, release_date, collection_date, condition, has_description, cover_image_path, created_at',
         )
         .order('id')
         .range(from, to),

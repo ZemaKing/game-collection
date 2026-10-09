@@ -5,7 +5,25 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Every page's data comes from Supabase (CORS requests, hence crossorigin): open the
+         connection while the JS downloads. Vite fills in the URL at build time. -->
+    <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- The dashboard hero is its LCP, but React only discovers it after the JS and the lazy page
+         chunk: on "/" only, start it now. Same srcset/sizes as DashboardPage.tsx (Phase 39); it sits
+         after the viewport meta so `imagesizes` sees the real width. -->
+    <script>
+      if (location.pathname === '/') {
+        var hero = document.createElement('link')
+        hero.rel = 'preload'
+        hero.as = 'image'
+        hero.type = 'image/webp'
+        hero.fetchPriority = 'high'
+        hero.setAttribute('imagesrcset', '/dashboard_cover-800.webp 800w, /dashboard_cover-1200.webp 1200w, /dashboard_cover-2172.webp 2172w')
+        hero.setAttribute('imagesizes', '(min-width: 1280px) calc(100vw - 19rem), (min-width: 768px) calc(100vw - 8rem), calc(100vw - 2rem)')
+        document.head.appendChild(hero)
+      }
+    </script>
     <meta
       name="description"
       content="ZemaKing's personal collection tracker for games, special editions, steelbooks, artbooks, figures, and collectibles."

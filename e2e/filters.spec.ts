@@ -101,3 +101,22 @@ test('grid/list view switches and is remembered, but stays out of the URL', asyn
     'true',
   )
 })
+
+test('the filter sheet (loaded on first open) returns focus to its trigger', async ({
+  page,
+}) => {
+  await page.goto('/games')
+  const trigger = page.getByRole('button', { name: /^Filters/ })
+  await trigger.click()
+  await expect(page.getByRole('dialog', { name: 'Filters' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).toBeHidden()
+  await expect(trigger).toBeFocused()
+
+  // Second open: the sheet is already loaded and stays mounted.
+  await trigger.press('Enter')
+  const sheet = page.getByRole('dialog', { name: 'Filters' })
+  await expect(sheet).toBeVisible()
+  await sheet.getByRole('button', { name: 'Close' }).click()
+  await expect(trigger).toBeFocused()
+})

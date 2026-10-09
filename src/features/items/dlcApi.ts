@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
-import { fetchAllRows, withFormats } from '@/features/items/api'
+import { ALL_ITEM_COLUMNS, fetchAllRows } from '@/features/items/api'
 import type { AllItemRow } from '@/features/items/types'
 
 /** A game offered in the DLC form's "Base Game" picker. */
@@ -25,19 +25,18 @@ export async function fetchGameOptions(): Promise<GameOption[]> {
 export async function fetchDlcsForGame(gameId: string): Promise<AllItemRow[]> {
   const { data, error } = await supabase
     .from('all_items')
-    .select('*')
+    .select(ALL_ITEM_COLUMNS)
     .eq('item_type', 'dlc')
     .eq('parent_game_id', gameId)
     .order('release_date', { ascending: true, nullsFirst: false })
     .order('title')
   if (error) throw error
-  return withFormats(data ?? [])
+  return data ?? []
 }
 
 /** The `all_items` row of a single item (a DLC's base game), or null if it no longer exists. */
 export async function fetchItemRow(id: string): Promise<AllItemRow | null> {
-  const { data, error } = await supabase.from('all_items').select('*').eq('id', id).maybeSingle()
+  const { data, error } = await supabase.from('all_items').select(ALL_ITEM_COLUMNS).eq('id', id).maybeSingle()
   if (error) throw error
-  if (!data) return null
-  return (await withFormats([data]))[0]
+  return data ?? null
 }

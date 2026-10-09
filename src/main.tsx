@@ -7,6 +7,9 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LocaleProvider } from '@/components/LocaleProvider'
 import { SettingsProvider } from '@/components/SettingsProvider'
 import { ThemeProvider } from '@/components/ThemeProvider'
+// Side effect: starts tracking focus for dialog focus return. It has to run before any dialog
+// opens, and lazily loaded dialogs (the filter sheet, Phase 39) arrive only when first used.
+import '@/lib/dialogFocus'
 import '@fontsource/inter/400.css'
 import '@fontsource/inter/500.css'
 import '@fontsource/inter/600.css'

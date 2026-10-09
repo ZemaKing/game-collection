@@ -8,11 +8,11 @@ describe('heroWidths', () => {
   })
 
   it('never enlarges: a target wider than the source becomes the source width', () => {
-    expect(heroWidths(2172)).toEqual([1200, 2172])
+    expect(heroWidths(2172)).toEqual([800, 1200, 2172])
   })
 
   it('collapses duplicates when the source is narrower than every target', () => {
-    expect(heroWidths(900)).toEqual([900])
+    expect(heroWidths(700)).toEqual([700])
   })
 })
 

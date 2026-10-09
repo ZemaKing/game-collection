@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
-import { fetchDlcIdsForGames } from '@/features/items/api'
+import { ALL_ITEM_COLUMNS, fetchDlcIdsForGames } from '@/features/items/api'
 import { FORMAT_TAG_SLUGS } from '@/features/items/constants'
 import { escapeLikePattern } from '@/features/items/likePattern'
 import { mergeSearchResults, searchTokens, tokenPattern } from '@/features/search/searchQuery'
@@ -47,7 +47,7 @@ export async function searchItems(query: string): Promise<AllItemRow[]> {
 async function searchByTokens(column: 'title_search' | 'subtitle_search', tokens: string[]) {
   // A query of only punctuation has no tokens; match nothing rather than everything.
   if (!tokens.length) return { data: [], error: null }
-  let query = supabase.from('all_items').select('*')
+  let query = supabase.from('all_items').select(ALL_ITEM_COLUMNS)
   for (const token of tokens) query = query.ilike(column, tokenPattern(token))
   return query.limit(RESULT_LIMIT)
 }
@@ -57,7 +57,7 @@ async function searchByPlatformName(pattern: string) {
   if (error || !platforms?.length) return { data: [], error }
   return supabase
     .from('all_items')
-    .select('*')
+    .select(ALL_ITEM_COLUMNS)
     .in(
       'platform_id',
       platforms.map((p) => p.id),
@@ -84,7 +84,7 @@ async function searchByGenreName(pattern: string) {
   const gameIds = gameGenres.map((g) => g.game_id)
   return supabase
     .from('all_items')
-    .select('*')
+    .select(ALL_ITEM_COLUMNS)
     .in('id', [...gameIds, ...(await fetchDlcIdsForGames(gameIds))])
     .limit(RESULT_LIMIT)
 }
@@ -108,7 +108,7 @@ async function searchByTagName(pattern: string) {
 
   return supabase
     .from('all_items')
-    .select('*')
+    .select(ALL_ITEM_COLUMNS)
     .in(
       'id',
       itemTags.map((t) => t.item_id),

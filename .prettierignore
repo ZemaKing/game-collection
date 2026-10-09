@@ -2,3 +2,5 @@
 scripts/images/
 src/lib/image-resize.ts
 src/lib/image-resize.test.ts
+scripts/perf/vitals.mjs
+scripts/lib/headless.mjs

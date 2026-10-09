@@ -113,6 +113,16 @@ describe('completenessFactsFromRow', () => {
     expect(completenessFactsFromRow(row({}))).toEqual(EMPTY_FACTS)
   })
 
+  it('uses the computed has_description of listing rows, which carry no description text', () => {
+    const { description: _omitted, ...listingRow } = row({})
+    void _omitted
+    expect(completenessFactsFromRow({ ...listingRow, has_description: true }).hasDescription).toBe(true)
+    expect(completenessFactsFromRow({ ...listingRow, has_description: false }).hasDescription).toBe(false)
+    // has_description wins over a stale text, and the text is the fallback without it.
+    expect(completenessFactsFromRow(row({ description: 'x', has_description: false })).hasDescription).toBe(false)
+    expect(completenessFactsFromRow(row({ description: 'x' })).hasDescription).toBe(true)
+  })
+
   it('maps a fully-populated row to all-true facts', () => {
     expect(
       completenessFactsFromRow(

@@ -11,7 +11,7 @@ import {
   Tag as TagIcon,
   X,
 } from 'lucide-react'
-import { useEffect, useId, useMemo, useState, type ComponentType, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useId, useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import { CloseIcon } from '@/components/icons/ActionIcons'
 import { ButtonIcon } from '@/components/ui/Button'
 import { buttonClasses } from '@/components/ui/buttonStyles'
@@ -30,11 +30,15 @@ import {
 } from '@/features/items/constants'
 import { editionDisplayName, groupEditionNames } from '@/features/items/editions'
 import { EditionGlyph } from '@/features/items/components/EditionBadge'
-import { FilterSheet } from '@/features/items/components/FilterSheet'
 import type { ViewMode } from '@/features/items/useListingPrefs'
 import type { Filters } from '@/features/items/useFilters'
 import type { Genre, ItemCondition, ItemType, Platform } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
+
+// The filter sheet (with the react-day-picker date fields, ≈ 24 kB gzip) loads the first time it's
+// wanted — hovered, focused or opened — not with every listing (ROADMAP Phase 39).
+const loadFilterSheet = () => import('@/features/items/components/FilterSheet')
+const FilterSheet = lazy(() => loadFilterSheet().then((m) => ({ default: m.FilterSheet })))
 
 interface Chip {
   key: string
@@ -88,6 +92,8 @@ export function ItemListingToolbar({
   const sortLabelId = useId()
   const viewLabelId = useId()
   const [sheetOpen, setSheetOpen] = useState(false)
+  // Stays mounted after the first open, so Radix can run its close (and focus-return) logic.
+  const [sheetMounted, setSheetMounted] = useState(false)
   const [expanded, setExpanded] = useState(true)
   const [searchDraft, setSearchDraft] = useState(filters.search)
 
@@ -194,7 +200,12 @@ export function ItemListingToolbar({
       <div className="flex items-center justify-between gap-3">
         <button
           type="button"
-          onClick={() => setSheetOpen(true)}
+          onClick={() => {
+            setSheetMounted(true)
+            setSheetOpen(true)
+          }}
+          onPointerEnter={loadFilterSheet}
+          onFocus={loadFilterSheet}
           className="flex items-center gap-3 text-left"
         >
           <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-card-hover text-text">
@@ -321,21 +332,25 @@ export function ItemListingToolbar({
         </>
       )}
 
-      <FilterSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        filters={filters}
-        onApply={setFilters}
-        showTypeFilter={showTypeFilter}
-        showPlatformFilter={showPlatformFilter}
-        showGenreFilter={showGenreFilter}
-        showEditionFilter={showEditionFilter}
-        platforms={platforms}
-        genres={genres}
-        tags={tags}
-        years={years}
-        editions={editions}
-      />
+      {sheetMounted && (
+        <Suspense fallback={null}>
+          <FilterSheet
+            open={sheetOpen}
+            onOpenChange={setSheetOpen}
+            filters={filters}
+            onApply={setFilters}
+            showTypeFilter={showTypeFilter}
+            showPlatformFilter={showPlatformFilter}
+            showGenreFilter={showGenreFilter}
+            showEditionFilter={showEditionFilter}
+            platforms={platforms}
+            genres={genres}
+            tags={tags}
+            years={years}
+            editions={editions}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

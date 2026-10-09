@@ -5,6 +5,16 @@ import { searchTokens, tokenPattern } from '@/features/search/searchQuery'
 import { combineIdRestrictions, pageRange, releaseYearsExpression } from '@/features/items/listingQuery'
 import type { AllItemRow, Genre, ItemCondition, ItemType, Platform } from '@/features/items/types'
 
+/**
+ * The `all_items` columns every listing-style row needs (cards, search results, related items,
+ * duplicates). Two are PostgREST computed fields (ROADMAP Phase 39): `has_description` stands in
+ * for the description text, which was most of each row's bytes and is only shown on the detail
+ * page, and `format_slug` (the Digital / Physical badge) replaces a second, serial item_tags
+ * request after every query.
+ */
+export const ALL_ITEM_COLUMNS =
+  'id, item_type, title, subtitle, platform_id, release_date, collection_date, condition, cover_image_path, cover_thumb_path, genre_slug, genre_name, edition_name, completed, parent_game_id, created_at, updated_at, has_description, format_slug'
+
 export async function fetchPlatforms(): Promise<Platform[]> {
   const { data, error } = await supabase.from('platforms').select('id, name, slug').order('name')
   if (error) throw error
@@ -138,34 +148,12 @@ async function resolveGenreTagRestriction(
   return combineIdRestrictions(genreItemIds, tagItemIds)
 }
 
-/** Attaches each row's Digital / Physical tag slug (`format_slug`) with a single `item_tags` query. */
-export async function withFormats<T extends AllItemRow>(rows: T[]): Promise<T[]> {
-  if (rows.length === 0) return rows
-  const { data, error } = await supabase
-    .from('item_tags')
-    .select('item_id, tags(slug)')
-    .in(
-      'item_id',
-      rows.map((row) => row.id),
-    )
-  if (error) throw error
-
-  const slugByItemId = new Map<string, string>()
-  for (const row of (data as unknown as { item_id: string; tags: { slug: string } | null }[] | null) ?? []) {
-    const slug = row.tags?.slug
-    if (slug && FORMAT_TAG_SLUGS.includes(slug) && !slugByItemId.has(row.item_id)) {
-      slugByItemId.set(row.item_id, slug)
-    }
-  }
-  return rows.map((row) => ({ ...row, format_slug: slugByItemId.get(row.id) ?? null }))
-}
-
 export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsResult> {
   const restriction = await resolveGenreTagRestriction(params.genreIds, params.tagIds)
   if (restriction && restriction.length === 0) return { rows: [], count: 0 }
 
   const { column, ascending } = SORT_COLUMNS[params.sort]
-  let query = supabase.from('all_items').select('*', { count: 'exact' })
+  let query = supabase.from('all_items').select(ALL_ITEM_COLUMNS, { count: 'exact' })
 
   // Every typed word must appear in the normalized title (see `searchTokens`).
   for (const token of searchTokens(params.search)) query = query.ilike('title_search', tokenPattern(token))
@@ -185,7 +173,7 @@ export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsRe
     .range(from, to)
 
   if (error) throw error
-  return { rows: await withFormats(data ?? []), count: count ?? 0 }
+  return { rows: data ?? [], count: count ?? 0 }
 }
 
 /** Supabase caps a single response at 1000 rows by default; aggregate queries must page through. */
@@ -267,9 +255,9 @@ export async function fetchGenreSummary(): Promise<GenreSummaryRow[]> {
 export async function fetchRecentlyAdded(limit: number): Promise<AllItemRow[]> {
   const { data, error } = await supabase
     .from('all_items')
-    .select('*')
+    .select(ALL_ITEM_COLUMNS)
     .order('created_at', { ascending: false })
     .limit(limit)
   if (error) throw error
-  return withFormats(data ?? [])
+  return data ?? []
 }

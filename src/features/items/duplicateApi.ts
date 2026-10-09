@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
+import { ALL_ITEM_COLUMNS } from '@/features/items/api'
 import { duplicateLookup } from '@/features/items/duplicates'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 
@@ -16,7 +17,7 @@ export async function findLikelyDuplicates(
 
   let query = supabase
     .from('all_items')
-    .select('*')
+    .select(ALL_ITEM_COLUMNS)
     .eq('item_type', lookup.itemType)
     .ilike('title', lookup.titlePattern)
   if (lookup.parentGameId) query = query.eq('parent_game_id', lookup.parentGameId)

@@ -18,9 +18,11 @@ export type StaticImageJob = {
   outputs: StaticImageOutput[]
 }
 
-/** The hero is shown 110–160 px high across the content width (≈ 340–1200 CSS px): 1200 covers 1×
- *  screens and 2× phones, the source width covers 2× desktops. Never enlarged. */
-export const HERO_WIDTHS = [1200, 2200]
+/** The hero is shown 110–160 px high across the content width (≈ 340–1200 CSS px): 800 covers
+ *  phones (≈ 380 CSS px at 2×; added in Phase 39, it's the mobile LCP), 1200 tablets and 1×
+ *  desktops, the source width 2× desktops. Never enlarged. Keep in sync with the `srcSet` in
+ *  DashboardPage.tsx and the preload in index.html. */
+export const HERO_WIDTHS = [800, 1200, 2200]
 
 export function heroWidths(
   sourceWidth: number,

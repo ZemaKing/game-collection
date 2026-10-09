@@ -84,7 +84,7 @@ export function calculateCompleteness(itemType: ItemType, facts: CompletenessFac
 export function completenessFactsFromRow(
   row: Pick<
     AllItemRow,
-    'subtitle' | 'platform_id' | 'release_date' | 'collection_date' | 'condition' | 'description' | 'cover_image_path'
+    'subtitle' | 'platform_id' | 'release_date' | 'collection_date' | 'condition' | 'description' | 'has_description' | 'cover_image_path'
   >,
 ): CompletenessFacts {
   return {
@@ -93,7 +93,7 @@ export function completenessFactsFromRow(
     hasReleaseDate: !!row.release_date,
     hasCollectionDate: !!row.collection_date,
     hasCondition: !!row.condition,
-    hasDescription: !!row.description,
+    hasDescription: row.has_description ?? !!row.description,
     hasCoverImage: !!row.cover_image_path,
   }
 }

@@ -12,6 +12,7 @@ export type StatsRow = Pick<
   | 'collection_date'
   | 'condition'
   | 'description'
+  | 'has_description'
   | 'cover_image_path'
   | 'created_at'
 >

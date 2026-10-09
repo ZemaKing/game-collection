@@ -119,10 +119,11 @@ function DashboardPage() {
     <div className="flex flex-col gap-6">
       <div className="relative flex h-[110px] items-end overflow-hidden rounded-2xl shadow-lg sm:h-[130px] lg:h-[160px]">
         {/* The dashboard's LCP. Built by `npm run images:static` from static-src/ (ROADMAP Phase 38);
-            `sizes` follows AppShell: the main padding, plus the sidebar from md (5rem) and xl (16rem). */}
+            `sizes` follows AppShell: the main padding, plus the sidebar from md (5rem) and xl (16rem).
+            index.html preloads the same srcset/sizes on "/" (Phase 39) — keep the two in sync. */}
         <img
           src="/dashboard_cover-1200.webp"
-          srcSet="/dashboard_cover-1200.webp 1200w, /dashboard_cover-2172.webp 2172w"
+          srcSet="/dashboard_cover-800.webp 800w, /dashboard_cover-1200.webp 1200w, /dashboard_cover-2172.webp 2172w"
           sizes="(min-width: 1280px) calc(100vw - 19rem), (min-width: 768px) calc(100vw - 8rem), calc(100vw - 2rem)"
           width={2172}
           height={724}

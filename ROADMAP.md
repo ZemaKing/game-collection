@@ -91,7 +91,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Check the RAWG cover import on the next autofill (migration applied, test uploads verified 2026-10-09) |
 | 37 | Retire Originals (free the quota) | ⬜ Not started | **Explicit approval to delete ~2 GB of originals** |
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
-| 39 | Performance Pass (was Phase 29) | ⬜ Not started | — |
+| 39 | Performance Pass (was Phase 29) | 🟡 Done (2026-10-09) except the image numbers, which wait for the Phase 34 flip | Migrations `20261011120000` + `20261011130000` applied 2026-10-09; after Phase 34: `perf:vitals -- --with-images` |
 | 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E in CI waits for the secrets | Add repo secrets `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`; make the `verify` CI check required (GitHub setting) |
 | 41 | Operations, Docs & Production Verification | ⬜ Not started | `RAWG_API_KEY` in Vercel; go/no-go |
 
@@ -285,15 +285,15 @@ No static image over ~200 KB ships in `public/`.
 Finish the old Phase 29 with real numbers, now that images are no longer the bottleneck.
 
 ### Tasks
-- [ ] Lab Web Vitals (LCP, CLS, INP-proxy) for dashboard, a listing page, a detail page and search, on mobile (slow 4G, 4× CPU) and desktop. Option: port diecast's `scripts/perf/vitals.mjs` + `scripts/lib/headless.mjs` (local Edge/Chrome, no new dependency)
-- [ ] Query payloads: `all_items` selects only the columns cards use; check `fetchAllRows` users (statistics); indexes for the common filters and sorts (`EXPLAIN` in `supabase/checks/performance.sql`)
-- [ ] Duplicate requests and re-renders: one fetch per screen; consider TanStack Query only if measurements show refetch churn (justify the dependency)
-- [ ] Bundle: `useSaveItem` chunk (133 kB) and `DatePickerField` (86 kB) only on edit routes; `preconnect` to the Supabase URL in `index.html`
-- [ ] Budget written to `docs/performance.md` (e.g. LCP < 2.5 s on mobile, listing ≤ 1 MB of images, initial JS ≤ 170 kB gzip)
-- [ ] Large-dataset check: does 427 → ~1,500 items keep listing/search responsive? (Generated rows in a local test only — never in production)
+- [x] Lab Web Vitals (LCP, CLS, INP-proxy) for dashboard, a listing page, a detail page and search, on mobile (slow 4G, 4× CPU) and desktop: ported diecast's `scripts/perf/vitals.mjs` + `scripts/lib/headless.mjs` (`npm run perf:vitals`, local Edge/Chrome, no new dependency), plus `/statistics`. **Storage images are blocked by default** (`--with-images` to include them) so 50 cold runs don't pull the multi-MB originals from the shared egress
+- [x] Query payloads: listing-style queries select `ALL_ITEM_COLUMNS`, with two PostgREST computed fields (migrations applied by the owner): `has_description` replaces the description text (58 % of each row; the statistics response went 204 → 34 kB), and `format_slug` replaces the serial `item_tags` request after every query (`withFormats` removed). Both verified against the old rule on all 433 rows (0 mismatches). Indexes: none needed — queries cost 74–126 ms against a 76 ms bare round trip; `supabase/checks/performance.sql` holds the `EXPLAIN (ANALYZE)` set for later
+- [x] Duplicate requests and re-renders: none found (the dashboard's "10 `all_items` requests" are 5 GETs + 5 CORS preflights). No TanStack Query — no churn to justify it
+- [x] Bundle: `useSaveItem` was already edit-only; `DatePickerField` was pulled into every listing and the dashboard by the closed filter sheet and blocked the lazy page chunk (done at 2.44 s on mobile) — the sheet now loads on first use. `preconnect` to the Supabase URL in `index.html`. Also: the dashboard hero (the mobile LCP) is preloaded on `/` and has an 800 px variant for phones. Tried and reverted lazy top-bar dialogs (no net gain)
+- [x] Budget written to `docs/performance.md` (LCP < 2.5 s on mobile, CLS < 0.1, TBT < 200 ms, listing ≤ 1 MB of images, initial JS ≤ 170 kB gzip)
+- [x] Large-dataset check: listings/search/duplicates/related are paged or capped by the server; the one full pass (statistics) is covered by `statistics.scale.test.ts` with 1,500 and 15,000 generated rows (local test only)
 
 ### Verification
-- [ ] Before/after table in `docs/performance.md`; the budget is met or the gaps are listed
+- [ ] Before/after table in `docs/performance.md`; the budget is met or the gaps are listed. *2026-10-09: table written; mobile LCP dashboard 3.51 → 2.35 s, listing 2.66 → 2.36 s, search 3.34 → 2.77 s, statistics 1.96 → 1.87 s; CLS ≤ 0.084; TBT ≤ 71 ms. Gaps listed: search LCP (needs route-level data loading), initial JS ≈ 201 kB vs 170 (framework: react-dom + supabase-js). Image rows pending Phase 34*
 
 ### Definition of Done
 Old Phase 29's DoD: browse, search and detail stay responsive at the expected scale, with numbers recorded.
