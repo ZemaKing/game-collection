@@ -4,7 +4,7 @@ Follow-up to [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md), which built the app (
 
 The image pipeline reuses the one built for the diecast app (`../diecast-collection/scripts/images/` + `src/lib/image-resize.ts`), which was written app-agnostic for this purpose (diecast ROADMAP Phase 21).
 
-**Status: Phase 31 applied and verified by `verify:rls` (2026-10-09); waiting on the owner's in-app check.** Research done 2026-10-04 (findings below).
+**Status: Phase 31 done (2026-10-09). Next: Phase 32.** Research done 2026-10-04 (findings below).
 
 ---
 
@@ -81,7 +81,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 
 | # | Phase | Status | Needs from owner |
 | --- | --- | --- | --- |
-| 31 | Security Lockdown | 🟡 Verified by script; owner app check pending | Add/edit/delete an item and an image in the app |
+| 31 | Security Lockdown | ✅ Done (2026-10-09) | — |
 | 32 | Image Audit & Local Backup | ⬜ Not started | Service-role key in `.env.local`; check the Usage page; approve the ~2 GB download |
 | 33 | Image Pipeline Port & Schema | ⬜ Not started | Apply migration |
 | 34 | WebP Migration of Existing Images | ⬜ Not started | Run the scripts with the service-role key |
@@ -112,7 +112,7 @@ Make "only the owner can write" true in the database, not just in the UI. This c
 ### Verification
 - [x] `/auth/v1/settings` reports `disable_signup: true` (2026-10-09)
 - [x] `verify:rls` is green (165/165, 2026-10-09): anon and non-admin are refused on every table and on Storage writes and list; admin CRUD works
-- [ ] The owner can still add, edit and delete an item and an image in the app
+- [x] The owner can still add, edit and delete an item and an image in the app (2026-10-09: a test Stuff item created with a tag, edited, PNG uploaded and shown, image deleted — file and row gone — then the item deleted)
 
 ### Definition of Done
 Writes require `is_admin()` everywhere; sign-ups are off; a script proves it.
