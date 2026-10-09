@@ -4,7 +4,7 @@ Follow-up to [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md), which built the app (
 
 The image pipeline reuses the one built for the diecast app (`../diecast-collection/scripts/images/` + `src/lib/image-resize.ts`), which was written app-agnostic for this purpose (diecast ROADMAP Phase 21).
 
-**Status: Phase 33 code done and its migration applied; Phase 35 code done ahead of Phase 34 (owner-approved, 2026-10-09), and the app reads thumbs as soon as Phase 34 fills them. The full image backup (Phase 32) waits for the egress reset on 2026-10-10, then the full Phase 33 dry run, then Phase 34.** Research done 2026-10-04 (findings below).
+**Status: Phase 33 code done and its migration applied; Phases 35 and 36 code done ahead of Phase 34 (owner-approved, 2026-10-09): the app reads thumbs as soon as Phase 34 fills them, and new uploads are already stored as WebP. The full image backup (Phase 32) waits for the egress reset on 2026-10-10, then the full Phase 33 dry run, then Phase 34.** Research done 2026-10-04 (findings below).
 
 ---
 
@@ -88,7 +88,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 33 | Image Pipeline Port & Schema | 🟡 Code done; dry run over 615/1,426 (the rest after the backup) | After the full backup, run `images:migrate` (dry run) |
 | 34 | WebP Migration of Existing Images | ⬜ Not started | Run the scripts with the service-role key |
 | 35 | Read Path: Thumbnails Everywhere | 🟡 Code done (before 34, owner-approved); size/blur checks after the Phase 34 flip | — |
-| 36 | Upload Path: WebP in the Browser | ⬜ Not started | Upload a test photo by hand |
+| 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Deploy, **then** apply `20261010130000_item_images_webp_only.sql`; upload a phone photo + a transparent PNG by hand |
 | 37 | Retire Originals (free the quota) | ⬜ Not started | **Explicit approval to delete ~2 GB of originals** |
 | 38 | Static Assets (dashboard hero, icons) | ⬜ Not started | Optional: a better hero source image |
 | 39 | Performance Pass (was Phase 29) | ⬜ Not started | — |
@@ -220,16 +220,18 @@ No list view downloads a full-size image.
 New uploads arrive already small, so the bucket never fills up with multi-MB PNGs again.
 
 ### Tasks
-- [ ] Copy diecast `src/lib/image-resize.ts` (no imports): decode once (EXIF-aware), step-down resize, `OffscreenCanvas` with a canvas fallback, WebP (`png` where a browser can't encode WebP)
-- [ ] `uploadItemImage` / `replaceItemImageFile` / `appendItemCoverImage` (RAWG import) produce `full` + `thumb`, upload both (`cacheControl` one year), write `storage_path`, `thumb_path`, `width`, `height`, and clean up both objects on failure
-- [ ] Accept JPEG/PNG/WebP/GIF input (GIF → first frame; say so in the UI). Raise the input limit if wanted, since only the output is stored. Update the bucket's `allowed_mime_types` to WebP (+ PNG fallback) only
-- [ ] Per-file status in `ImageManager` gains a "Optimising…" step
+- [x] Copy diecast `src/lib/image-resize.ts` + its test (no imports, kept in diecast's style via `.prettierignore`): decode once (EXIF-aware), step-down resize, `OffscreenCanvas` with a canvas fallback, WebP (`png` where a browser can't encode WebP)
+- [x] One variant config for both paths: `src/features/items/imageVariants.ts` (`IMAGE_VARIANTS`, `IMAGE_CACHE_SECONDS`), used by `imageApi.ts` and by the migration job, so uploads and migrated images can't drift apart
+- [x] `uploadItemImage` / `replaceItemImageFile` / `appendItemCoverImage` (RAWG import) produce `full` + `thumb`, upload both (`cacheControl` one year) as `{uuid}.webp` + `{uuid}.thumb.webp`, write `storage_path`, `thumb_path`, `width`, `height`, and clean up whatever was uploaded on failure (a failed thumb upload removes the full image; a failed row write removes both; a failed replace keeps the old objects)
+- [x] Accept JPEG/PNG/WebP/GIF input; a GIF keeps its first frame and the upload area says so (owner decision 2026-10-09, closes Open decision 4). Input limit **kept at 10 MB** (owner decision). Migration `20261010130000_item_images_webp_only.sql` sets the bucket's `allowed_mime_types` to WebP + PNG
+- [x] Per-file status in `ImageManager` gains an "Optimising…" step (queued → optimising → uploading → done/failed). Also fixed: a failed upload showed an empty label (it looked up a missing `images.error` key) and never exposed its reason; it now says "Failed", with the reason as a tooltip and for screen readers
+- [x] The migration job skips rows uploaded this way (thumb set, no original), since they're already WebP and aren't in the backup
 - [x] Delete paths remove both variants (and `original_path` if still set). *Done early in Phase 35*
 
 ### Verification
-- [ ] Owner uploads a phone photo (~4–8 MB) and a transparent PNG: stored as ~100–200 KB + ~25 KB WebP; the transparency is kept
-- [ ] The RAWG cover import stores WebP
-- [ ] Unit tests for the resize maths (fit box, never enlarge) and the upload/rollback order (mocked Storage)
+- [ ] Owner uploads a phone photo (~4–8 MB) and a transparent PNG: stored as ~100–200 KB + ~25 KB WebP; the transparency is kept. *2026-10-09, in the dev browser without uploading: a generated 4000×3000 transparent PNG (6.2 MB) → full 1600×1200 WebP 19 KB + thumb 600×450 6 KB in 233 ms, alpha kept*
+- [ ] The RAWG cover import stores WebP (same `uploadItemImage` path; check on the owner's next autofill)
+- [x] Unit tests for the resize maths (fit box, never enlarge; the copied suite) and the upload/rollback order (`imageApi.test.ts`, mocked Storage; 174 tests in total)
 
 ### Definition of Done
 No new object larger than ~400 KB reaches the bucket.
@@ -346,5 +348,5 @@ Every `DEVELOPMENT_PLAN.md` final-checklist item is ticked or explicitly deferre
 | 1 | **Over the Storage quota (≈ 2.1 GB of 1 GB, org-wide).** If uploads are already blocked, the WebP variants (~0.26 GB) can't be uploaded before space is freed. Options: (a) upgrade to Pro for one month ($25) during the migration; (b) after the verified local backup, delete originals per batch *before* uploading their WebP (the rollback then depends on the local backup); (c) migrate the recipes app first (frees ~70 MB, not enough on its own). Recommended: check the Usage page first; if blocked, (a) is the safest | Ph 32 / 34 |
 | 2 | Keep originals anywhere online after Phase 37 (e.g. a cloud drive), or is the local + second-copy backup enough? | Ph 37 |
 | 3 | E2E: a separate free Supabase test project (allows owner-flow E2E; the org already uses both free slots, so it would go in another org) or read-only E2E against production (the diecast choice)? | Ph 40 |
-| 4 | GIF uploads: convert to a still WebP (first frame), or reject GIFs? | Ph 36 |
+| 4 | ~~GIF uploads: convert or reject?~~ **Decided 2026-10-09:** convert to a still WebP (first frame); the upload area says so. Input limit stays 10 MB | ~~Ph 36~~ |
 | 5 | ~~Thumb size 600 px vs 400 px~~ **Decided 2026-10-09:** thumb 600×750, full 1600, both q85 | ~~Ph 33~~ |

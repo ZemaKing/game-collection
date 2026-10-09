@@ -10,10 +10,11 @@ import {
   uploadItemImage,
   validateFiles,
   type FileValidationError,
+  type UploadStage,
 } from '@/features/items/imageApi'
 import type { ItemType } from '@/features/items/types'
 
-export type UploadStatus = 'queued' | 'uploading' | 'done' | 'error'
+export type UploadStatus = 'queued' | UploadStage | 'done' | 'error'
 
 export interface UploadQueueItem {
   id: string
@@ -24,7 +25,8 @@ export interface UploadQueueItem {
 
 /**
  * Owns the full read/write lifecycle for one item's gallery: initial load,
- * an upload queue with per-file status (no byte-level progress — see
+ * an upload queue with per-file status (queued → optimizing in the browser →
+ * uploading → done/error; no byte-level progress — see
  * imageApi.ts / DEVELOPMENT_PLAN.md Phase 17 for why), and every mutation
  * (delete/replace/reorder/cover/alt-text), each saving immediately rather
  * than being staged behind the item form's own Save button.
@@ -85,11 +87,12 @@ export function useItemImages(itemType: ItemType, itemId: string) {
     for (let i = 0; i < valid.length; i += 1) {
       const file = valid[i]
       const queueId = queueEntries[i].id
-      updateQueueItem(queueId, { status: 'uploading' })
       try {
         const position = images.length + i
         const isCover = images.length === 0 && i === 0
-        const row = await uploadItemImage(itemType, itemId, file, position, isCover)
+        const row = await uploadItemImage(itemType, itemId, file, position, isCover, (stage) =>
+          updateQueueItem(queueId, { status: stage }),
+        )
         setImages((prev) => [...prev, row])
         updateQueueItem(queueId, { status: 'done' })
       } catch (err) {

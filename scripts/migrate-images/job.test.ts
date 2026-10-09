@@ -3,7 +3,12 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { plannedPaths } from '../images/batch.ts'
-import job, { assertNoOverwrite, type ImageRow, rowToSource } from './job.ts'
+import job, {
+  assertNoOverwrite,
+  type ImageRow,
+  needsMigration,
+  rowToSource,
+} from './job.ts'
 
 const ITEM_TYPES = [
   'game',
@@ -109,9 +114,26 @@ describe('games image job', () => {
         quality,
       })),
     ).toEqual([
-      { name: 'full', maxWidth: 1600, maxHeight: undefined, quality: 85 },
+      { name: 'full', maxWidth: 1600, maxHeight: 1600, quality: 85 },
       { name: 'thumb', maxWidth: 600, maxHeight: 750, quality: 85 },
     ])
     expect(job.cacheControl).toBe('31536000')
+  })
+
+  it('skips rows uploaded as WebP in the browser, but keeps originals and flipped rows', () => {
+    expect(needsMigration(row('game'))).toBe(true)
+    expect(needsMigration(row('game', { thumb_path: null }))).toBe(true)
+    const flipped = {
+      storage_path: `game/${ITEM}/${ROW}.webp`,
+      thumb_path: `game/${ITEM}/${ROW}.thumb.webp`,
+      original_path: `game/${ITEM}/${UPLOAD}.png`,
+    }
+    expect(needsMigration(row('game', flipped))).toBe(true)
+    const browserUpload = {
+      storage_path: `game/${ITEM}/${UPLOAD}.webp`,
+      thumb_path: `game/${ITEM}/${UPLOAD}.thumb.webp`,
+      original_path: null,
+    }
+    expect(needsMigration(row('game', browserUpload))).toBe(false)
   })
 })

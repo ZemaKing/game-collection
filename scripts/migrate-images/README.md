@@ -1,6 +1,6 @@
 # Item images → WebP (ROADMAP Phases 33–34)
 
-Converts every `item_images` original to two WebP objects with the generic pipeline in [`../images/`](../images/README.md). The originals come from the **local backup** (`backups/images/`, made by `npm run images:backup`), so converting them costs no download egress. Only the uploads in Phase 34 touch the network.
+Converts every `item_images` original that predates Phase 36 (rows uploaded since are already WebP and are skipped) to two WebP objects with the generic pipeline in [`../images/`](../images/README.md). The originals come from the **local backup** (`backups/images/`, made by `npm run images:backup`), so converting them costs no download egress. Only the uploads in Phase 34 touch the network.
 
 | | |
 | --- | --- |

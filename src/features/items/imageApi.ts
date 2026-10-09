@@ -1,9 +1,16 @@
 import { fetchItemImages, ITEM_IMAGE_COLUMNS } from '@/features/items/detailApi'
 import { imageObjectPaths, ITEM_IMAGES_BUCKET } from '@/features/items/storage'
 import type { ItemImageRow } from '@/features/items/detailTypes'
+import { IMAGE_CACHE_SECONDS, IMAGE_VARIANTS } from '@/features/items/imageVariants'
 import type { ItemType } from '@/features/items/types'
+import { resizeImageVariants } from '@/lib/image-resize'
 import { supabase } from '@/lib/supabaseClient'
 
+/**
+ * Accepted *input* types and size. Every upload is converted in the browser, so
+ * only WebP (PNG where a browser can't encode WebP) is stored; a GIF keeps its
+ * first frame.
+ */
 export const ALLOWED_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 export const MAX_IMAGE_BYTES = 10 * 1024 * 1024
 export const MAX_IMAGES_PER_ITEM = 20
@@ -44,14 +51,65 @@ export function validateFiles(files: File[], existingCount: number): FileValidat
   return { valid, errors }
 }
 
-function extensionFor(file: File): string {
-  const fromName = file.name.split('.').pop()
-  if (fromName && fromName.length <= 5) return fromName.toLowerCase()
-  return file.type.split('/').pop() ?? 'jpg'
-}
-
 async function removeStorageObjects(storagePaths: string[]): Promise<void> {
   await supabase.storage.from(ITEM_IMAGES_BUCKET).remove(storagePaths)
+}
+
+/** What a file becomes once stored: the `item_images` columns of its two variants. */
+interface StoredVariants {
+  storage_path: string
+  thumb_path: string
+  width: number
+  height: number
+}
+
+/** Per-file progress for the upload queue: converting in the browser, then sending to Storage. */
+export type UploadStage = 'optimizing' | 'uploading'
+
+/**
+ * Converts `file` to the full + thumb variants (`IMAGE_VARIANTS`) in the
+ * browser and uploads both as `{itemType}/{itemId}/{uuid}.webp` and
+ * `{uuid}.thumb.webp` (`.png` where a browser can't encode WebP), cached for a
+ * year. If an upload fails, whatever was already uploaded is removed again.
+ */
+async function storeVariants(
+  itemType: ItemType,
+  itemId: string,
+  file: File,
+  onStage?: (stage: UploadStage) => void,
+): Promise<StoredVariants> {
+  onStage?.('optimizing')
+  const [full, thumb] = await resizeImageVariants(file, [
+    { name: 'full', ...IMAGE_VARIANTS.full, quality: IMAGE_VARIANTS.full.quality / 100 },
+    { name: 'thumb', ...IMAGE_VARIANTS.thumb, quality: IMAGE_VARIANTS.thumb.quality / 100 },
+  ])
+
+  const base = `${itemType}/${itemId}/${crypto.randomUUID()}`
+  const stored: StoredVariants = {
+    storage_path: `${base}.${full.ext}`,
+    thumb_path: `${base}.thumb.${thumb.ext}`,
+    width: full.width,
+    height: full.height,
+  }
+
+  onStage?.('uploading')
+  const uploaded: string[] = []
+  try {
+    for (const [path, image] of [
+      [stored.storage_path, full],
+      [stored.thumb_path, thumb],
+    ] as const) {
+      const { error } = await supabase.storage
+        .from(ITEM_IMAGES_BUCKET)
+        .upload(path, image.blob, { contentType: image.type, cacheControl: IMAGE_CACHE_SECONDS })
+      if (error) throw error
+      uploaded.push(path)
+    }
+  } catch (err) {
+    if (uploaded.length > 0) await removeStorageObjects(uploaded)
+    throw err
+  }
+  return stored
 }
 
 export async function uploadItemImage(
@@ -60,22 +118,18 @@ export async function uploadItemImage(
   file: File,
   position: number,
   isCover: boolean,
+  onStage?: (stage: UploadStage) => void,
 ): Promise<ItemImageRow> {
-  const storagePath = `${itemType}/${itemId}/${crypto.randomUUID()}.${extensionFor(file)}`
-
-  const { error: uploadError } = await supabase.storage.from(ITEM_IMAGES_BUCKET).upload(storagePath, file, {
-    contentType: file.type,
-  })
-  if (uploadError) throw uploadError
+  const stored = await storeVariants(itemType, itemId, file, onStage)
 
   const { data, error: insertError } = await supabase
     .from('item_images')
-    .insert({ item_type: itemType, item_id: itemId, storage_path: storagePath, position, is_cover: isCover })
+    .insert({ item_type: itemType, item_id: itemId, ...stored, position, is_cover: isCover })
     .select(ITEM_IMAGE_COLUMNS)
     .single()
 
   if (insertError) {
-    await removeStorageObjects([storagePath])
+    await removeStorageObjects([stored.storage_path, stored.thumb_path])
     throw insertError
   }
 
@@ -101,24 +155,19 @@ export async function deleteItemImage(image: ItemImageRow, remainingImages: Item
 }
 
 export async function replaceItemImageFile(image: ItemImageRow, file: File): Promise<ItemImageRow> {
-  const itemTypeAndId = image.storage_path.split('/').slice(0, 2)
-  const newStoragePath = `${itemTypeAndId[0]}/${itemTypeAndId[1]}/${crypto.randomUUID()}.${extensionFor(file)}`
-
-  const { error: uploadError } = await supabase.storage.from(ITEM_IMAGES_BUCKET).upload(newStoragePath, file, {
-    contentType: file.type,
-  })
-  if (uploadError) throw uploadError
+  const [itemType, itemId] = image.storage_path.split('/') as [ItemType, string]
+  const stored = await storeVariants(itemType, itemId, file)
 
   const { data, error: updateError } = await supabase
     .from('item_images')
-    // The new file has no WebP variants (yet): clear the old ones so no stale thumb is shown.
-    .update({ storage_path: newStoragePath, thumb_path: null, width: null, height: null, original_path: null })
+    // original_path belonged to the old photo, which is removed below.
+    .update({ ...stored, original_path: null })
     .eq('id', image.id)
     .select(ITEM_IMAGE_COLUMNS)
     .single()
 
   if (updateError) {
-    await removeStorageObjects([newStoragePath])
+    await removeStorageObjects([stored.storage_path, stored.thumb_path])
     throw updateError
   }
 
@@ -132,6 +181,7 @@ export async function replaceItemImageFile(image: ItemImageRow, file: File): Pro
  * only if the item has no images yet, positioned after whatever's there.
  */
 export async function appendItemCoverImage(itemType: ItemType, itemId: string, file: File): Promise<ItemImageRow> {
+  // Converted like a picked file, so an imported RAWG cover is stored as WebP too.
   const existing = await fetchItemImages(itemType, itemId)
   return uploadItemImage(itemType, itemId, file, existing.length, existing.length === 0)
 }

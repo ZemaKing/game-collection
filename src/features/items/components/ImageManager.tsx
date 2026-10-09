@@ -19,13 +19,21 @@ import { ItemImage } from '@/features/items/components/ItemImage'
 import type { ItemImageRow } from '@/features/items/detailTypes'
 import { ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGES_PER_ITEM } from '@/features/items/imageApi'
 import type { ItemType } from '@/features/items/types'
-import { useItemImages } from '@/features/items/useItemImages'
+import { useItemImages, type UploadStatus } from '@/features/items/useItemImages'
 import { useLocale } from '@/hooks/useLocale'
 import type { TranslationKey } from '@/lib/i18n'
 
 interface ImageManagerProps {
   itemType: ItemType
   itemId: string
+}
+
+const UPLOAD_STATUS_KEYS: Record<UploadStatus, TranslationKey> = {
+  queued: 'images.queued',
+  optimizing: 'images.optimizing',
+  uploading: 'images.uploading',
+  done: 'images.done',
+  error: 'images.failed',
 }
 
 function errorMessage(t: (key: TranslationKey, vars?: Record<string, string>) => string, code: string, fileName: string) {
@@ -114,6 +122,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
         <ImageUp size={24} className="text-muted" />
         <span className="block text-sm font-medium text-text">{t('images.uploadButton')}</span>
         <span className="block text-xs text-muted">{t('images.dropHint')}</span>
+        <span className="block text-xs text-muted">{t('images.formatHint')}</span>
       </button>
       <input
           ref={fileInputRef}
@@ -136,7 +145,9 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
             >
               <span className="truncate text-text">{item.name}</span>
               <span className="flex items-center gap-2 shrink-0">
-                {item.status === 'uploading' && <Spinner size={14} className="text-muted" />}
+                {(item.status === 'optimizing' || item.status === 'uploading') && (
+                  <Spinner size={14} className="text-muted" />
+                )}
                 <span
                   className={
                     item.status === 'error'
@@ -145,8 +156,12 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                         ? 'text-success'
                         : 'text-muted'
                   }
+                  title={item.status === 'error' ? item.errorMessage : undefined}
                 >
-                  {t(`images.${item.status}` as TranslationKey)}
+                  {t(UPLOAD_STATUS_KEYS[item.status])}
+                  {item.status === 'error' && item.errorMessage && (
+                    <span className="sr-only">: {item.errorMessage}</span>
+                  )}
                 </span>
                 {(item.status === 'done' || item.status === 'error') && (
                   <button

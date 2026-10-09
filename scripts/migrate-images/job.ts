@@ -15,6 +15,10 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { plannedPaths } from '../images/batch.ts'
 import type { ImageJob, ImageSource } from '../images/types.ts'
 import { localPathFor } from '../lib/imageMeta.mjs'
+import {
+  IMAGE_CACHE_SECONDS,
+  IMAGE_VARIANTS,
+} from '../../src/features/items/imageVariants.ts'
 
 export const BUCKET = 'item-images'
 export const BACKUP_ROOT = resolve('backups', 'images')
@@ -25,6 +29,7 @@ export type ImageRow = {
   item_type: string
   item_id: string
   storage_path: string
+  thumb_path?: string | null // absent before the Phase 33 migration
   original_path?: string | null // set by the Phase 34 flip; absent before the migration is applied
 }
 
@@ -65,6 +70,12 @@ export async function loadImageRows(
     throw new Error(`Read ${rows.length} of ${total} item_images rows.`)
   return rows
 }
+
+// Rows uploaded since Phase 36 are born WebP (thumb_path set, no original): nothing to convert,
+// and they aren't in the backup. Flipped rows (original_path set) stay in, so re-runs and the
+// manifest still cover them.
+export const needsMigration = (row: ImageRow): boolean =>
+  !row.thumb_path || !!row.original_path
 
 // Before the flip storage_path is the original; after it, original_path is.
 export const originalPath = (row: ImageRow): string =>
@@ -109,24 +120,22 @@ const job: ImageJob = {
   bucket: BUCKET,
   pathPattern: '{item_type}/{item_id}/{id}.{ext}',
   variants: [
-    { name: 'full', maxWidth: 1600, quality: 85 },
+    { name: 'full', ...IMAGE_VARIANTS.full },
     {
       name: 'thumb',
-      maxWidth: 600,
-      maxHeight: 750,
-      quality: 85,
+      ...IMAGE_VARIANTS.thumb,
       pathPattern: '{item_type}/{item_id}/{id}.thumb.{ext}',
     },
   ],
   manifest: new URL('./manifest.json', import.meta.url),
-  cacheControl: '31536000', // a year: every output path is new, so it is never overwritten with other content
+  cacheControl: IMAGE_CACHE_SECONDS, // a year: every output path is new, so it is never overwritten with other content
   concurrency: 4,
   retries: 4,
   async sources(supabase) {
     const backup = loadBackupIndex()
     const publicUrl = (path: string) =>
       supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl
-    const rows = await loadImageRows(supabase)
+    const rows = (await loadImageRows(supabase)).filter(needsMigration)
     const sources = rows.map((row) => rowToSource(row, backup, publicUrl))
     assertNoOverwrite(job, sources, rows)
     return sources
