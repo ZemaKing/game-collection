@@ -13,6 +13,7 @@ import { PlusIcon } from '@/components/icons/ActionIcons'
 import { Button } from '@/components/ui/Button'
 import { ITEM_TYPE_META, PLATFORM_ICONS } from '@/features/items/constants'
 import { hasEditionField } from '@/features/items/editions'
+import { hasActiveFacets } from '@/features/items/filters'
 import { useFilters } from '@/features/items/useFilters'
 import { useItemListing } from '@/features/items/useItemListing'
 import { useListingPrefs } from '@/features/items/useListingPrefs'
@@ -103,17 +104,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
   const titleText = platform ? platform.name : t(meta?.labelKey ?? 'nav.allItems')
   const showTypeBadge = !itemType
   const showGenreFilter = !itemType || itemType === 'game'
-  const hasActiveFilters =
-    filters.search.trim().length > 0 ||
-    filters.itemTypes.length > 0 ||
-    filters.platformIds.length > 0 ||
-    filters.genreIds.length > 0 ||
-    filters.tagIds.length > 0 ||
-    filters.editions.length > 0 ||
-    filters.years.length > 0 ||
-    filters.conditions.length > 0 ||
-    filters.collectionDateFrom !== null ||
-    filters.collectionDateTo !== null
+  const hasActiveFilters = filters.search.trim().length > 0 || hasActiveFacets(filters)
 
   return (
     <div className="flex flex-col gap-4">

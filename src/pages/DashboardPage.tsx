@@ -23,6 +23,7 @@ import {
 import { ItemCard, PRIORITY_CARD_COUNT } from '@/features/items/components/ItemCard'
 import { ItemCardSkeleton } from '@/features/items/components/ItemCardSkeleton'
 import { ItemListingToolbar } from '@/features/items/components/ItemListingToolbar'
+import { hasActiveFacets } from '@/features/items/filters'
 import { useFilters } from '@/features/items/useFilters'
 import { useItemListing } from '@/features/items/useItemListing'
 import { useListingPrefs } from '@/features/items/useListingPrefs'
@@ -112,16 +113,7 @@ function DashboardPage() {
   }, [sidebarRetryToken])
 
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p])), [platforms])
-  const hasActiveFilters =
-    filters.itemTypes.length > 0 ||
-    filters.platformIds.length > 0 ||
-    filters.genreIds.length > 0 ||
-    filters.tagIds.length > 0 ||
-    filters.editions.length > 0 ||
-    filters.years.length > 0 ||
-    filters.conditions.length > 0 ||
-    filters.collectionDateFrom !== null ||
-    filters.collectionDateTo !== null
+  const hasActiveFilters = hasActiveFacets(filters)
 
   return (
     <div className="flex flex-col gap-6">

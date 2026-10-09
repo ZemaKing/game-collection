@@ -16,8 +16,50 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+      - run: npm run typecheck
+      # Unit + component tests, including the image pipeline's (scripts/**/*.test.ts).
       - run: npm run test
       - run: npm run build
         env:
           VITE_SUPABASE_URL: https://example.supabase.co
           VITE_SUPABASE_ANON_KEY: ci-placeholder
+
+  # Read-only journeys against the live Supabase project (ROADMAP Phase 40, e2e/README.md).
+  # A separate job, so it can stay out of the required checks. Needs the repository secrets
+  # VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (the public anon key); skipped until they exist
+  # (and on pull requests from forks, which don't get secrets).
+  e2e:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      # The runner's preinstalled Chrome, so no Playwright browser download.
+      E2E_CHANNEL: chrome
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+    steps:
+      - name: Check for the E2E secrets
+        id: secrets
+        run: echo "ok=${{ env.VITE_SUPABASE_URL != '' && env.VITE_SUPABASE_ANON_KEY != '' }}" >> "$GITHUB_OUTPUT"
+      - if: steps.secrets.outputs.ok != 'true'
+        run: echo "::notice::E2E skipped — add the VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY repository secrets to run it."
+      - if: steps.secrets.outputs.ok == 'true'
+        uses: actions/checkout@v4
+      - if: steps.secrets.outputs.ok == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.secrets.outputs.ok == 'true'
+        run: npm ci
+      - if: steps.secrets.outputs.ok == 'true'
+        run: npm run test:e2e
+      - if: failure() && steps.secrets.outputs.ok == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

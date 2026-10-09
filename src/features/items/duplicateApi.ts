@@ -1,32 +1,25 @@
 import { supabase } from '@/lib/supabaseClient'
-import { escapeLikePattern } from '@/features/items/likePattern'
+import { duplicateLookup } from '@/features/items/duplicates'
 import type { AllItemRow, ItemType } from '@/features/items/types'
 
 const MATCH_LIMIT = 10
 
-/**
- * "Likely duplicate" = same item type + same title, case/whitespace
- * insensitive (`ilike` with no wildcards is an exact case-insensitive
- * match; `%`, `_` and `\` in the title are escaped so they can't act as
- * wildcards). Deliberately title-only, no platform/publisher narrowing —
- * confirmed with the owner during planning as the simplest rule that still
- * catches the common case (re-adding an item already in the collection).
- */
+/** Items that are likely duplicates of a new one; the rule itself is `duplicateLookup`. */
 export async function findLikelyDuplicates(
   itemType: ItemType,
   title: string,
   /** DLCs only: titles like "Season Pass" legitimately repeat across games, so match within the base game. */
   parentGameId?: string,
 ): Promise<AllItemRow[]> {
-  const normalized = title.trim()
-  if (!normalized) return []
+  const lookup = duplicateLookup(itemType, title, parentGameId)
+  if (!lookup) return []
 
   let query = supabase
     .from('all_items')
     .select('*')
-    .eq('item_type', itemType)
-    .ilike('title', escapeLikePattern(normalized))
-  if (itemType === 'dlc' && parentGameId) query = query.eq('parent_game_id', parentGameId)
+    .eq('item_type', lookup.itemType)
+    .ilike('title', lookup.titlePattern)
+  if (lookup.parentGameId) query = query.eq('parent_game_id', lookup.parentGameId)
   const { data, error } = await query.limit(MATCH_LIMIT)
   if (error) throw error
   return data ?? []

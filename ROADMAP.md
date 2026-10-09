@@ -92,7 +92,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 37 | Retire Originals (free the quota) | ⬜ Not started | **Explicit approval to delete ~2 GB of originals** |
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
 | 39 | Performance Pass (was Phase 29) | ⬜ Not started | — |
-| 40 | Testing Hardening (was Phase 30) | ⬜ Not started | Make CI a required check (GitHub setting) |
+| 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E in CI waits for the secrets | Add repo secrets `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`; make the `verify` CI check required (GitHub setting) |
 | 41 | Operations, Docs & Production Verification | ⬜ Not started | `RAWG_API_KEY` in Vercel; go/no-go |
 
 ---
@@ -306,15 +306,15 @@ Old Phase 29's DoD: browse, search and detail stay responsive at the expected sc
 Finish the old Phase 30: protect the core flows end to end.
 
 ### Tasks
-- [ ] Media viewer component test (old 30 leftover)
-- [ ] Pull filter/search/duplicate logic out of the Supabase hooks into pure functions and test them (old 30 leftover)
-- [ ] Playwright E2E (`@playwright/test`, the locally installed Edge, so no browser download), at Desktop, Tablet and Mobile: browse, filter, search, detail, viewer, settings. **Read-only against production by default**, with a fixture that fails any non-GET to Supabase (diecast pattern), unless the owner sets up a test project (Open decision 3)
-- [ ] Owner flows (login, create/edit/delete, image upload, duplicate warning, unsaved-changes guard) only if a test project exists; otherwise document them as a manual checklist in `docs/production-verification.md`
-- [ ] CI: add `typecheck` and the image-pipeline tests; E2E as a separate job (optional on PRs)
+- [x] Media viewer component test (old 30 leftover): `MediaViewer.test.tsx`, 9 cases (open on the requested image at full size, buttons + wrap-around, arrow keys, thumbnail strip on thumbs, swipe left/right/too short, zoom and un-zoom on change, close, single image, neighbour preload and none in data-saver)
+- [x] Pull filter/search/duplicate logic out of the Supabase hooks into pure functions and test them (old 30 leftover): `filters.ts` (URL parse/serialise, `hasActiveFacets`, which also replaced two hand-copied checks), `listingQuery.ts` (genre/tag id intersection, release-year expression, page range), `duplicates.ts` (the duplicate rule), `mergeSearchResults` in `searchQuery.ts`. `useFilters`, `fetchItems`, `searchItems` and `findLikelyDuplicates` now call them; behaviour unchanged. 43 new tests (222 in total)
+- [x] Playwright E2E (`@playwright/test` 1.64, dev dependency: the E2E runner; the locally installed Edge, so no browser download), at Desktop, Tablet and Mobile: browse, filter, search, detail, viewer, settings — 21 journeys × 3 layouts (`e2e/README.md`). **Read-only against production** (Open decision 3): a fixture fails any non-GET to Supabase (diecast pattern; proven with a throw-away POST), and Storage images are answered with a 1×1 PNG, so a run costs ≈ 2 MB of egress. Expected counts come from PostgREST, not the app
+- [x] Owner flows (login, create/edit/delete, image upload, duplicate warning, unsaved-changes guard): no test project, so they're a manual checklist in `docs/production-verification.md`
+- [x] CI: `npm run typecheck` (`tsc -b`, now also over `e2e/` via `tsconfig.e2e.json`) as its own step; the image-pipeline tests (`scripts/**/*.test.ts`, 60) already ran in `npm test`. E2E is a separate `e2e` job after `verify`, using the runner's Chrome; it is skipped with a notice until the two repo secrets exist, and keeps the report as an artifact on failure
 - [ ] Owner: make the CI check required on `main` (GitHub → Settings → Branches)
 
 ### Verification
-- [ ] E2E is green 3 runs in a row (no flakes); CI blocks a deliberately broken commit
+- [ ] E2E is green 3 runs in a row (no flakes); CI blocks a deliberately broken commit. *2026-10-09, locally: `--repeat-each=3` → 186 passed, 0 flaky, 3 skipped (Ctrl K on phones, by design). The CI half waits for the required-check setting and the secrets*
 
 ### Definition of Done
 Core public flows are covered by E2E; owner flows by E2E or a documented manual checklist.
@@ -348,6 +348,6 @@ Every `DEVELOPMENT_PLAN.md` final-checklist item is ticked or explicitly deferre
 | --- | --- | --- |
 | 1 | **Over the Storage quota (≈ 2.1 GB of 1 GB, org-wide).** If uploads are already blocked, the WebP variants (~0.26 GB) can't be uploaded before space is freed. Options: (a) upgrade to Pro for one month ($25) during the migration; (b) after the verified local backup, delete originals per batch *before* uploading their WebP (the rollback then depends on the local backup); (c) migrate the recipes app first (frees ~70 MB, not enough on its own). Recommended: check the Usage page first; if blocked, (a) is the safest | Ph 32 / 34 |
 | 2 | Keep originals anywhere online after Phase 37 (e.g. a cloud drive), or is the local + second-copy backup enough? | Ph 37 |
-| 3 | E2E: a separate free Supabase test project (allows owner-flow E2E; the org already uses both free slots, so it would go in another org) or read-only E2E against production (the diecast choice)? | Ph 40 |
+| 3 | ~~E2E: a separate test project or read-only against production?~~ **Decided 2026-10-09:** read-only against production (the diecast choice); owner flows are a manual checklist | ~~Ph 40~~ |
 | 4 | ~~GIF uploads: convert or reject?~~ **Decided 2026-10-09:** convert to a still WebP (first frame); the upload area says so. Input limit stays 10 MB | ~~Ph 36~~ |
 | 5 | ~~Thumb size 600 px vs 400 px~~ **Decided 2026-10-09:** thumb 600×750, full 1600, both q85 | ~~Ph 33~~ |

@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { fetchDlcIdsForGames } from '@/features/items/api'
 import { FORMAT_TAG_SLUGS } from '@/features/items/constants'
 import { escapeLikePattern } from '@/features/items/likePattern'
-import { searchTokens, tokenPattern } from '@/features/search/searchQuery'
+import { mergeSearchResults, searchTokens, tokenPattern } from '@/features/search/searchQuery'
 import type { AllItemRow } from '@/features/items/types'
 
 const RESULT_LIMIT = 30
@@ -36,15 +36,12 @@ export async function searchItems(query: string): Promise<AllItemRow[]> {
       searchByTagName(pattern),
     ])
 
-  const merged = new Map<string, AllItemRow>()
-  for (const result of [titleMatches, subtitleMatches, platformMatches, genreMatches, tagMatches]) {
-    if (result.error) throw result.error
-    for (const row of result.data ?? []) {
-      if (!merged.has(row.id)) merged.set(row.id, row)
-    }
-  }
-
-  return Array.from(merged.values()).slice(0, RESULT_LIMIT)
+  const results = [titleMatches, subtitleMatches, platformMatches, genreMatches, tagMatches]
+  for (const result of results) if (result.error) throw result.error
+  return mergeSearchResults(
+    results.map((result) => result.data ?? []),
+    RESULT_LIMIT,
+  )
 }
 
 async function searchByTokens(column: 'title_search' | 'subtitle_search', tokens: string[]) {

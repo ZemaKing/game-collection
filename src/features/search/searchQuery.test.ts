@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { searchTokens, tokenPattern } from '@/features/search/searchQuery'
+import { mergeSearchResults, searchTokens, tokenPattern } from '@/features/search/searchQuery'
 
 describe('searchTokens', () => {
   it('lowercases and splits on whitespace', () => {
@@ -39,5 +39,26 @@ describe('searchTokens', () => {
 describe('tokenPattern', () => {
   it('wraps the token for a substring ilike', () => {
     expect(tokenPattern('fist')).toBe('%fist%')
+  })
+})
+
+describe('mergeSearchResults', () => {
+  const row = (id: string, source: string) => ({ id, source })
+
+  it('keeps the first occurrence of each id, in list priority order', () => {
+    const merged = mergeSearchResults(
+      [[row('a', 'title'), row('b', 'title')], [row('b', 'subtitle'), row('c', 'subtitle')], [row('a', 'tag')]],
+      10,
+    )
+    expect(merged).toEqual([row('a', 'title'), row('b', 'title'), row('c', 'subtitle')])
+  })
+
+  it('caps the merged list at the limit', () => {
+    expect(mergeSearchResults([[row('a', 't'), row('b', 't')], [row('c', 's')]], 2).map((r) => r.id)).toEqual(['a', 'b'])
+  })
+
+  it('handles no lists and empty lists', () => {
+    expect(mergeSearchResults([], 5)).toEqual([])
+    expect(mergeSearchResults([[], []], 5)).toEqual([])
   })
 })

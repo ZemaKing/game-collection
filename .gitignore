@@ -26,3 +26,7 @@ dist-ssr
 
 # Local image + database backups (ROADMAP Phase 32) — never commit
 backups/
+
+# Playwright E2E output (ROADMAP Phase 40)
+test-results/
+playwright-report/

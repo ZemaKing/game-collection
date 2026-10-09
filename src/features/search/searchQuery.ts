@@ -39,3 +39,17 @@ export function searchTokens(query: string): string[] {
 export function tokenPattern(token: string): string {
   return `%${token}%`
 }
+
+/**
+ * Merges the per-field result lists of `searchItems` in priority order (earlier lists win, so a
+ * title match ranks above a tag match), dropping repeats by id and keeping at most `limit`.
+ */
+export function mergeSearchResults<T extends { id: string }>(lists: T[][], limit: number): T[] {
+  const merged = new Map<string, T>()
+  for (const list of lists) {
+    for (const row of list) {
+      if (!merged.has(row.id)) merged.set(row.id, row)
+    }
+  }
+  return Array.from(merged.values()).slice(0, limit)
+}

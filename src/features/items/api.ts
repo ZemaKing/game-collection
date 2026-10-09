@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { FORMAT_TAG_SLUGS, ITEM_TYPES } from '@/features/items/constants'
 import { SORT_KEYS, type SortKey } from '@/features/items/sort'
 import { searchTokens, tokenPattern } from '@/features/search/searchQuery'
+import { combineIdRestrictions, pageRange, releaseYearsExpression } from '@/features/items/listingQuery'
 import type { AllItemRow, Genre, ItemCondition, ItemType, Platform } from '@/features/items/types'
 
 export async function fetchPlatforms(): Promise<Platform[]> {
@@ -134,10 +135,7 @@ async function resolveGenreTagRestriction(
     tagItemIds = new Set((data ?? []).map((r) => r.item_id))
   }
 
-  if (genreItemIds && tagItemIds) {
-    return Array.from(genreItemIds).filter((id) => tagItemIds.has(id))
-  }
-  return Array.from(genreItemIds ?? tagItemIds ?? [])
+  return combineIdRestrictions(genreItemIds, tagItemIds)
 }
 
 /** Attaches each row's Digital / Physical tag slug (`format_slug`) with a single `item_tags` query. */
@@ -178,16 +176,10 @@ export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsRe
   if (params.collectionDateFrom) query = query.gte('collection_date', params.collectionDateFrom)
   if (params.collectionDateTo) query = query.lte('collection_date', params.collectionDateTo)
   if (restriction) query = query.in('id', restriction)
-  if (params.years.length) {
-    // `years` are parsed integers (see useFilters), never raw user text, so
-    // it's safe to interpolate directly into a hand-built `.or()` expression.
-    query = query.or(
-      params.years.map((y) => `and(release_date.gte.${y}-01-01,release_date.lte.${y}-12-31)`).join(','),
-    )
-  }
+  const years = releaseYearsExpression(params.years)
+  if (years) query = query.or(years)
 
-  const from = params.page * params.pageSize
-  const to = from + params.pageSize - 1
+  const { from, to } = pageRange(params.page, params.pageSize)
   const { data, error, count } = await query
     .order(column, { ascending, nullsFirst: false })
     .range(from, to)
