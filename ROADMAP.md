@@ -88,7 +88,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 33 | Image Pipeline Port & Schema | 🟡 Code done; dry run over 615/1,426 (the rest after the backup) | After the full backup, run `images:migrate` (dry run) |
 | 34 | WebP Migration of Existing Images | ⬜ Not started | Run the scripts with the service-role key |
 | 35 | Read Path: Thumbnails Everywhere | 🟡 Code done (before 34, owner-approved); size/blur checks after the Phase 34 flip | — |
-| 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Deploy, **then** apply `20261010130000_item_images_webp_only.sql`; upload a phone photo + a transparent PNG by hand |
+| 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Check the RAWG cover import on the next autofill (migration applied, test uploads verified 2026-10-09) |
 | 37 | Retire Originals (free the quota) | ⬜ Not started | **Explicit approval to delete ~2 GB of originals** |
 | 38 | Static Assets (dashboard hero, icons) | ⬜ Not started | Optional: a better hero source image |
 | 39 | Performance Pass (was Phase 29) | ⬜ Not started | — |
@@ -229,7 +229,7 @@ New uploads arrive already small, so the bucket never fills up with multi-MB PNG
 - [x] Delete paths remove both variants (and `original_path` if still set). *Done early in Phase 35*
 
 ### Verification
-- [ ] Owner uploads a phone photo (~4–8 MB) and a transparent PNG: stored as ~100–200 KB + ~25 KB WebP; the transparency is kept. *2026-10-09, in the dev browser without uploading: a generated 4000×3000 transparent PNG (6.2 MB) → full 1600×1200 WebP 19 KB + thumb 600×450 6 KB in 233 ms, alpha kept*
+- [x] Owner uploads a phone photo (~4–8 MB) and a transparent PNG: stored as ~100–200 KB + ~25 KB WebP; the transparency is kept. *2026-10-09, owner uploads to a test game: a 16:9 screenshot → full 1600×900 104.6 KB + thumb 600×338 20.5 KB; a transparent PNG → 189.4 KB + 67.2 KB, alpha kept in both (0–255); both `image/webp`, `max-age=31536000`, rows have `thumb_path`/`width`/`height`, no orphan objects. A portrait upload (the owner's own rotated copy of the screenshot) → 900×1600 103.0 KB + thumb 422×750 28.9 KB, stored exactly as the file displays, with no rotation data left in it. Still untried: a real portrait camera photo whose rotation exists only as EXIF data. Earlier, in the dev browser without uploading: a generated 4000×3000 transparent PNG (6.2 MB) → full 1600×1200 WebP 19 KB + thumb 600×450 6 KB in 233 ms, alpha kept*
 - [ ] The RAWG cover import stores WebP (same `uploadItemImage` path; check on the owner's next autofill)
 - [x] Unit tests for the resize maths (fit box, never enlarge; the copied suite) and the upload/rollback order (`imageApi.test.ts`, mocked Storage; 174 tests in total)
 
