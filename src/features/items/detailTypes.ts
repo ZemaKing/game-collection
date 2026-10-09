@@ -57,4 +57,13 @@ export interface ItemImageRow {
   position: number
   is_cover: boolean
   alt_text: string | null
+  // WebP variants (image-variants migration). Optional because the image queries don't select
+  // them yet (Phase 35); null until the image migration has run (Phase 34).
+  /** Small WebP (fits 600×750) for cards, strips and lists. */
+  thumb_path?: string | null
+  /** Pixel size of the image at `storage_path`. */
+  width?: number | null
+  height?: number | null
+  /** The pre-WebP original, kept for rollback until the originals are retired. */
+  original_path?: string | null
 }

@@ -24,7 +24,7 @@ npm run test      # vitest run
 
 Run a single test file: `npx vitest run src/features/items/completeness.test.ts`. There is no separate typecheck script — `tsc -b` runs as part of `build`.
 
-Maintenance scripts (plain Node ESM in `scripts/`, run against the live project via `node --env-file-if-exists=.env.local`; pure helpers in `scripts/lib/` have colocated `*.test.mjs` that Vitest picks up): `npm run verify:rls` (anon key + `RLS_*` logins), and `images:audit` / `images:backup` / `db:export`, which need `SUPABASE_SERVICE_ROLE_KEY` and only read. Output goes to git-ignored `backups/` — see `docs/backup.md`. The org's 5 GB/month egress is shared with another app: anything that downloads the bucket prints its size first and needs `--apply`.
+Maintenance scripts (plain Node ESM in `scripts/`, run against the live project via `node --env-file-if-exists=.env.local`; pure helpers in `scripts/lib/` have colocated `*.test.mjs` that Vitest picks up): `npm run verify:rls` (anon key + `RLS_*` logins), and `images:audit` / `images:backup` / `db:export`, which need `SUPABASE_SERVICE_ROLE_KEY` and only read. Output goes to git-ignored `backups/` — see `docs/backup.md`. The WebP image pipeline (Phase 33) is TypeScript run by `tsx`: the generic converter in `scripts/images/` (copied from the diecast app, kept in its style and in `.prettierignore`) plus the games job in `scripts/migrate-images/` (`npm run images:migrate` is a dry run by default; it reads originals from `backups/images/` and never downloads them). `tsconfig.scripts.json` makes `tsc -b` type-check `scripts/**/*.ts`. The org's 5 GB/month egress is shared with another app: anything that downloads the bucket prints its size first and needs `--apply`.
 
 Local Supabase env vars live in `.env.local` (see `.env.local.example`): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. The app throws at import time (`src/lib/supabaseClient.ts`) if these are missing.
 
@@ -55,7 +55,7 @@ Tests are Vitest: pure-function unit tests (`*.test.ts`) plus component tests (`
 
 **Serverless API (`api/`) — RAWG autofill proxy**: `games-search.ts`, `games-details.ts`, `games-image-proxy.ts` are Vercel functions sharing logic in `api/_rawg.ts` (underscore prefix = not deployed as a route). Because `npm run dev` is plain `vite`, `vite.config.ts` re-mounts these same three routes as dev middleware — **adding or changing an `/api` route means updating both the `api/` file and `rawgDevApiPlugin` in `vite.config.ts`**. The image proxy only allows `https://media.rawg.io`. The client side lives in `features/items/gameAutofillApi.ts` and `forms/useGameAutofillSearch.ts`.
 
-**Storage & images**: bucket `item-images`; `features/items/storage.ts` builds plain public URLs (no Supabase image-transform params — responsive sizing is CSS-only by design).
+**Storage & images**: bucket `item-images`; `features/items/storage.ts` builds plain public URLs (no Supabase image-transform params — responsive sizing is CSS-only by design). Since migration `20261010120000_item_image_variants.sql`, `item_images` also has `thumb_path` (WebP, fits 600×750), `width`/`height` and `original_path` (rollback), and `all_items` has `cover_thumb_path` as its last column. They stay null until the Phase 34 flip, and the app doesn't read them until Phase 35.
 
 **Deployment**: `vercel.json` rewrites all paths to `index.html` (SPA) and sets security/caching headers.
 

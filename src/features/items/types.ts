@@ -44,6 +44,8 @@ export interface AllItemRow {
   completed?: boolean
   /** DLCs only: id of the base game this DLC belongs to (also the item's `subtitle` source). */
   parent_game_id?: string | null
+  /** The cover's WebP thumbnail (`item_images.thumb_path`); null until the image migration has run. Absent until the image-variants migration is applied. */
+  cover_thumb_path?: string | null
   /** Slug of the item's Digital / Physical tag, if set. Not part of the view — attached by `withFormats`. */
   format_slug?: string | null
   created_at: string

@@ -1,0 +1,27 @@
+# Item images → WebP (ROADMAP Phases 33–34)
+
+Converts every `item_images` original to two WebP objects with the generic pipeline in [`../images/`](../images/README.md). The originals come from the **local backup** (`backups/images/`, made by `npm run images:backup`), so converting them costs no download egress. Only the uploads in Phase 34 touch the network.
+
+| | |
+| --- | --- |
+| Source | `item_images.original_path ?? storage_path`, read from `backups/images/<path>`. Its sha256 must match `backups/images/manifest.json` |
+| Objects | `{item_type}/{item_id}/{row id}.webp`: **full**, fits 1600×1600, q85 · `{item_type}/{item_id}/{row id}.thumb.webp`: **thumb**, fits 600×750, q85. Next to the original, named after the row (stable across runs, never the original's own name). `Cache-Control: max-age=31536000` |
+| Record | `manifest.json` (written on `--apply` only): per object, the source (row id, original URL, sha256), settings, output sha256, bytes and dimensions. Commit it after the Phase 34 run |
+| Rows | Unchanged here. The Phase 34 flip sets `original_path`, `storage_path`, `thumb_path`, `width` and `height` in one transaction |
+
+**Why these sizes** (measured 2026-10-09): cards are `aspect-[4/5]` and at most 216 CSS px wide on listings, 281 px on the dashboard (1535 px wide), and 296 px on a 639-px landscape phone. At 2× that's ≈ 600×750, which also covers portrait phones at 3× (164–192 px cards). The viewer on a 1080p screen is height-bound, so it shows a 16:9 screenshot at ≈ 1600 px wide. Quality 85 was the owner's choice. Every cover is portrait box art, and 81 % of gallery images are 16:9 screenshots.
+
+## Commands
+
+Needs `VITE_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`.
+
+```bash
+npm run images:backup -- --apply           # Phase 32: every original on disk first
+npm run images:migrate                     # dry run: convert all from the backup, print sizes (nothing uploaded)
+npm run images:migrate -- --limit=10 --apply   # Phase 34
+npm run images:check                       # HEAD every uploaded object vs the manifest (--full: sha256 too)
+```
+
+A source whose original isn't in the backup fails with `… is missing (local source)`. Run `images:backup -- --apply` again, then re-run. Nothing falls back to downloading.
+
+Dry run on 2026-10-09 with 615 of 1,426 originals backed up: 615 converted, 0 conversion failures, every sha256 matched. Average output: full 134.5 KB and thumb 40.7 KB, so ≈ 250 MB for all 1,426 (the originals are 1.45 GB).

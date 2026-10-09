@@ -4,7 +4,7 @@ Follow-up to [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md), which built the app (
 
 The image pipeline reuses the one built for the diecast app (`../diecast-collection/scripts/images/` + `src/lib/image-resize.ts`), which was written app-agnostic for this purpose (diecast ROADMAP Phase 21).
 
-**Status: Phase 32 scripts done (2026-10-09); the full image download waits for the egress reset on 2026-10-10.** Research done 2026-10-04 (findings below).
+**Status: Phase 33 code done and its migration applied (2026-10-09). The full image backup (Phase 32) waits for the egress reset on 2026-10-10, and the full Phase 33 dry run waits for that backup.** Research done 2026-10-04 (findings below).
 
 ---
 
@@ -33,7 +33,7 @@ All numbers come from the live project: public anon reads of `item_images` and S
 
 **Update 2026-10-09 (`docs/images-audit.md`):** the owner deleted every non-game image on 2026-10-08, so the bucket now holds **1,426 objects, 1.45 GB** (730 PNG 987 MB · 664 JPEG 463 MB · 32 WebP 2.4 MB), all under `game/`; 160 non-game items have no images. 0 orphans, 0 broken rows; 19 pairs of identical files are used by two different games (kept: each row owns its own object). The org's Usage page (cycle 10 Sep – 10 Oct) showed Storage 1.113 GB, **egress 3.88 GB of 5 GB** + 3.02 GB cached, uploads not restricted.
 
-**Target after this roadmap:** ≈ 1,426 × (115 KB full + ~28 KB thumb) ≈ **0.2 GB** in the bucket (−86 %); exact sizes are proposed at the start of Phase 33. (Originally estimated as 1,811 × … ≈ 0.26 GB.) The org total drops to ≈ 0.3 GB of 1 GB, and a listing page needs ≈ 0.6 MB.
+**Target after this roadmap:** ≈ 1,426 × (134.5 KB full + 40.7 KB thumb) ≈ **0.25 GB** in the bucket (−83 %), measured by the Phase 33 dry run (q85, the owner's choice). (Originally estimated as 1,811 × (115 + ~28 KB) ≈ 0.26 GB.) The org total drops to ≈ 0.3 GB of 1 GB, and a listing page needs ≈ 0.6 MB.
 
 ### Security — urgent
 
@@ -75,8 +75,8 @@ Read:              cards / lists / strips ─► thumb_path ?? storage_path     
 Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─► verify ─► flip rows in one transaction ─► (later) delete originals
 ```
 
-- **Variants:** `full` fits inside 1600×1600, q82 (never enlarges). `thumb` fits inside 600×750, q75: cards are `aspect-[4/5]` and at most ~280 CSS px wide, so 600 px covers 2× screens. Transparency is kept (WebP alpha).
-- **Paths:** `{item_type}/{item_id}/{uuid}.webp` and `{uuid}.thumb.webp`. A changed photo always gets a new UUID, so objects are uploaded with `Cache-Control: max-age=31536000, immutable`.
+- **Variants** (decided 2026-10-09, Phase 33): `full` fits inside 1600×1600, `thumb` fits inside 600×750, both **q85** (the owner's choice), never enlarged. Measured: cards are `aspect-[4/5]` and at most 216 CSS px wide on listings, 281 px on the dashboard, and 296 px on a 639-px landscape phone, so ≈ 600×750 is sharp at 2× (and on 3× portrait phones). The viewer on a 1080p screen is height-bound at ≈ 1600 px for 16:9. Transparency is kept (WebP alpha).
+- **Paths:** `{item_type}/{item_id}/{uuid}.webp` and `{uuid}.thumb.webp`. The migration uses the `item_images` row id as `{uuid}` (stable across runs, never an original's name). A changed photo always gets a new UUID, so objects are uploaded with `Cache-Control: max-age=31536000, immutable`.
 - **Rollback column:** `original_path` keeps the pre-migration object until Phase 37.
 
 ## Status
@@ -85,7 +85,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | --- | --- | --- | --- |
 | 31 | Security Lockdown | ✅ Done (2026-10-09) | — |
 | 32 | Image Audit & Local Backup | 🟡 Scripts done; full backup after 10 Oct | Run `images:backup -- --apply` after the reset (≈ 1.45 GB); copy `backups/` to a second place |
-| 33 | Image Pipeline Port & Schema | ⬜ Not started | Apply migration |
+| 33 | Image Pipeline Port & Schema | 🟡 Code done; dry run over 615/1,426 (the rest after the backup) | After the full backup, run `images:migrate` (dry run) |
 | 34 | WebP Migration of Existing Images | ⬜ Not started | Run the scripts with the service-role key |
 | 35 | Read Path: Thumbnails Everywhere | ⬜ Not started | — |
 | 36 | Upload Path: WebP in the Browser | ⬜ Not started | Upload a test photo by hand |
@@ -151,16 +151,17 @@ A verified local copy of every original plus a DB export exists in two places.
 Bring the diecast WebP converter in, and give `item_images` room for variants. No row changes yet.
 
 ### Tasks
-- [ ] Copy `scripts/images/` from diecast unchanged (batch, convert, retry, manifest, verify, supabase-target, paths + their tests). Dev dependencies: **`sharp`** (WebP encoding, used by scripts only), **`tsx`** (runs the TS scripts)
-- [ ] Add a **local source** option: the job reads originals from `backups/images/` (Phase 32) instead of URLs, so the migration costs no download egress. Keep it generic and send the change back to diecast's copy (or note the divergence in the README)
-- [ ] Migration: `item_images` add `thumb_path text null`, `width int null`, `height int null`, `original_path text null`. Recreate `all_items` with `cover_thumb_path` next to `cover_image_path` (a new migration, keeping the column order the app reads). Update `AllItemRow`, `ItemImageRow`, `ItemDetail`
-- [ ] `scripts/migrate-images/job.ts`: the games `ImageJob` (bucket `item-images`, `{item_type}/{item_id}/{uuid}.webp` + `.thumb.webp`, variants per the architecture above, `cacheControl` one year)
-- [ ] `tsconfig.scripts.json` so `tsc -b` type-checks `scripts/` too; npm scripts `images:migrate`, `images:check`
-- [ ] Tests: the copied suites pass; a local-source test; a path-pattern test for every item type
+- [x] Owner decision on sizes (2026-10-09): measured display sizes + a trial on 120 backup images → thumb 600×750, full 1600, **q85** (see the architecture above; closes Open decision 5)
+- [x] Copy `scripts/images/` from diecast (commit `993da26`; batch, convert, retry, manifest, verify, supabase-target, paths + their tests), kept in diecast's style (`.prettierignore`). Dev dependencies: **`sharp`** (WebP encoding, used by scripts only), **`tsx`** (runs the TS scripts)
+- [x] Add a **local source** option: `ImageSource.file` (+ an expected `sha256`) reads the original from disk and never falls back to the network. Plus `Variant.pathPattern` for the `.thumb.webp` name. Both generic; the divergence is noted at the top of `scripts/images/README.md` (not yet ported back to diecast)
+- [x] Migration `20261010120000_item_image_variants.sql`: `item_images` gets `thumb_path`, `width`, `height` (both or neither, > 0) and `original_path`. `all_items` gets `cover_thumb_path` via `create or replace view`, **appended as the last column**: that keeps the view, its grants and the search functions in place without a drop, and the app selects by name. Types: `AllItemRow.cover_thumb_path`, `ItemImageRow.thumb_path/width/height/original_path`, all optional until Phase 35 selects them. `ItemDetail` has no image fields, so it needed nothing
+- [x] `scripts/migrate-images/job.ts`: the games `ImageJob` (bucket `item-images`, `{item_type}/{item_id}/{row id}.webp` + `.thumb.webp`, `cacheControl` one year). It reads `original_path ?? storage_path` from `backups/images/`, checks the backup's sha256, and refuses any output path that equals an original's
+- [x] `tsconfig.scripts.json` so `tsc -b` type-checks `scripts/` too; npm scripts `images:migrate`, `images:check`
+- [x] Tests: the copied suites pass; local-source tests (reads the file, no network; a missing file or a sha256 mismatch fails without retry); a path-pattern test for every item type; the overwrite guard (149 tests in total)
 
 ### Verification
-- [ ] `npm run images:migrate` (dry run) converts all 1,811 from the local backup and prints the before/after sizes. Expected ≈ 2.0 GB → ≈ 0.26 GB
-- [ ] The app works unchanged after the migration (new columns are null, the view still returns everything)
+- [ ] `npm run images:migrate` (dry run) converts all 1,426 from the local backup and prints the before/after sizes. *2026-10-09, with 615 backed up: 615/615 converted, 0 conversion failures, every sha256 matched; 557.7 MB → 105.2 MB (full avg 134.5 KB, thumb 40.7 KB) ⇒ ≈ 0.25 GB for all. Re-run after the full backup*
+- [x] The app works unchanged after the migration (new columns are null, the view still returns everything). *2026-10-09: migration applied by the owner; `all_items` returns all 432 items with `cover_thumb_path` last (all null), and the listing renders with no console errors*
 
 ### Definition of Done
 A dry run over every image succeeds with zero failures; the schema is ready; no user-visible change.
@@ -344,4 +345,4 @@ Every `DEVELOPMENT_PLAN.md` final-checklist item is ticked or explicitly deferre
 | 2 | Keep originals anywhere online after Phase 37 (e.g. a cloud drive), or is the local + second-copy backup enough? | Ph 37 |
 | 3 | E2E: a separate free Supabase test project (allows owner-flow E2E; the org already uses both free slots, so it would go in another org) or read-only E2E against production (the diecast choice)? | Ph 40 |
 | 4 | GIF uploads: convert to a still WebP (first frame), or reject GIFs? | Ph 36 |
-| 5 | Thumb size 600 px (sharp on 2× screens, ~28 KB est.) vs 400 px (14 KB measured, slightly soft on 2× screens) | Ph 33 |
+| 5 | ~~Thumb size 600 px vs 400 px~~ **Decided 2026-10-09:** thumb 600×750, full 1600, both q85 | ~~Ph 33~~ |
