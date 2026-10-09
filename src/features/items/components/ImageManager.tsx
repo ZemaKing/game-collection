@@ -173,6 +173,7 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
               <div className="relative">
                 <ItemImage
                   storagePath={image.storage_path}
+                  thumbPath={image.thumb_path}
                   itemType={itemType}
                   alt={image.alt_text ?? t(meta.labelKey)}
                   className="aspect-[4/5] w-full rounded-lg"

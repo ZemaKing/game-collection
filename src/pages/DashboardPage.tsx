@@ -20,7 +20,7 @@ import {
   type GenreSummaryRow,
   type Tag,
 } from '@/features/items/api'
-import { ItemCard } from '@/features/items/components/ItemCard'
+import { ItemCard, PRIORITY_CARD_COUNT } from '@/features/items/components/ItemCard'
 import { ItemCardSkeleton } from '@/features/items/components/ItemCardSkeleton'
 import { ItemListingToolbar } from '@/features/items/components/ItemListingToolbar'
 import { useFilters } from '@/features/items/useFilters'
@@ -209,10 +209,11 @@ function DashboardPage() {
                   : 'flex flex-col gap-2'
               }
             >
-              {items.map((item) => (
+              {items.map((item, index) => (
                 <ItemCard
                   key={item.id}
                   item={item}
+                  priority={index < PRIORITY_CARD_COUNT}
                   platformName={item.platform_id ? (platformById.get(item.platform_id)?.name ?? null) : null}
                   platformSlug={item.platform_id ? (platformById.get(item.platform_id)?.slug ?? null) : null}
                   view={view}

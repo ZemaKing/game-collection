@@ -15,9 +15,15 @@ const signedOut: AuthContextValue = {
   signOut: async () => {},
 }
 
-/** Renders with router, English locale, settings and (optionally signed-in) auth context. */
-export function renderWithProviders(ui: ReactElement, { signedIn = false }: { signedIn?: boolean } = {}) {
-  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ locale: 'en' }))
+/**
+ * Renders with router, English locale, settings and (optionally signed-in) auth context.
+ * `settings` overrides stored preferences (e.g. `{ imageLoading: 'saver' }`).
+ */
+export function renderWithProviders(
+  ui: ReactElement,
+  { signedIn = false, settings = {} }: { signedIn?: boolean; settings?: Record<string, unknown> } = {},
+) {
+  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ locale: 'en', ...settings }))
   const auth = signedIn ? { ...signedOut, user: { id: 'owner' } as AuthContextValue['user'] } : signedOut
   return render(
     <MemoryRouter>

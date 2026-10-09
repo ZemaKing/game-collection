@@ -46,4 +46,17 @@ describe('ItemCard', () => {
     const edit = await screen.findByRole('menuitem', { name: /edit/i })
     expect(edit.getAttribute('href')).toBe('/games/item-1/edit')
   })
+
+  it('shows the cover thumb, eager only for priority cards', () => {
+    const item = makeItem({ cover_image_path: 'game/item-1/r.webp', cover_thumb_path: 'game/item-1/r.thumb.webp' })
+    for (const view of ['grid', 'list'] as const) {
+      const { container, unmount } = renderWithProviders(<ItemCard item={item} platformName={null} view={view} />)
+      const img = container.querySelector('img')!
+      expect(img.getAttribute('src')).toMatch(/\/game\/item-1\/r\.thumb\.webp$/)
+      expect(img.getAttribute('loading')).toBe('lazy')
+      unmount()
+    }
+    const { container } = renderWithProviders(<ItemCard item={item} platformName={null} view="grid" priority />)
+    expect(container.querySelector('img')!.getAttribute('fetchpriority')).toBe('high')
+  })
 })

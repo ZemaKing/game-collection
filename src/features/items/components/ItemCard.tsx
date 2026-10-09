@@ -37,7 +37,12 @@ interface ItemCardProps {
   view: 'grid' | 'list'
   /** Show an item-type icon/label badge — used on mixed (All Items) results. */
   showTypeBadge?: boolean
+  /** One of the first cards on the page (see `PRIORITY_CARD_COUNT`): its cover loads eagerly at high priority. */
+  priority?: boolean
 }
+
+/** How many leading cards of a listing load their cover eagerly — about the first visible row. */
+export const PRIORITY_CARD_COUNT = 6
 
 const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg'
@@ -180,6 +185,7 @@ export function ItemCard({
   platformSlug = null,
   view,
   showTypeBadge = false,
+  priority = false,
 }: ItemCardProps) {
   const { t } = useLocale()
   const { user } = useAuth()
@@ -204,6 +210,8 @@ export function ItemCard({
         <div className="relative aspect-[4/5] w-14 shrink-0 self-stretch md:w-16">
           <ItemImage
             storagePath={item.cover_image_path}
+            thumbPath={item.cover_thumb_path}
+            priority={priority}
             itemType={item.item_type}
             alt=""
             className="h-full w-full rounded-md"
@@ -298,7 +306,15 @@ export function ItemCard({
   return (
     <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card hover:border-accent">
       <div className="relative">
-        <ItemImage storagePath={item.cover_image_path} itemType={item.item_type} alt="" className="aspect-[4/5] w-full" deferrable />
+        <ItemImage
+          storagePath={item.cover_image_path}
+          thumbPath={item.cover_thumb_path}
+          priority={priority}
+          itemType={item.item_type}
+          alt=""
+          className="aspect-[4/5] w-full"
+          deferrable
+        />
         <FormatOverlayBadge slug={item.format_slug} />
         {platformName && (
           <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1">

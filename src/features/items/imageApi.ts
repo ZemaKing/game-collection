@@ -1,5 +1,5 @@
-import { fetchItemImages } from '@/features/items/detailApi'
-import { ITEM_IMAGES_BUCKET } from '@/features/items/storage'
+import { fetchItemImages, ITEM_IMAGE_COLUMNS } from '@/features/items/detailApi'
+import { imageObjectPaths, ITEM_IMAGES_BUCKET } from '@/features/items/storage'
 import type { ItemImageRow } from '@/features/items/detailTypes'
 import type { ItemType } from '@/features/items/types'
 import { supabase } from '@/lib/supabaseClient'
@@ -50,8 +50,8 @@ function extensionFor(file: File): string {
   return file.type.split('/').pop() ?? 'jpg'
 }
 
-async function removeStorageObject(storagePath: string): Promise<void> {
-  await supabase.storage.from(ITEM_IMAGES_BUCKET).remove([storagePath])
+async function removeStorageObjects(storagePaths: string[]): Promise<void> {
+  await supabase.storage.from(ITEM_IMAGES_BUCKET).remove(storagePaths)
 }
 
 export async function uploadItemImage(
@@ -71,11 +71,11 @@ export async function uploadItemImage(
   const { data, error: insertError } = await supabase
     .from('item_images')
     .insert({ item_type: itemType, item_id: itemId, storage_path: storagePath, position, is_cover: isCover })
-    .select('id, storage_path, position, is_cover, alt_text')
+    .select(ITEM_IMAGE_COLUMNS)
     .single()
 
   if (insertError) {
-    await removeStorageObject(storagePath)
+    await removeStorageObjects([storagePath])
     throw insertError
   }
 
@@ -84,7 +84,7 @@ export async function uploadItemImage(
 
 /** `remainingImages` must be every other image still on this item (used to pick a cover fallback). */
 export async function deleteItemImage(image: ItemImageRow, remainingImages: ItemImageRow[]): Promise<void> {
-  const { error: removeError } = await supabase.storage.from(ITEM_IMAGES_BUCKET).remove([image.storage_path])
+  const { error: removeError } = await supabase.storage.from(ITEM_IMAGES_BUCKET).remove(imageObjectPaths(image))
   if (removeError) throw removeError
 
   const { error: deleteError } = await supabase.from('item_images').delete().eq('id', image.id)
@@ -111,17 +111,18 @@ export async function replaceItemImageFile(image: ItemImageRow, file: File): Pro
 
   const { data, error: updateError } = await supabase
     .from('item_images')
-    .update({ storage_path: newStoragePath })
+    // The new file has no WebP variants (yet): clear the old ones so no stale thumb is shown.
+    .update({ storage_path: newStoragePath, thumb_path: null, width: null, height: null, original_path: null })
     .eq('id', image.id)
-    .select('id, storage_path, position, is_cover, alt_text')
+    .select(ITEM_IMAGE_COLUMNS)
     .single()
 
   if (updateError) {
-    await removeStorageObject(newStoragePath)
+    await removeStorageObjects([newStoragePath])
     throw updateError
   }
 
-  await removeStorageObject(image.storage_path)
+  await removeStorageObjects(imageObjectPaths(image))
   return data
 }
 

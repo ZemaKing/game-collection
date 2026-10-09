@@ -3,8 +3,10 @@ import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from 'lucide-react'
 import { useEffect, useRef, useState, type TouchEvent } from 'react'
 import { ItemImage } from '@/features/items/components/ItemImage'
 import type { ItemImageRow } from '@/features/items/detailTypes'
+import { getImageUrls } from '@/features/items/storage'
 import type { ItemType } from '@/features/items/types'
 import { useLocale } from '@/hooks/useLocale'
+import { useSettings } from '@/hooks/useSettings'
 import { restoreFocusOnClose } from '@/lib/dialogFocus'
 
 interface MediaViewerProps {
@@ -27,6 +29,7 @@ export function MediaViewer({
   onOpenChange,
 }: MediaViewerProps) {
   const { t } = useLocale()
+  const { imageLoading } = useSettings().settings
   const [index, setIndex] = useState(initialIndex)
   const [zoomed, setZoomed] = useState(false)
   const touchStartX = useRef<number | null>(null)
@@ -65,6 +68,16 @@ export function MediaViewer({
     // goPrev/goNext close over `images.length`, which is stable per open item.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, images.length])
+
+  // Warm the cache with the previous and next images (full size only — the strip shows thumbs),
+  // so swiping doesn't wait on the network. Skipped in the Settings "data saver" mode.
+  useEffect(() => {
+    if (!open || images.length < 2 || imageLoading === 'saver') return
+    for (const offset of [-1, 1]) {
+      const neighbour = images[(index + offset + images.length) % images.length]
+      new Image().src = getImageUrls(neighbour).full
+    }
+  }, [open, index, images, imageLoading])
 
   function handleTouchStart(event: TouchEvent) {
     touchStartX.current = event.touches[0]?.clientX ?? null
@@ -137,6 +150,10 @@ export function MediaViewer({
               <ItemImage
                 key={current.id}
                 storagePath={current.storage_path}
+                variant="full"
+                width={current.width}
+                height={current.height}
+                priority
                 itemType={itemType}
                 alt={current.alt_text ?? itemTitle}
                 iconSize={64}
@@ -179,6 +196,7 @@ export function MediaViewer({
                 >
                   <ItemImage
                     storagePath={image.storage_path}
+                    thumbPath={image.thumb_path}
                     itemType={itemType}
                     alt=""
                     className="h-full w-full"

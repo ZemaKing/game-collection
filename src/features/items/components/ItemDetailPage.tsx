@@ -185,6 +185,10 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
             >
               <ItemImage
                 storagePath={coverImage.storage_path}
+                variant="full"
+                width={coverImage.width}
+                height={coverImage.height}
+                priority
                 itemType={itemType}
                 alt=""
                 className="aspect-[4/5] w-full rounded-xl"
@@ -226,6 +230,7 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
                 >
                   <ItemImage
                     storagePath={image.storage_path}
+                    thumbPath={image.thumb_path}
                     itemType={itemType}
                     alt=""
                     className="aspect-[4/5] w-full"

@@ -1,5 +1,5 @@
 import { ITEM_TABLE_NAMES } from '@/features/items/constants'
-import { ITEM_IMAGES_BUCKET } from '@/features/items/storage'
+import { imageObjectPaths, ITEM_IMAGES_BUCKET } from '@/features/items/storage'
 import type { ItemType } from '@/features/items/types'
 import { supabase } from '@/lib/supabaseClient'
 
@@ -24,7 +24,7 @@ export async function deleteItem(itemType: ItemType, itemId: string): Promise<vo
 
   const { data: images, error: imagesFetchError } = await supabase
     .from('item_images')
-    .select('storage_path')
+    .select('storage_path, thumb_path, original_path')
     .eq('item_type', itemType)
     .eq('item_id', itemId)
   if (imagesFetchError) throw imagesFetchError
@@ -32,7 +32,7 @@ export async function deleteItem(itemType: ItemType, itemId: string): Promise<vo
   if (images && images.length > 0) {
     const { error: removeStorageError } = await supabase.storage
       .from(ITEM_IMAGES_BUCKET)
-      .remove(images.map((image) => image.storage_path))
+      .remove(images.flatMap((image) => imageObjectPaths(image)))
     if (removeStorageError) throw removeStorageError
   }
 

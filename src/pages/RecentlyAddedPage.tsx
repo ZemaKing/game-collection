@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { fetchItems, fetchPlatforms } from '@/features/items/api'
-import { ItemCard } from '@/features/items/components/ItemCard'
+import { ItemCard, PRIORITY_CARD_COUNT } from '@/features/items/components/ItemCard'
 import { ItemCardSkeleton } from '@/features/items/components/ItemCardSkeleton'
 import type { AllItemRow, Platform } from '@/features/items/types'
 import { useLoadMoreOnScroll, useScrollLoading } from '@/hooks/useLoadMoreOnScroll'
@@ -126,6 +126,8 @@ function RecentlyAddedPage() {
 
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p.name])), [platforms])
   const groups = useMemo(() => groupByDay(items, t, locale), [items, t, locale])
+  // The newest few covers are above the fold: load them eagerly.
+  const priorityIds = new Set(items.slice(0, PRIORITY_CARD_COUNT).map((item) => item.id))
   const hasMore = items.length < totalCount
   const scrollLoading = useScrollLoading()
   const loadMoreSentinel = useLoadMoreOnScroll(scrollLoading && hasMore && !loading && !error, () =>
@@ -162,6 +164,7 @@ function RecentlyAddedPage() {
                 <ItemCard
                   key={item.id}
                   item={item}
+                  priority={priorityIds.has(item.id)}
                   platformName={
                     item.platform_id ? (platformById.get(item.platform_id) ?? null) : null
                   }

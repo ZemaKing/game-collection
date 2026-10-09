@@ -4,7 +4,7 @@ Follow-up to [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md), which built the app (
 
 The image pipeline reuses the one built for the diecast app (`../diecast-collection/scripts/images/` + `src/lib/image-resize.ts`), which was written app-agnostic for this purpose (diecast ROADMAP Phase 21).
 
-**Status: Phase 33 code done and its migration applied (2026-10-09). The full image backup (Phase 32) waits for the egress reset on 2026-10-10, and the full Phase 33 dry run waits for that backup.** Research done 2026-10-04 (findings below).
+**Status: Phase 33 code done and its migration applied; Phase 35 code done ahead of Phase 34 (owner-approved, 2026-10-09), and the app reads thumbs as soon as Phase 34 fills them. The full image backup (Phase 32) waits for the egress reset on 2026-10-10, then the full Phase 33 dry run, then Phase 34.** Research done 2026-10-04 (findings below).
 
 ---
 
@@ -87,7 +87,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 32 | Image Audit & Local Backup | 🟡 Scripts done; full backup after 10 Oct | Run `images:backup -- --apply` after the reset (≈ 1.45 GB); copy `backups/` to a second place |
 | 33 | Image Pipeline Port & Schema | 🟡 Code done; dry run over 615/1,426 (the rest after the backup) | After the full backup, run `images:migrate` (dry run) |
 | 34 | WebP Migration of Existing Images | ⬜ Not started | Run the scripts with the service-role key |
-| 35 | Read Path: Thumbnails Everywhere | ⬜ Not started | — |
+| 35 | Read Path: Thumbnails Everywhere | 🟡 Code done (before 34, owner-approved); size/blur checks after the Phase 34 flip | — |
 | 36 | Upload Path: WebP in the Browser | ⬜ Not started | Upload a test photo by hand |
 | 37 | Retire Originals (free the quota) | ⬜ Not started | **Explicit approval to delete ~2 GB of originals** |
 | 38 | Static Assets (dashboard hero, icons) | ⬜ Not started | Optional: a better hero source image |
@@ -196,16 +196,18 @@ Every image row serves WebP; originals are untouched in Storage and backed up lo
 Each place loads the smallest image that looks sharp there.
 
 ### Tasks
-- [ ] `storage.ts`: `getImageUrls(row) → { full, thumb }` (`thumb_path ?? storage_path`); unit-tested
-- [ ] `ItemImage` gets `variant: 'thumb' | 'full'` (default `thumb`). **Thumb:** `ItemCard` grid + list, dashboard, recently added, platform pages, search results, related items, DLC section, relationship picker, `ImageManager` tiles, the detail gallery strip, the viewer's thumbnail strip. **Full:** the detail page's main image and the `MediaViewer` stage
-- [ ] Pass `width`/`height` to `<img>` where known (avoids layout shift); `decoding="async"`
-- [ ] The first visible row of cards (≈ 4–6) loads eager with `fetchpriority="high"` (an LCP candidate); the rest stay lazy (the Settings "image loading" preference still applies)
-- [ ] The viewer preloads its neighbours' `full` only
+- [x] `storage.ts`: `getImageUrls(row) → { full, thumb }` (`thumb_path ?? storage_path`), plus `imagePathFor(row, variant)` and `imageObjectPaths(row)`; unit-tested
+- [x] `ItemImage` gets `variant: 'thumb' | 'full'` (default `thumb`) and `thumbPath`. A thumb that fails to load falls back to the full image before the placeholder. **Thumb:** `ItemCard` grid + list (so dashboard, recently added, platform pages, related items and the DLC section, which all render `ItemCard`), `ImageManager` tiles, the detail gallery strip, the viewer's thumbnail strip. **Full:** the detail page's main image and the `MediaViewer` stage. Search results and the relationship picker show no images
+- [x] Image queries select `thumb_path, width, height, original_path` (`ITEM_IMAGE_COLUMNS`); `all_items` rows carry `cover_thumb_path` via `select('*')`
+- [x] Pass `width`/`height` to `<img>` where known (detail cover and viewer stage; `all_items` has no sizes, and cards sit in a fixed `aspect-[4/5]` box anyway); `decoding="async"` on every image
+- [x] The first 6 cards (`PRIORITY_CARD_COUNT`) on listings, the dashboard and recently added load eager with `fetchpriority="high"`, as does the detail cover and the viewer stage; the rest stay lazy (the Settings "image loading" preference still applies, and "saver" still wins)
+- [x] The viewer preloads its neighbours' `full` only (not in "saver" mode)
+- [x] Also (needed once rows have variants, so done now rather than in Phase 36): deleting an image or an item removes every object the row owns (`storage_path`, `thumb_path`, `original_path`), and replacing a file clears `thumb_path`/`width`/`height`/`original_path` so no stale thumb shows
 
 ### Verification
-- [ ] Network tab: a listing page of 20 cards transfers ≲ 1 MB of images (was ≈ 22 MB); no `full` request until the detail page or viewer
-- [ ] Desktop/Tablet/Mobile × both themes: no visible blur on cards on a 2× screen; viewer zoom still sharp
-- [ ] Tests for `getImageUrls` and `ItemImage`'s variant choice
+- [ ] Network tab: a listing page of 20 cards transfers ≲ 1 MB of images (was ≈ 22 MB); no `full` request until the detail page or viewer. *After the Phase 34 flip (until then thumbs fall back to the originals). Checked 2026-10-09 before the flip: first 6 cards eager + `fetchpriority=high`, the rest lazy; detail cover eager/high on the full path, strip lazy; the viewer at 1/4 preloaded exactly images 4 and 2; no new console errors*
+- [ ] Desktop/Tablet/Mobile × both themes: no visible blur on cards on a 2× screen; viewer zoom still sharp. *After the Phase 34 flip*
+- [x] Tests for `getImageUrls` and `ItemImage`'s variant choice (`storage.test.ts`, `ItemImage.test.tsx`, and an `ItemCard` thumb/priority case; 158 tests in total)
 
 ### Definition of Done
 No list view downloads a full-size image.
@@ -222,7 +224,7 @@ New uploads arrive already small, so the bucket never fills up with multi-MB PNG
 - [ ] `uploadItemImage` / `replaceItemImageFile` / `appendItemCoverImage` (RAWG import) produce `full` + `thumb`, upload both (`cacheControl` one year), write `storage_path`, `thumb_path`, `width`, `height`, and clean up both objects on failure
 - [ ] Accept JPEG/PNG/WebP/GIF input (GIF → first frame; say so in the UI). Raise the input limit if wanted, since only the output is stored. Update the bucket's `allowed_mime_types` to WebP (+ PNG fallback) only
 - [ ] Per-file status in `ImageManager` gains a "Optimising…" step
-- [ ] Delete paths remove both variants (and `original_path` if still set)
+- [x] Delete paths remove both variants (and `original_path` if still set). *Done early in Phase 35*
 
 ### Verification
 - [ ] Owner uploads a phone photo (~4–8 MB) and a transparent PNG: stored as ~100–200 KB + ~25 KB WebP; the transparency is kept
