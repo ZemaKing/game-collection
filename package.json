@@ -10,7 +10,10 @@
     "format": "prettier --write .",
     "preview": "vite preview",
     "test": "vitest run",
-    "verify:rls": "node --env-file-if-exists=.env.local scripts/verify-rls.mjs"
+    "verify:rls": "node --env-file-if-exists=.env.local scripts/verify-rls.mjs",
+    "images:audit": "node --env-file-if-exists=.env.local scripts/images-audit.mjs",
+    "images:backup": "node --env-file-if-exists=.env.local scripts/images-backup.mjs",
+    "db:export": "node --env-file-if-exists=.env.local scripts/db-export.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",

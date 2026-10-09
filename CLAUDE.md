@@ -24,6 +24,8 @@ npm run test      # vitest run
 
 Run a single test file: `npx vitest run src/features/items/completeness.test.ts`. There is no separate typecheck script — `tsc -b` runs as part of `build`.
 
+Maintenance scripts (plain Node ESM in `scripts/`, run against the live project via `node --env-file-if-exists=.env.local`; pure helpers in `scripts/lib/` have colocated `*.test.mjs` that Vitest picks up): `npm run verify:rls` (anon key + `RLS_*` logins), and `images:audit` / `images:backup` / `db:export`, which need `SUPABASE_SERVICE_ROLE_KEY` and only read. Output goes to git-ignored `backups/` — see `docs/backup.md`. The org's 5 GB/month egress is shared with another app: anything that downloads the bucket prints its size first and needs `--apply`.
+
 Local Supabase env vars live in `.env.local` (see `.env.local.example`): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. The app throws at import time (`src/lib/supabaseClient.ts`) if these are missing.
 
 Games autofill (Phase 21) uses `RAWG_API_KEY` — server-only, no `VITE_` prefix, so it never reaches the client bundle. It's read by the `/api/*` Vercel serverless functions and, for local dev, by a Vite dev-server middleware in `vite.config.ts` that mounts the same routes. Must also be set in the Vercel project's environment variables for preview/production (as of Phase 23 it was still missing in production, so autofill returns 500 there).

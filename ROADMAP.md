@@ -4,7 +4,7 @@ Follow-up to [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md), which built the app (
 
 The image pipeline reuses the one built for the diecast app (`../diecast-collection/scripts/images/` + `src/lib/image-resize.ts`), which was written app-agnostic for this purpose (diecast ROADMAP Phase 21).
 
-**Status: Phase 31 done (2026-10-09). Next: Phase 32.** Research done 2026-10-04 (findings below).
+**Status: Phase 32 scripts done (2026-10-09); the full image download waits for the egress reset on 2026-10-10.** Research done 2026-10-04 (findings below).
 
 ---
 
@@ -31,7 +31,9 @@ All numbers come from the live project: public anon reads of `item_images` and S
 - **Egress.** One listing page (20 cards) ≈ 20 × 1.1 MB ≈ **22 MB**. The dashboard (12 cards + hero) ≈ **15 MB**. 5 GB a month is about **230 listing-page views**, shared with the recipes app. With 600 px WebP thumbnails, the same page is ≈ 0.6 MB (~40× less).
 - **Speed.** Every card downloads a phone-sized photo, and the LCP on the dashboard is a 2.3 MB background image.
 
-**Target after this roadmap:** ≈ 1,811 × (115 KB full + ~28 KB thumb) ≈ **0.26 GB** in the bucket (−87 %). The org total drops to ≈ 0.3 GB of 1 GB, and a listing page needs ≈ 0.6 MB.
+**Update 2026-10-09 (`docs/images-audit.md`):** the owner deleted every non-game image on 2026-10-08, so the bucket now holds **1,426 objects, 1.45 GB** (730 PNG 987 MB · 664 JPEG 463 MB · 32 WebP 2.4 MB), all under `game/`; 160 non-game items have no images. 0 orphans, 0 broken rows; 19 pairs of identical files are used by two different games (kept: each row owns its own object). The org's Usage page (cycle 10 Sep – 10 Oct) showed Storage 1.113 GB, **egress 3.88 GB of 5 GB** + 3.02 GB cached, uploads not restricted.
+
+**Target after this roadmap:** ≈ 1,426 × (115 KB full + ~28 KB thumb) ≈ **0.2 GB** in the bucket (−86 %); exact sizes are proposed at the start of Phase 33. (Originally estimated as 1,811 × … ≈ 0.26 GB.) The org total drops to ≈ 0.3 GB of 1 GB, and a listing page needs ≈ 0.6 MB.
 
 ### Security — urgent
 
@@ -82,7 +84,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | # | Phase | Status | Needs from owner |
 | --- | --- | --- | --- |
 | 31 | Security Lockdown | ✅ Done (2026-10-09) | — |
-| 32 | Image Audit & Local Backup | ⬜ Not started | Service-role key in `.env.local`; check the Usage page; approve the ~2 GB download |
+| 32 | Image Audit & Local Backup | 🟡 Scripts done; full backup after 10 Oct | Run `images:backup -- --apply` after the reset (≈ 1.45 GB); copy `backups/` to a second place |
 | 33 | Image Pipeline Port & Schema | ⬜ Not started | Apply migration |
 | 34 | WebP Migration of Existing Images | ⬜ Not started | Run the scripts with the service-role key |
 | 35 | Read Path: Thumbnails Everywhere | ⬜ Not started | — |
@@ -125,17 +127,18 @@ Writes require `is_admin()` everywhere; sign-ups are off; a script proves it.
 Take one complete, checksummed copy of every original before anything is converted or deleted. Use that same copy as the conversion source, so the bucket is downloaded **once**.
 
 ### Tasks
-- [ ] Owner: Dashboard → Organization → Usage. Record Storage size, this month's egress, and whether uploads are restricted; record the billing-cycle reset date (→ Open decision 1)
-- [ ] Owner: add `SUPABASE_SERVICE_ROLE_KEY` to `.env.local` (git-ignored, never `VITE_`)
-- [ ] `scripts/images-audit.ts` (`npm run images:audit`): lists every `item_images` row and Storage object, then reports counts, bytes by format and type, orphans (row without object / object without row), and duplicates. Uses `HEAD`s only, so almost no egress. Writes `docs/images-audit.md`
-- [ ] `scripts/images-backup.ts` (`npm run images:backup`): downloads every original to git-ignored `backups/images/<path>`, writes `backups/images/manifest.json` (path, bytes, sha256, width, height, content-type), and resumes (skips files already there with a matching sha256). It prints the expected download size and needs `--apply`
+- [x] Owner: Dashboard → Organization → Usage. Record Storage size, this month's egress, and whether uploads are restricted; record the billing-cycle reset date (→ Open decision 1). *2026-10-09: Storage 1.113 GB, egress 3.88/5 GB, cached egress 3.02 GB, not restricted; resets 10 Oct (recorded in the findings above)*
+- [x] Owner: add `SUPABASE_SERVICE_ROLE_KEY` to `.env.local` (git-ignored, never `VITE_`)
+- [x] `scripts/images-audit.mjs` (`npm run images:audit`): lists every `item_images` row and Storage object, then reports counts, bytes by format and type, orphans (row without object / object without row), and duplicates. Uses the Storage list API's metadata (no `HEAD`s needed), so almost no egress. Writes `docs/images-audit.md`. *Plain `.mjs` like `verify-rls.mjs`, so no `tsx` until Phase 33*
+- [x] `scripts/images-backup.mjs` (`npm run images:backup`): downloads every original to git-ignored `backups/images/<path>`, writes `backups/images/manifest.json` (path, bytes, sha256, width, height, content-type, plus the `item_images` rows using each file), and resumes (skips files already there with a matching sha256). It prints the expected download size and needs `--apply`; `--limit=N` for a trial, `--verify [--root=…]` re-hashes a copy offline. Tried on 3 files (1.57 MB)
+- [ ] **Run the full backup after the reset on 10 Oct** (≈ 1.45 GB; this cycle has only ~1.1 GB of egress left)
 - [ ] Copy the backup to a second place (external disk / cloud drive) — owner
-- [ ] Also export the database (Dashboard → Database → Backups is not on Free, so: `pg_dump` with the DB connection string, or a CSV export of every table) and document it in `docs/backup.md`
+- [x] Also export the database (Dashboard → Database → Backups is not on Free, so: `pg_dump` with the DB connection string, or a CSV export of every table) and document it in `docs/backup.md`. *`npm run db:export` → JSON per table + checksummed manifest (no `pg_dump` installed; the Docker route is documented). First export 2026-10-09: 15 tables, 1.29 MB*
 
 ### Verification
-- [ ] The audit totals match the findings above (±new uploads): ~1,811 objects, ~2.0 GB, 0 orphans
-- [ ] The backup has all 1,811 files; a second run downloads 0 bytes; all sha256 recorded
-- [ ] Egress used by the backup (≈ 2.0 GB) is noted against the month's budget
+- [x] The audit totals match the findings above (±new uploads): ~1,811 objects, ~2.0 GB, 0 orphans. *1,426 objects / 1.45 GB, 0 orphans — the difference is the owner's deletion of the non-game images on 2026-10-08 (see the update in the findings)*
+- [ ] The backup has all 1,426 files; a second run downloads 0 bytes; all sha256 recorded (`--verify` green)
+- [ ] Egress used by the backup (≈ 1.45 GB) is noted against the month's budget
 
 ### Definition of Done
 A verified local copy of every original plus a DB export exists in two places.
