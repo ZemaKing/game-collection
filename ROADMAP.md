@@ -4,7 +4,7 @@ Follow-up to [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md), which built the app (
 
 The image pipeline reuses the one built for the diecast app (`../diecast-collection/scripts/images/` + `src/lib/image-resize.ts`), which was written app-agnostic for this purpose (diecast ROADMAP Phase 21).
 
-**Status: nothing started.** Research done 2026-10-04 (findings below).
+**Status: Phase 31 applied and verified by `verify:rls` (2026-10-09); waiting on the owner's in-app check.** Research done 2026-10-04 (findings below).
 
 ---
 
@@ -81,7 +81,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 
 | # | Phase | Status | Needs from owner |
 | --- | --- | --- | --- |
-| 31 | Security Lockdown | ⬜ Not started | Disable sign-ups in the dashboard (1 min); apply migration |
+| 31 | Security Lockdown | 🟡 Verified by script; owner app check pending | Add/edit/delete an item and an image in the app |
 | 32 | Image Audit & Local Backup | ⬜ Not started | Service-role key in `.env.local`; check the Usage page; approve the ~2 GB download |
 | 33 | Image Pipeline Port & Schema | ⬜ Not started | Apply migration |
 | 34 | WebP Migration of Existing Images | ⬜ Not started | Run the scripts with the service-role key |
@@ -101,17 +101,17 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 Make "only the owner can write" true in the database, not just in the UI. This comes first because today any registered user can wipe the collection.
 
 ### Tasks
-- [ ] **Owner, now:** Dashboard → Authentication → Sign In / Providers → turn off "Allow new users to sign up". Then check the Users list for unknown accounts
-- [ ] Migration: `admin_users (user_id uuid primary key references auth.users)`, with RLS on and no API grants, plus `is_admin()` (`security definer`, `stable`, `search_path` pinned) — the diecast pattern
-- [ ] Migration: replace every `*_owner_write` / `to authenticated using (true)` policy with `using (is_admin()) with check (is_admin())`, on the 7 item tables, `item_images`, `item_relationships`, `item_tags`, `game_genres`, `tags`, `platforms`, `genres`
-- [ ] Storage: `insert/update/delete` on `storage.objects` for `item-images` only for `is_admin()`. Drop the public `SELECT` policy (public URLs don't need it; this stops anonymous bucket listing). Re-check `file_size_limit` / `allowed_mime_types`
-- [ ] Owner inserts their user id into `admin_users` (SQL in the phase report)
-- [ ] `scripts/verify-rls.mjs` (`npm run verify:rls`): checks as anon and as a signed-in **non-admin** test user (`RLS_*` logins in `.env.local`) that reads succeed and every write/delete/upload/list is refused, and that the admin can write (self-cleaning fixtures)
-- [ ] Point `CLAUDE.md` at this roadmap; describe the admin allow-list there
+- [x] **Owner, now:** Dashboard → Authentication → Sign In / Providers → turn off "Allow new users to sign up". Then check the Users list for unknown accounts
+- [x] Migration: `admin_users (user_id uuid primary key references auth.users)`, with RLS on and no API grants, plus `is_admin()` (`security definer`, `stable`, `search_path` pinned) — the diecast pattern
+- [x] Migration: replace every `*_owner_write` / `to authenticated using (true)` policy with `using (is_admin()) with check (is_admin())`, on the 7 item tables, `item_images`, `item_relationships`, `item_tags`, `game_genres`, `tags`, `platforms`, `genres`
+- [x] Storage: `insert/update/delete` on `storage.objects` for `item-images` only for `is_admin()`. Drop the public `SELECT` policy (public URLs don't need it; this stops anonymous bucket listing). Re-check `file_size_limit` / `allowed_mime_types`
+- [x] Owner inserts their user id into `admin_users` (SQL in the phase report)
+- [x] `scripts/verify-rls.mjs` (`npm run verify:rls`): checks as anon and as a signed-in **non-admin** test user (`RLS_*` logins in `.env.local`) that reads succeed and every write/delete/upload/list is refused, and that the admin can write (self-cleaning fixtures)
+- [x] Point `CLAUDE.md` at this roadmap; describe the admin allow-list there
 
 ### Verification
-- [ ] `/auth/v1/settings` reports `disable_signup: true`
-- [ ] `verify:rls` is green: anon and non-admin are refused on every table and on Storage writes and list; admin CRUD works
+- [x] `/auth/v1/settings` reports `disable_signup: true` (2026-10-09)
+- [x] `verify:rls` is green (165/165, 2026-10-09): anon and non-admin are refused on every table and on Storage writes and list; admin CRUD works
 - [ ] The owner can still add, edit and delete an item and an image in the app
 
 ### Definition of Done

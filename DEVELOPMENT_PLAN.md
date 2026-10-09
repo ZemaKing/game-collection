@@ -1,6 +1,8 @@
 # Game Collection — Development Plan
 
-This file is the live progress tracker for the game-collection site. Update checkboxes only when a task is actually implemented and verified, not merely started.
+> **History file.** Phases 1–28 were built from this plan. Since Phase 31 the live tracker is [`ROADMAP.md`](ROADMAP.md); the open Phases 29 (Performance) and 30 (Testing Hardening) continue there as Phases 39 and 40. Don't tick items here any more.
+
+This file was the live progress tracker for the game-collection site. Update checkboxes only when a task is actually implemented and verified, not merely started.
 
 ## Working Rules
 
