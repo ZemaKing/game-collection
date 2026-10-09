@@ -125,10 +125,20 @@ function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div
-        className="relative flex h-[110px] items-end overflow-hidden rounded-2xl bg-cover bg-right shadow-lg sm:h-[130px] lg:h-[160px] lg:bg-[position:right_25%]"
-        style={{ backgroundImage: "url('/dashboard_cover.png')" }}
-      >
+      <div className="relative flex h-[110px] items-end overflow-hidden rounded-2xl shadow-lg sm:h-[130px] lg:h-[160px]">
+        {/* The dashboard's LCP. Built by `npm run images:static` from static-src/ (ROADMAP Phase 38);
+            `sizes` follows AppShell: the main padding, plus the sidebar from md (5rem) and xl (16rem). */}
+        <img
+          src="/dashboard_cover-1200.webp"
+          srcSet="/dashboard_cover-1200.webp 1200w, /dashboard_cover-2172.webp 2172w"
+          sizes="(min-width: 1280px) calc(100vw - 19rem), (min-width: 768px) calc(100vw - 8rem), calc(100vw - 2rem)"
+          width={2172}
+          height={724}
+          alt=""
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 size-full object-cover object-right lg:object-[right_25%]"
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         {/* The photo is busy and the fade to the page colour is only partial, so the text sits on its

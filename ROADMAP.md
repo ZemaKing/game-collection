@@ -90,7 +90,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 35 | Read Path: Thumbnails Everywhere | 🟡 Code done (before 34, owner-approved); size/blur checks after the Phase 34 flip | — |
 | 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Check the RAWG cover import on the next autofill (migration applied, test uploads verified 2026-10-09) |
 | 37 | Retire Originals (free the quota) | ⬜ Not started | **Explicit approval to delete ~2 GB of originals** |
-| 38 | Static Assets (dashboard hero, icons) | ⬜ Not started | Optional: a better hero source image |
+| 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
 | 39 | Performance Pass (was Phase 29) | ⬜ Not started | — |
 | 40 | Testing Hardening (was Phase 30) | ⬜ Not started | Make CI a required check (GitHub setting) |
 | 41 | Operations, Docs & Production Verification | ⬜ Not started | `RAWG_API_KEY` in Vercel; go/no-go |
@@ -266,12 +266,13 @@ Only WebP variants remain in Storage; originals live in the off-Supabase backup.
 Fix the 2.3 MB home page hero and tidy the other static images.
 
 ### Tasks
-- [ ] `dashboard_cover.png` (2172×724, 2.3 MB) → responsive WebP at ~1200 and ~2200 px wide (expected ~60–150 KB), with AVIF optional. Switch the CSS background to an `<img>` with `srcset`/`sizes`, `object-fit: cover`, `fetchpriority="high"` (it is the dashboard's LCP), keeping the gradient and text backing
-- [ ] Generate the assets with a small `scripts/build-static-images.ts` (sharp) so the source stays in the repo and the outputs are reproducible
-- [ ] Favicon: add PNG/apple-touch sizes if missing; `manifest.webmanifest` only if PWA is wanted (it is on the "Optional" list)
+- [x] `dashboard_cover.png` (2172×724, 2.3 MB) → `dashboard_cover-1200.webp` (52 KB) + `dashboard_cover-2172.webp` (134 KB; the source width, never enlarged), q80. No AVIF (WebP is already small enough). The CSS background is now an `<img>` with `srcset`/`sizes` (from AppShell's padding and sidebar widths), `object-cover` with the same `right` / `lg:right 25%` crop, `fetchpriority="high"`, `width`/`height`; the gradients and text backing are unchanged
+- [x] Also: `og:image` pointed at the 2.3 MB PNG. It now uses `og-image.jpg` (1200×630, 112 KB, cropped from the right like the hero; JPEG because every link-preview crawler reads it) with `og:image:width/height`
+- [x] `scripts/build-static-images.ts` (`npm run images:static`, sharp, offline). Sources live in `static-src/` (the PNG moved there, so it no longer ships); the output list is the pure `scripts/static-images/plan.ts` (tested). Re-running gives byte-identical files
+- [x] Favicon: `favicon-32.png` (1.6 KB) and `apple-touch-icon.png` (180×180, padded on white, 7.3 KB) rendered from `favicon.svg`, linked in `index.html`. `favicon.svg` itself (26 KB) stays as is. No `manifest.webmanifest` (PWA stays optional)
 
 ### Verification
-- [ ] The dashboard transfers < 200 KB for the hero; it looks identical at the three breakpoints, both themes
+- [x] The dashboard transfers < 200 KB for the hero; it looks identical at the three breakpoints, both themes. *2026-10-09: 1× narrow pane loads only the 1200 file (53.8 KB transferred); desktop 1440 / tablet / mobile 2× show the same crop as before (`object-position` 100% 25% on lg, 100% 50% below), light and dark; the largest file in `dist/` is now 134 KB*
 
 ### Definition of Done
 No static image over ~200 KB ships in `public/`.

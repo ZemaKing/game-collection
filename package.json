@@ -15,7 +15,8 @@
     "images:backup": "node --env-file-if-exists=.env.local scripts/images-backup.mjs",
     "db:export": "node --env-file-if-exists=.env.local scripts/db-export.mjs",
     "images:migrate": "tsx --env-file-if-exists=.env.local scripts/images/cli.ts scripts/migrate-images/job.ts upload",
-    "images:check": "tsx --env-file-if-exists=.env.local scripts/images/cli.ts scripts/migrate-images/job.ts verify"
+    "images:check": "tsx --env-file-if-exists=.env.local scripts/images/cli.ts scripts/migrate-images/job.ts verify",
+    "images:static": "tsx scripts/build-static-images.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
