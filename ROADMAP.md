@@ -89,11 +89,11 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 34 | WebP Migration of Existing Images | ✅ Done (2026-10-10: 1,426 rows flipped, rollback tested) | — |
 | 35 | Read Path: Thumbnails Everywhere | ✅ Done (2026-10-10: listing 20 cards ≈ 1.07 MB of thumbs, was ≈ 22 MB; ≥ 2× px on cards) | — |
 | 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Check the RAWG cover import on the next autofill (migration applied, test uploads verified 2026-10-09) |
-| 37 | Retire Originals (free the quota) | ⬜ Not started | **Explicit approval to delete ~2 GB of originals** |
+| 37 | Retire Originals (free the quota) | ✅ Done (2026-10-10, owner-approved: 1,426 originals / 1.45 GB deleted; bucket 437 MB, all WebP) | Check the Usage page shows Storage < 1 GB once it refreshes |
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
 | 39 | Performance Pass (was Phase 29) | ✅ Done (2026-10-10, image numbers measured; photo LCP on mobile is gap 3 in `docs/performance.md`) | Decide on gap 3 (a phone-sized image variant, and/or route-level data loading) |
 | 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E in CI waits for the secrets | Add repo secrets `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`; make the `verify` CI check required (GitHub setting) |
-| 41 | Operations, Docs & Production Verification | 🟡 Docs done (2026-10-10); release and the production sweep wait for the owner | `RAWG_API_KEY` in Vercel; check production; go/no-go |
+| 41 | Operations, Docs & Production Verification | 🟡 Docs done and `RAWG_API_KEY` live (2026-10-10); the production sweep waits for the owner | Production sweep (`docs/production-verification.md`); go/no-go |
 
 ---
 
@@ -244,13 +244,13 @@ No new object larger than ~400 KB reaches the bucket.
 Remove the 1,811 original files from Storage once WebP has been live and stable, bringing the org back under 1 GB.
 
 ### Tasks
-- [ ] Wait period after Phase 35/36 (suggest ≥ 7 days of normal use) with no image regressions reported
-- [ ] Re-verify the local backup (sha256 of every file) **in both places** right before deleting
-- [ ] `images:prune-originals` (dry run by default, `--apply`): deletes only objects referenced by `original_path` whose row now points at a verified WebP, in batches, then clears `original_path`. Writes a deletion log
-- [ ] Document the restore path: re-upload from `backups/images/` + `images:flip -- --rollback` (the rollback now needs the re-upload first)
+- [x] Wait period after Phase 35/36 (suggest ≥ 7 days of normal use) with no image regressions reported. *Skipped by the owner's decision on 2026-10-10 ("brisi originale"), the same day as the flip, after the Phase 34/35 checks*
+- [x] Re-verify the local backup (sha256 of every file) **in both places** right before deleting. *`images:prune-originals` re-hashes every original's local file against the backup manifest before deleting (1,426/1,426 matched). The second copy was made by the owner on 2026-10-10 and wasn't re-hashed here: its location isn't known to the scripts (`images:backup -- --verify --root=<copy>/images` checks it)*
+- [x] `images:prune-originals` (dry run by default, `--apply`): deletes only objects referenced by `original_path` whose row now points at a verified WebP, in batches, then clears `original_path`. Writes a deletion log. *Plan in `prune.ts` (unit-tested): the row must serve the WebPs made from that original, the original must be in the backup and served by no row; plus the local re-hash and a HEAD of every WebP. Clears `original_path` through `set_item_image_variants` (no new SQL). `--limit=5` trial first, then the rest: 1,426 deleted, 0 already gone. Log: `scripts/migrate-images/prune-log.json`*
+- [x] Document the restore path: re-upload from `backups/images/` + `images:flip -- --rollback` (the rollback now needs the re-upload first). *`docs/backup.md` → "Undoing the WebP migration": `original_path` is cleared, so `prune-log.json` (row id → original path) is what maps the re-uploaded files back*
 
 ### Verification
-- [ ] The bucket is ≈ 0.26 GB; the org's Usage page shows Storage < 1 GB and uploads allowed
+- [ ] The bucket is ≈ 0.26 GB; the org's Usage page shows Storage < 1 GB and uploads allowed. *`images:audit` 2026-10-10: 4,622 objects, **437 MB**, all WebP, 0 orphans (more than 0.26 GB because ≈ 520 items' images were added since the estimate). The Usage page lags; owner to confirm*
 - [ ] Every row still resolves (HEAD 200); the app is checked on each item type
 
 ### Definition of Done
@@ -327,7 +327,7 @@ Core public flows are covered by E2E; owner flows by E2E or a documented manual 
 Close the `DEVELOPMENT_PLAN.md` final checklist and ship it all.
 
 ### Tasks
-- [ ] `RAWG_API_KEY` set in Vercel (Production + Preview); autofill checked on the deployed site
+- [x] `RAWG_API_KEY` set in Vercel (Production + Preview); autofill checked on the deployed site. *2026-10-10: set by the owner; `GET https://game-collection-six.vercel.app/api/games-search?q=halo` → 200 with RAWG results*
 - [x] `docs/backup.md`: DB export + image backup procedure, how often, restore steps (the open "backup/recovery" item). *Written in Phase 32; 2026-10-10 added the post-flip state and how to undo the WebP migration*
 - [x] README: setup, env, migrations (manual SQL-editor flow), seed, scripts (`images:*`, `verify:rls`), testing, deployment *(2026-10-10)*
 - [x] `CLAUDE.md`: image variants, upload pipeline, admin allow-list, scripts *(kept current phase by phase; the flip state added 2026-10-10)*

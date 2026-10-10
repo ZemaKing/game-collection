@@ -35,7 +35,17 @@ npm run images:flip -- --rollback --apply  # storage_path ← original_path; thu
 npm run images:verify -- --originals       # also HEAD every original_path (the rollback path)
 ```
 
-The app needs no deploy either way: the read path (Phase 35) falls back to `storage_path` when a row has no thumb. The WebP objects stay in Storage after a rollback, so flipping forward again is just `images:flip -- --apply`. The rollback path lasts until Phase 37 deletes the originals.
+The app needs no deploy either way: the read path (Phase 35) falls back to `storage_path` when a row has no thumb. The WebP objects stay in Storage after a rollback, so flipping forward again is just `images:flip -- --apply`. The rollback path lasted until Phase 37 deleted the originals.
+
+## Retiring the originals (Phase 37, done 2026-10-10)
+
+```bash
+npm run images:prune-originals                   # dry run: plan + re-hash every local backup file + HEAD every WebP
+npm run images:prune-originals -- --limit=5 --apply   # a trial batch
+npm run images:prune-originals -- --apply        # the rest, then original_path → null in one transaction
+```
+
+An original is deleted only when its row serves the WebPs made from it, the original is in the backup manifest and its local file re-hashes to the recorded sha256, and no row serves the same path. Every deleted path goes to [`prune-log.json`](prune-log.json). Since then `images:flip -- --rollback` has nothing to restore; going back means re-uploading from the backup first (`docs/backup.md` → "Undoing the WebP migration").
 
 A source whose original isn't in the backup fails with `… is missing (local source)`. Run `images:backup -- --apply` again, then re-run. Nothing falls back to downloading.
 

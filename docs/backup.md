@@ -63,10 +63,19 @@ Write a small script that walks the manifest and uploads each file with the serv
 
 ### Undoing the WebP migration
 
-While the originals are still in Storage (until Phase 37): `npm run images:flip -- --rollback --apply`
-points every migrated row back at its `original_path`, in one transaction, with no deploy
-(`scripts/migrate-images/README.md`). After Phase 37 the originals exist only in
-`backups/images/`: re-upload them to their old paths first, then roll back.
+Phase 37 (2026-10-10) deleted the 1,426 originals from Storage and cleared `original_path`, so
+`images:flip -- --rollback` no longer has anything to point back to. The originals exist only in
+`backups/images/` (and its second copy). `scripts/migrate-images/prune-log.json` records, per
+deleted original, the row `id`, its `path` and `sha256`. To go back for some or all rows:
+
+1. Upload each logged `path` from `backups/images/<path>` to the same path in `item-images`
+   (service-role client, as under "Many images"). The bucket accepts only WebP and PNG since
+   Phase 36, so JPEG originals need `allowed_mime_types` widened first (SQL editor).
+2. Point the rows back with `public.set_item_image_variants` (service role): for each logged row,
+   `expected_storage_path` = its current WebP path, `storage_path` = the logged `path`, and
+   `thumb_path`, `width`, `height`, `original_path` = null.
+
+Normally there's no reason to: the WebPs are what the app is built around.
 
 ### Database
 

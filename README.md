@@ -55,7 +55,7 @@ Every script that downloads from the bucket prints the size first and needs `--a
 
 ## Images
 
-Uploads are converted **in the browser** to a full WebP (fits 1600 px) plus a thumbnail (fits 600×750), both stored in the public `item-images` bucket. Cards and strips load the thumbnail, and the detail page and viewer load the full image. Since Phase 34 every existing image is served this way too. The pre-WebP originals stay in Storage, referenced by `original_path`, until Phase 37 retires them.
+Uploads are converted **in the browser** to a full WebP (fits 1600 px) plus a thumbnail (fits 600×750), both stored in the public `item-images` bucket. Cards and strips load the thumbnail, and the detail page and viewer load the full image. Since Phase 34 every existing image is served this way too, and Phase 37 deleted the pre-WebP originals from Storage (they live on in the local backup).
 
 ## Testing and CI
 
@@ -71,4 +71,4 @@ The project is on Supabase **Free**, and its organization shares **5 GB egress/m
 
 1. Dashboard → Organization → Usage: note Storage size, egress and cached egress, and whether uploads are restricted.
 2. `npm run images:audit`: the bucket's exact size, by format and type, from metadata only (≈ 0 egress).
-3. If Storage is near 1 GB: look for orphans in the audit; after Phase 37 the bucket should be ≈ 0.4 GB.
+3. If Storage is near 1 GB: look for orphans in the audit. After Phase 37 (2026-10-10) the bucket was 437 MB, all WebP; at ≈ 95 kB per image (full + thumb) the 1 GB covers ≈ 10,000 images.
