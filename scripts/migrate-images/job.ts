@@ -31,6 +31,8 @@ export type ImageRow = {
   storage_path: string
   thumb_path?: string | null // absent before the Phase 33 migration
   original_path?: string | null // set by the Phase 34 flip; absent before the migration is applied
+  width?: number | null
+  height?: number | null
 }
 
 // The backup manifest's sha256 per Storage path (scripts/images-backup.mjs).

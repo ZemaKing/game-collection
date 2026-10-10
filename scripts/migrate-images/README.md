@@ -7,7 +7,7 @@ Converts every `item_images` original that predates Phase 36 (rows uploaded sinc
 | Source | `item_images.original_path ?? storage_path`, read from `backups/images/<path>`. Its sha256 must match `backups/images/manifest.json` |
 | Objects | `{item_type}/{item_id}/{row id}.webp`: **full**, fits 1600×1600, q85 · `{item_type}/{item_id}/{row id}.thumb.webp`: **thumb**, fits 600×750, q85. Next to the original, named after the row (stable across runs, never the original's own name). `Cache-Control: max-age=31536000` |
 | Record | `manifest.json` (written on `--apply` only): per object, the source (row id, original URL, sha256), settings, output sha256, bytes and dimensions. Commit it after the Phase 34 run |
-| Rows | Unchanged here. The Phase 34 flip sets `original_path`, `storage_path`, `thumb_path`, `width` and `height` in one transaction |
+| Rows | Unchanged by the upload. `npm run images:flip` sets `original_path`, `storage_path`, `thumb_path`, `width` and `height` for every migrated row in one transaction (`public.set_item_image_variants`, migration `20261012120000`, service role only) |
 
 **Why these sizes** (measured 2026-10-09): cards are `aspect-[4/5]` and at most 216 CSS px wide on listings, 281 px on the dashboard (1535 px wide), and 296 px on a 639-px landscape phone. At 2× that's ≈ 600×750, which also covers portrait phones at 3× (164–192 px cards). The viewer on a 1080p screen is height-bound, so it shows a 16:9 screenshot at ≈ 1600 px wide. Quality 85 was the owner's choice. Every cover is portrait box art, and 81 % of gallery images are 16:9 screenshots.
 
@@ -20,7 +20,22 @@ npm run images:backup -- --apply           # Phase 32: every original on disk fi
 npm run images:migrate                     # dry run: convert all from the backup, print sizes (nothing uploaded)
 npm run images:migrate -- --limit=10 --apply   # Phase 34
 npm run images:check                       # HEAD every uploaded object vs the manifest (--full: sha256 too)
+npm run images:flip                        # dry run: plan + HEAD every object + exact counts, rolled back
+npm run images:flip -- --apply             # point the rows at the WebPs (one transaction)
+npm run images:verify                      # every row's storage_path + thumb_path answers 200 image/webp
 ```
+
+## Flip and rollback
+
+The flip only runs when every migrated row has both variants in the manifest, made from that row's current original with the current settings, and every one of those objects answers HEAD 200 with the manifest's type and size. Any problem blocks the whole flip. The SQL function also refuses a row whose `storage_path` changed after the plan was made, so an image the owner edits in the meantime is never overwritten. Rows born WebP (Phase 36) are not touched.
+
+```bash
+npm run images:flip -- --rollback          # dry run
+npm run images:flip -- --rollback --apply  # storage_path ← original_path; thumb_path, width, height, original_path → null
+npm run images:verify -- --originals       # also HEAD every original_path (the rollback path)
+```
+
+The app needs no deploy either way: the read path (Phase 35) falls back to `storage_path` when a row has no thumb. The WebP objects stay in Storage after a rollback, so flipping forward again is just `images:flip -- --apply`. The rollback path lasts until Phase 37 deletes the originals.
 
 A source whose original isn't in the backup fails with `… is missing (local source)`. Run `images:backup -- --apply` again, then re-run. Nothing falls back to downloading.
 

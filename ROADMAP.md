@@ -84,9 +84,9 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | # | Phase | Status | Needs from owner |
 | --- | --- | --- | --- |
 | 31 | Security Lockdown | ✅ Done (2026-10-09) | — |
-| 32 | Image Audit & Local Backup | 🟡 Full backup done and verified (2026-10-10) | Copy `backups/` (≈ 1.6 GB) to a second place |
+| 32 | Image Audit & Local Backup | ✅ Done (2026-10-10: full backup verified, copied to a second place) | — |
 | 33 | Image Pipeline Port & Schema | ✅ Done (2026-10-10: dry run 1,426/1,426, 0 failures) | — |
-| 34 | WebP Migration of Existing Images | ⬜ Not started | Run the scripts with the service-role key |
+| 34 | WebP Migration of Existing Images | ✅ Done (2026-10-10: 1,426 rows flipped, rollback tested) | — |
 | 35 | Read Path: Thumbnails Everywhere | 🟡 Code done (before 34, owner-approved); size/blur checks after the Phase 34 flip | — |
 | 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Check the RAWG cover import on the next autofill (migration applied, test uploads verified 2026-10-09) |
 | 37 | Retire Originals (free the quota) | ⬜ Not started | **Explicit approval to delete ~2 GB of originals** |
@@ -132,7 +132,7 @@ Take one complete, checksummed copy of every original before anything is convert
 - [x] `scripts/images-audit.mjs` (`npm run images:audit`): lists every `item_images` row and Storage object, then reports counts, bytes by format and type, orphans (row without object / object without row), and duplicates. Uses the Storage list API's metadata (no `HEAD`s needed), so almost no egress. Writes `docs/images-audit.md`. *Plain `.mjs` like `verify-rls.mjs`, so no `tsx` until Phase 33*
 - [x] `scripts/images-backup.mjs` (`npm run images:backup`): downloads every original to git-ignored `backups/images/<path>`, writes `backups/images/manifest.json` (path, bytes, sha256, width, height, content-type, plus the `item_images` rows using each file), and resumes (skips files already there with a matching sha256). It prints the expected download size and needs `--apply`; `--limit=N` for a trial, `--verify [--root=…]` re-hashes a copy offline. Tried on 3 files (1.57 MB)
 - [x] **Run the full backup after the reset on 10 Oct** (≈ 1.45 GB; this cycle has only ~1.1 GB of egress left). *2026-10-10: by then the bucket had grown to 3,196 objects / 1.63 GB (images uploaded on 2026-10-09 through the Phase 36 path, each a WebP + thumb); all of it backed up*
-- [ ] Copy the backup to a second place (external disk / cloud drive) — owner
+- [x] Copy the backup to a second place (external disk / cloud drive) — owner *(done 2026-10-10)*
 - [x] Also export the database (Dashboard → Database → Backups is not on Free, so: `pg_dump` with the DB connection string, or a CSV export of every table) and document it in `docs/backup.md`. *`npm run db:export` → JSON per table + checksummed manifest (no `pg_dump` installed; the Docker route is documented). First export 2026-10-09: 15 tables, 1.29 MB*
 
 ### Verification
@@ -174,16 +174,16 @@ A dry run over every image succeeds with zero failures; the schema is ready; no 
 Upload WebP variants for every image, verify them, then switch the rows over in one step, with a tested rollback.
 
 ### Tasks
-- [ ] Owner runs `images:migrate -- --limit=10 --apply`, checks, then the rest. Re-runs resume. **If uploads are blocked by the quota** (Open decision 1), follow the decided plan before continuing
-- [ ] `images:check`: `HEAD` every new object (status, type, size vs manifest). Run a `--full` sha256 check on a sample only (~50 objects) to spare egress
-- [ ] DB function `set_item_image_variants(jsonb)` (service role only, one transaction): sets `original_path = storage_path`, `storage_path = <full webp>`, `thumb_path`, `width`, `height` for every row. It refuses if any row's current `storage_path` isn't the one recorded in the manifest
-- [ ] `images:flip` (dry run by default, `--apply`), and `images:flip -- --rollback --apply` (restores `storage_path` from `original_path` and clears the thumbs)
-- [ ] Commit `scripts/migrate-images/manifest.json` as the record
+- [x] Owner runs `images:migrate -- --limit=10 --apply`, checks, then the rest. Re-runs resume. **If uploads are blocked by the quota** (Open decision 1), follow the decided plan before continuing. *2026-10-10 (run by Claude, owner-approved): 10, checked (HEAD + `--full` 20/20), then the rest. 4 sources failed on "Too many connections issued to the database" (Storage's own DB, transient) and went through on re-run. 1,426/1,426 uploaded, 2,852 objects, 247.8 MB. Uploads were not blocked at 151 % of the Storage quota*
+- [x] `images:check`: `HEAD` every new object (status, type, size vs manifest). Run a `--full` sha256 check on a sample only (~50 objects) to spare egress. *2,852/2,852 after retrying a handful of HTTP 429s; the sample is `images:verify -- --sample=50` (50/50 match). Storage rate-limits HEADs at concurrency 8, so `images:flip`/`images:verify` use 3 with 8 retries*
+- [x] DB function `set_item_image_variants(jsonb)` (service role only, one transaction): sets `original_path = storage_path`, `storage_path = <full webp>`, `thumb_path`, `width`, `height` for every row. It refuses if any row's current `storage_path` isn't the one recorded in the manifest. *Migration `20261012120000_set_item_image_variants.sql` (applied by the owner 2026-10-10). Each payload row carries `expected_storage_path`; unknown ids or changed rows abort the whole call. Smoke-tested: a dry run changes nothing, a stale row is refused*
+- [x] `images:flip` (dry run by default, `--apply`), and `images:flip -- --rollback --apply` (restores `storage_path` from `original_path` and clears the thumbs). *Plan logic in `plan.ts` (unit-tested). Before a flip every object must answer HEAD with the manifest's type and size. Plus `images:verify` (HEAD every row's paths, `--originals`, `--sample=N`)*
+- [x] Commit `scripts/migrate-images/manifest.json` as the record
 
 ### Verification
-- [ ] 1,811/1,811 rows point at WebP; every `storage_path` and `thumb_path` answers 200 `image/webp`
-- [ ] Rollback exercised once (flip → rollback → flip), with the app checked after each
-- [ ] Spot-check 20 items across all 7 types in the browser (incl. transparent figure/stuff images)
+- [x] 1,811/1,811 rows point at WebP; every `storage_path` and `thumb_path` answers 200 `image/webp`. *2026-10-10: 2,311/2,311 rows (1,426 flipped + 885 born WebP since Phase 36); `images:verify -- --originals` HEAD 6,048 URLs → all 200*
+- [x] Rollback exercised once (flip → rollback → flip), with the app checked after each. *2026-10-10: after the rollback the detail page and listing loaded the original PNG/JPGs (no deploy needed), then flipped again*
+- [x] Spot-check 20 items across all 7 types in the browser (incl. transparent figure/stuff images). *2026-10-10, dev server against the live data: the listing of every type (games 20, DLC 20, special editions 20, steelbooks 20, artbooks 10, figures 4, stuff 20 cards) loads only `.thumb.webp`, none broken; a game detail page loads the full WebP + 6 gallery thumbs*
 
 ### Definition of Done
 Every image row serves WebP; originals are untouched in Storage and backed up locally.
