@@ -41,6 +41,10 @@ export function heroSrcSet(widths: number[]): string {
   return widths.map((w) => `/${heroFile(w)} ${w}w`).join(', ')
 }
 
+/** Sizes packed into public/favicon.ico, built from public/favicon.svg after the jobs below.
+ *  Vercel's dashboard shows a project's icon from /favicon.ico only (else the Vite logo). */
+export const FAVICON_ICO_SIZES = [16, 32, 48]
+
 export function staticImageJobs(heroSourceWidth: number): StaticImageJob[] {
   return [
     {

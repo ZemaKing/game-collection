@@ -1,14 +1,16 @@
 // Builds the static images in public/ from their sources in static-src/ (ROADMAP Phase 38):
 // the dashboard hero as responsive WebP, the og:image share card, and PNG favicons from
-// public/favicon.svg. Deterministic and offline; re-run after changing a source, then commit
-// the outputs.
+// public/favicon.svg, plus favicon.ico (Vercel's dashboard takes the project icon from it).
+// Deterministic and offline; re-run after changing a source, then commit the outputs.
 //   npm run images:static
-import { mkdirSync, statSync } from 'node:fs'
+import { mkdirSync, statSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import sharp, { type Sharp } from 'sharp'
 
+import { pngsToIco } from './static-images/ico.ts'
 import {
+  FAVICON_ICO_SIZES,
   staticImageJobs,
   type StaticImageOutput,
 } from './static-images/plan.ts'
@@ -71,6 +73,25 @@ async function main() {
       )
     }
   }
+
+  const icons = await Promise.all(
+    FAVICON_ICO_SIZES.map(async (size) => {
+      const output: StaticImageOutput = {
+        file: 'favicon.ico',
+        format: 'png',
+        width: size,
+        height: size,
+      }
+      const png = await (await render('public/favicon.svg', output)).toBuffer()
+      return { width: size, height: size, png }
+    }),
+  )
+  const ico = resolve(PUBLIC_DIR, 'favicon.ico')
+  writeFileSync(ico, pngsToIco(icons))
+  const kb = (statSync(ico).size / 1024).toFixed(1)
+  console.log(
+    `public/favicon.svg → public/favicon.ico  ${FAVICON_ICO_SIZES.join('/')} px  ${kb} KB`,
+  )
 }
 
 await main()
