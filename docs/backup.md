@@ -16,7 +16,8 @@ committed) and never write to Supabase. Everything lands in `backups/`, which is
 
 The org's Free quota is **5 GB of egress a month, shared with the recipes app** (Dashboard →
 Organization → Usage; the cycle resets on the 10th). The first full image backup downloads the
-whole bucket (**≈ 1.45 GB** on 2026-10-09). After that the backup is incremental: a run downloads
+whole bucket (**≈ 1.45 GB** planned on 2026-10-09; **1.63 GB / 3,196 objects** when it ran on
+2026-10-10). After that the backup is incremental: a run downloads
 only objects that aren't in the manifest yet, so routine runs cost a few MB. Always run the plan
 (no `--apply`) first; it prints the exact download size.
 
@@ -51,11 +52,21 @@ insert into public.item_images (id, item_type, item_id, storage_path, position, 
 values ('<id>', '<item_type>', '<item_id>', '<path>', <position>, <is_cover>, <alt_text or null>);
 ```
 
+Since the Phase 34 WebP flip (2026-10-10) a row points at `<row id>.webp` + `<row id>.thumb.webp`;
+the migrated rows also keep their pre-WebP file in `original_path`. Back up after the flip
+(`images:backup -- --apply` picks up the new WebPs) so the local copy holds what rows point at.
+
 ### Many images
 
 Write a small script that walks the manifest and uploads each file with the service-role client
-(`storage.from('item-images').upload(path, bytes, { contentType, upsert: false })`). Phase 37
-(retiring the originals) adds the documented restore path that goes with the WebP migration.
+(`storage.from('item-images').upload(path, bytes, { contentType, upsert: false })`).
+
+### Undoing the WebP migration
+
+While the originals are still in Storage (until Phase 37): `npm run images:flip -- --rollback --apply`
+points every migrated row back at its `original_path`, in one transaction, with no deploy
+(`scripts/migrate-images/README.md`). After Phase 37 the originals exist only in
+`backups/images/`: re-upload them to their old paths first, then roll back.
 
 ### Database
 

@@ -87,13 +87,13 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 32 | Image Audit & Local Backup | ✅ Done (2026-10-10: full backup verified, copied to a second place) | — |
 | 33 | Image Pipeline Port & Schema | ✅ Done (2026-10-10: dry run 1,426/1,426, 0 failures) | — |
 | 34 | WebP Migration of Existing Images | ✅ Done (2026-10-10: 1,426 rows flipped, rollback tested) | — |
-| 35 | Read Path: Thumbnails Everywhere | 🟡 Code done (before 34, owner-approved); size/blur checks after the Phase 34 flip | — |
+| 35 | Read Path: Thumbnails Everywhere | ✅ Done (2026-10-10: listing 20 cards ≈ 1.07 MB of thumbs, was ≈ 22 MB; ≥ 2× px on cards) | — |
 | 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Check the RAWG cover import on the next autofill (migration applied, test uploads verified 2026-10-09) |
 | 37 | Retire Originals (free the quota) | ⬜ Not started | **Explicit approval to delete ~2 GB of originals** |
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
-| 39 | Performance Pass (was Phase 29) | 🟡 Done (2026-10-09) except the image numbers, which wait for the Phase 34 flip | Migrations `20261011120000` + `20261011130000` applied 2026-10-09; after Phase 34: `perf:vitals -- --with-images` |
+| 39 | Performance Pass (was Phase 29) | ✅ Done (2026-10-10, image numbers measured; photo LCP on mobile is gap 3 in `docs/performance.md`) | Decide on gap 3 (a phone-sized image variant, and/or route-level data loading) |
 | 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E in CI waits for the secrets | Add repo secrets `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`; make the `verify` CI check required (GitHub setting) |
-| 41 | Operations, Docs & Production Verification | ⬜ Not started | `RAWG_API_KEY` in Vercel; go/no-go |
+| 41 | Operations, Docs & Production Verification | 🟡 Docs done (2026-10-10); release and the production sweep wait for the owner | `RAWG_API_KEY` in Vercel; check production; go/no-go |
 
 ---
 
@@ -205,8 +205,8 @@ Each place loads the smallest image that looks sharp there.
 - [x] Also (needed once rows have variants, so done now rather than in Phase 36): deleting an image or an item removes every object the row owns (`storage_path`, `thumb_path`, `original_path`), and replacing a file clears `thumb_path`/`width`/`height`/`original_path` so no stale thumb shows
 
 ### Verification
-- [ ] Network tab: a listing page of 20 cards transfers ≲ 1 MB of images (was ≈ 22 MB); no `full` request until the detail page or viewer. *After the Phase 34 flip (until then thumbs fall back to the originals). Checked 2026-10-09 before the flip: first 6 cards eager + `fetchpriority=high`, the rest lazy; detail cover eager/high on the full path, strip lazy; the viewer at 1/4 preloaded exactly images 4 and 2; no new console errors*
-- [ ] Desktop/Tablet/Mobile × both themes: no visible blur on cards on a 2× screen; viewer zoom still sharp. *After the Phase 34 flip*
+- [x] Network tab: a listing page of 20 cards transfers ≲ 1 MB of images (was ≈ 22 MB); no `full` request until the detail page or viewer. *2026-10-10 after the flip: `/games` scrolled through its 20 cards loads 20 `.thumb.webp`, 1.07 MB in all (summed `content-length`; cross-origin resource timing reports 0), 0 full images; dashboard 0 full images. Before the flip: Checked 2026-10-09 before the flip: first 6 cards eager + `fetchpriority=high`, the rest lazy; detail cover eager/high on the full path, strip lazy; the viewer at 1/4 preloaded exactly images 4 and 2; no new console errors*
+- [x] Desktop/Tablet/Mobile × both themes: no visible blur on cards on a 2× screen; viewer zoom still sharp. *2026-10-10, measured as image px per CSS px under `object-cover` on every loaded card: mobile 375 (listing, 164 px cards) ≥ 1.98, tablet 768 (dashboard) ≥ 2.22, desktop 1024 (listing) ≥ 1.96, desktop 1536 (dashboard) ≥ 2.42. The only cards under 2.0 are images whose original is itself smaller than the thumb box. The theme doesn't change image pixels. The viewer stage loads the full WebP (a 1422×800 screenshot shown at 1008×590), the strip uses thumbs*
 - [x] Tests for `getImageUrls` and `ItemImage`'s variant choice (`storage.test.ts`, `ItemImage.test.tsx`, and an `ItemCard` thumb/priority case; 158 tests in total)
 
 ### Definition of Done
@@ -293,7 +293,7 @@ Finish the old Phase 29 with real numbers, now that images are no longer the bot
 - [x] Large-dataset check: listings/search/duplicates/related are paged or capped by the server; the one full pass (statistics) is covered by `statistics.scale.test.ts` with 1,500 and 15,000 generated rows (local test only)
 
 ### Verification
-- [ ] Before/after table in `docs/performance.md`; the budget is met or the gaps are listed. *2026-10-09: table written; mobile LCP dashboard 3.51 → 2.35 s, listing 2.66 → 2.36 s, search 3.34 → 2.77 s, statistics 1.96 → 1.87 s; CLS ≤ 0.084; TBT ≤ 71 ms. Gaps listed: search LCP (needs route-level data loading), initial JS ≈ 201 kB vs 170 (framework: react-dom + supabase-js). Image rows pending Phase 34*
+- [x] Before/after table in `docs/performance.md`; the budget is met or the gaps are listed. *2026-10-09: table written; mobile LCP dashboard 3.51 → 2.35 s, listing 2.66 → 2.36 s, search 3.34 → 2.77 s, statistics 1.96 → 1.87 s; CLS ≤ 0.084; TBT ≤ 71 ms. Gaps listed: search LCP (needs route-level data loading), initial JS ≈ 201 kB vs 170 (framework: react-dom + supabase-js). Image rows pending Phase 34. 2026-10-10, `--with-images` after the flip: listing images ≈ 1.1 MB per 20 cards (was ≈ 22 MB). Photos become the LCP: mobile listing 4.50 s, search 5.10 s, detail 3.65 s; desktop 0.70–1.51 s. Listed as gap 3 with a waterfall and options (phone-sized variant via `srcset`, route-level data loading, thumb as the detail page's narrow candidate)*
 
 ### Definition of Done
 Old Phase 29's DoD: browse, search and detail stay responsive at the expected scale, with numbers recorded.
@@ -328,10 +328,10 @@ Close the `DEVELOPMENT_PLAN.md` final checklist and ship it all.
 
 ### Tasks
 - [ ] `RAWG_API_KEY` set in Vercel (Production + Preview); autofill checked on the deployed site
-- [ ] `docs/backup.md`: DB export + image backup procedure, how often, restore steps (the open "backup/recovery" item)
-- [ ] README: setup, env, migrations (manual SQL-editor flow), seed, scripts (`images:*`, `verify:rls`), testing, deployment
-- [ ] `CLAUDE.md`: image variants, upload pipeline, admin allow-list, scripts
-- [ ] Egress/storage watch: a short monthly check in the README (Usage page), or a script that sums the bucket
+- [x] `docs/backup.md`: DB export + image backup procedure, how often, restore steps (the open "backup/recovery" item). *Written in Phase 32; 2026-10-10 added the post-flip state and how to undo the WebP migration*
+- [x] README: setup, env, migrations (manual SQL-editor flow), seed, scripts (`images:*`, `verify:rls`), testing, deployment *(2026-10-10)*
+- [x] `CLAUDE.md`: image variants, upload pipeline, admin allow-list, scripts *(kept current phase by phase; the flip state added 2026-10-10)*
+- [x] Egress/storage watch: a short monthly check in the README (Usage page), or a script that sums the bucket. *README "Monthly quota check": the Usage page plus `npm run images:audit`, which sums the bucket from metadata*
 - [ ] Release on a preview deployment → the owner checks it → `main`
 
 ### Verification

@@ -8,7 +8,7 @@ How fast the public pages load, the budget they're held to, and how to measure a
 npm run build && npm run preview                  # serves dist/ on :4173 (another terminal)
 npm run perf:vitals                               # 5 pages × mobile + desktop, 5 runs each (medians)
 npm run perf:vitals -- --runs 1 --profile mobile --route /games --waterfall   # request timeline
-npm run perf:vitals -- --with-images              # after Phase 34 only — see "Images" below
+npm run perf:vitals -- --with-images              # also load the photos (≈ 1 MB per listing load) — see "Images"
 ```
 
 `scripts/perf/vitals.mjs` (copied from the diecast app) drives the local Edge/Chrome headless over
@@ -24,12 +24,11 @@ Pages: `/` (dashboard), `/games` (a listing), `/games/04a0…` ("Alan Wake", a d
 
 ### Images
 
-**Storage images are blocked by default.** Until the Phase 34 WebP flip the photos are the 1–7 MB
-originals, and 50 cold runs would download hundreds of MB of the org's shared 5 GB/month. So
-these numbers cover the app shell, data and layout; the hero and favicons (static files on
-Vercel) are included, collection photos are not. The detail page's LCP is a placeholder until
-then. After Phase 34, re-run with `--with-images` (≈ 1 MB per listing load) and fill in the
-pending rows.
+**Storage images are blocked by default**, so a routine run costs almost no egress: the numbers
+then cover the app shell, data and layout (the hero and favicons, static files on Vercel, are
+included). Before the Phase 34 WebP flip the photos were the 1–7 MB originals. Since the flip
+(2026-10-10) `--with-images` costs ≈ 0.5–1.1 MB per page load, ≈ 40 MB for a full run. The
+"With images" section below is that run.
 
 ## Budget
 
@@ -37,13 +36,14 @@ pending rows.
 | --- | --- | --- | --- |
 | LCP, mobile — dashboard, listing, statistics | < 2.5 s | 2.35 / 2.36 / 1.87 s | ✅ |
 | LCP, mobile — search | < 2.5 s | 2.77 s | ❌ gap 1 |
-| LCP, mobile — detail page | < 2.5 s | pending Phase 34 (photo is the LCP) | ⏳ |
+| LCP, mobile — with photos (listing / search / detail) | < 2.5 s | 4.50 / 5.10 / 3.65 s | ❌ gap 3 |
+| LCP, desktop — with photos | < 1.0 s | 0.70–1.51 s (listing 1.40, search 1.51, detail 1.02) | ❌ gap 3 |
 | LCP, desktop — every page | < 1.0 s | 0.32–0.80 s | ✅ |
 | CLS | < 0.1 | ≤ 0.084 (dashboard, desktop) | ✅ |
 | TBT (INP proxy), mobile | < 200 ms | ≤ 71 ms | ✅ |
 | Initial JS (scripts in `index.html`, gzip) | ≤ 170 kB | ≈ 201 kB | ❌ gap 2 |
 | JS per page, transferred | — | 207–220 kB | |
-| Listing images | ≤ 1 MB | pending Phase 34 | ⏳ |
+| Listing images (20 cards, all thumbs loaded) | ≤ 1 MB | ≈ 1.07–1.12 MB (was ≈ 22 MB); mobile first load 434 kB | ≈ ✅ |
 | `all_items` listing response (20 rows) | — | 2.2 kB transferred | |
 
 ## Before / after (2026-10-09, medians of 5)
@@ -60,6 +60,23 @@ Mobile (Slow 4G, 4× CPU):
 
 Desktop: LCP was already 0.35–0.78 s and stays there (0.32–0.80 s), with the same request and
 byte savings.
+
+## With images (2026-10-10, after the Phase 34 flip, medians of 5)
+
+`npm run perf:vitals -- --with-images`. The app-only numbers above didn't move (same JS, same
+data; dashboard and statistics LCP are unchanged), but once photos load they become the LCP element
+on the listing, search and detail pages:
+
+| Page | Mobile LCP | Mobile images | Desktop LCP | Desktop images |
+| --- | --- | --- | --- | --- |
+| `/` | 2,336 ms (hero) | 364 kB × 10 | 700 ms | 612 kB × 14 |
+| `/games` | 4,504 ms (first card thumb) | 434 kB × 11 | 1,404 ms | 1,117 kB × 21 |
+| `/games/04a0…` | 3,652 ms (full WebP) | 124 kB × 7 | 1,016 ms | 124 kB × 7 |
+| `/items?q=creed` | 5,096 ms (first card thumb) | 719 kB × 11 | 1,508 ms | 1,138 kB × 20 |
+| `/statistics` | 1,864 ms | 10 kB × 1 | 348 ms | 10 kB × 1 |
+
+CLS stays ≤ 0.084 and TBT ≤ 41 ms. For comparison, before the flip one listing load was ≈ 22 MB of
+originals.
 
 ## What changed
 
@@ -110,6 +127,22 @@ so it wasn't worth the code.
    be replacing `createClient` with the separate `postgrest-js` / `auth-js` / `storage-js`
    clients, a rewrite of every query module for ≈ 15 kB. Not worth it now; the budget should
    probably become ≤ 205 kB unless that's done.
+
+3. **Photo LCP on mobile (4.5 s listing, 5.1 s search, 3.65 s detail) and desktop (1.0–1.5 s).**
+   The `/games` waterfall (mobile, `--waterfall`) shows two halves. (a) The images can't start
+   before ≈ 2.75 s: JS done 1.43 s → route chunk 1.76 s → `all_items` 2.69 s, which is gap 1's
+   chain. (b) Then 11 thumbs (≈ 30–85 kB each, 434 kB) download in parallel over 1.6 Mbps, so each
+   takes ≈ 2 s and the LCP card lands at ≈ 4.6 s. Instant images would still leave ≈ 2.8 s. Options,
+   for the owner to choose:
+   - **A smaller phone variant**, e.g. ≈ 320×400 (a 2-column card is ≈ 180 CSS px × 1.75 DPR ≈ 315
+     px), served through `srcset`/`sizes`. ≈ 12 kB each would cut (b) to ≈ 0.7 s. Costs a third
+     variant: one more upload run of ≈ 1,400 objects (≈ 20 MB) and a schema/read-path change.
+   - **Fewer images competing:** priority only for the first visible row (2 cards on phones)
+     instead of 6. Chrome still loads the other lazy cards near the viewport, so the gain is small.
+   - **Route-level data loading** (gap 1) to start the query, and so the images, ≈ 0.7 s earlier.
+   - **Detail page:** the main image is the full WebP (≈ 1600 px) on phones too, where the 600×750
+     thumb is close to enough (a ≈ 380 px frame × 1.75 ≈ 665 px). `srcset` with the thumb as the
+     narrow candidate would roughly halve its bytes.
 
 ## Scale
 
