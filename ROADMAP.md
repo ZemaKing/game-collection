@@ -92,7 +92,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 37 | Retire Originals (free the quota) | ✅ Done (2026-10-10, owner-approved: 1,426 originals / 1.45 GB deleted; bucket 437 MB, all WebP) | Check the Usage page shows Storage < 1 GB once it refreshes |
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
 | 39 | Performance Pass (was Phase 29) | ✅ Done (2026-10-10; gap 3's phone-sized `small` variant shipped: mobile listing LCP 4.50 → 3.99 s, search 5.10 → 4.25 s) | Optional: route-level data loading (gaps 1 and 3) |
-| 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E job enabled by the secrets (2026-10-10) | Repo secrets added 2026-10-10; make the `verify` CI check required (GitHub setting) |
+| 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E job enabled by the secrets (2026-10-10) | Repo secrets added 2026-10-10 (required check not applicable: straight-to-`main` workflow); confirm the `e2e` job is green in GitHub → Actions |
 | 41 | Operations, Docs & Production Verification | 🟡 Docs done and `RAWG_API_KEY` live (2026-10-10); the production sweep waits for the owner | Production sweep (`docs/production-verification.md`); go/no-go |
 
 ---
@@ -311,7 +311,7 @@ Finish the old Phase 30: protect the core flows end to end.
 - [x] Playwright E2E (`@playwright/test` 1.64, dev dependency: the E2E runner; the locally installed Edge, so no browser download), at Desktop, Tablet and Mobile: browse, filter, search, detail, viewer, settings — 21 journeys × 3 layouts (`e2e/README.md`). **Read-only against production** (Open decision 3): a fixture fails any non-GET to Supabase (diecast pattern; proven with a throw-away POST), and Storage images are answered with a 1×1 PNG, so a run costs ≈ 2 MB of egress. Expected counts come from PostgREST, not the app
 - [x] Owner flows (login, create/edit/delete, image upload, duplicate warning, unsaved-changes guard): no test project, so they're a manual checklist in `docs/production-verification.md`
 - [x] CI: `npm run typecheck` (`tsc -b`, now also over `e2e/` via `tsconfig.e2e.json`) as its own step; the image-pipeline tests (`scripts/**/*.test.ts`, 60) already ran in `npm test`. E2E is a separate `e2e` job after `verify`, using the runner's Chrome; it is skipped with a notice until the two repo secrets exist, and keeps the report as an artifact on failure
-- [ ] Owner: make the CI check required on `main` (GitHub → Settings → Branches)
+- [x] ~~Owner: make the CI check required on `main`~~ **Not applicable (owner, 2026-10-10):** all work is pushed straight to `main`, no branches or PRs, and a required check only gates PR merges. CI still runs on every push and GitHub mails a failure
 
 ### Verification
 - [ ] E2E is green 3 runs in a row (no flakes); CI blocks a deliberately broken commit. *2026-10-09, locally: `--repeat-each=3` → 186 passed, 0 flaky, 3 skipped (Ctrl K on phones, by design). The CI half waits for the required-check setting and the secrets*
@@ -332,7 +332,7 @@ Close the `DEVELOPMENT_PLAN.md` final checklist and ship it all.
 - [x] README: setup, env, migrations (manual SQL-editor flow), seed, scripts (`images:*`, `verify:rls`), testing, deployment *(2026-10-10)*
 - [x] `CLAUDE.md`: image variants, upload pipeline, admin allow-list, scripts *(kept current phase by phase; the flip state added 2026-10-10)*
 - [x] Egress/storage watch: a short monthly check in the README (Usage page), or a script that sums the bucket. *README "Monthly quota check": the Usage page plus `npm run images:audit`, which sums the bucket from metadata*
-- [ ] Release on a preview deployment → the owner checks it → `main`
+- [x] ~~Release on a preview deployment → the owner checks it → `main`~~ **Not applicable (owner, 2026-10-10):** no branches, so Vercel builds no previews; every push to `main` is a production deploy, checked there (`docs/production-verification.md`)
 
 ### Verification
 - [ ] On production: Desktop/Tablet/Mobile sweep of every screen (the final checklist item), sign-ups off, images WebP, autofill works
