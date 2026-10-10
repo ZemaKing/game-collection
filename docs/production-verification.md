@@ -15,15 +15,15 @@ Back/Next/Save bar and the bottom tab bar's + button).
 
 ## Sign in / out
 
-- [ ] `/login` with the owner account → signed in; the + "Add New Item" button and the ⋮ "More actions" button next to each grid card's title (Edit, Delete) appear
-- [ ] A signed-out visitor sees neither; `/games/<id>/edit` redirects to `/login`
-- [ ] Sign out → back to the public view
+- [x] `/login` with the owner account → signed in; the + "Add New Item" button and the ⋮ "More actions" button next to each grid card's title (Edit, Delete) appear
+- [x] A signed-out visitor sees neither; `/games/<id>/edit` redirects to `/login`
+- [x] Sign out → back to the public view
 
 ## Create
 
-- [ ] `/items/new` → Game → fill title, platform, genre, condition → Save → lands on the new detail page with everything shown
+- [x] `/items/new` → Game → fill title, platform, genre, condition → Save → lands on the new detail page with everything shown
 - [x] The RAWG autofill finds a game and imports its cover plus up to 3 screenshots (cover first, the cover marked as cover), each stored as `.webp` + `.thumb.webp` + `.small.webp` (the Phase 36 open check)
-- [ ] One more type with its own fields (e.g. a Figure: manufacturer, character, scale)
+- [x] One more type with its own fields (e.g. a Figure: manufacturer, character, scale)
 
 ## Duplicate warning
 
@@ -53,4 +53,4 @@ Back/Next/Save bar and the bottom tab bar's + button).
 
 | Date | Release / commit | Result | Notes |
 | --- | --- | --- | --- |
-| 2026-10-10 | `47529a6` (production) | Pass | Owner: RAWG autofill (cover + 3 screenshots, each `.webp` + `.thumb.webp` + `.small.webp`), duplicate warning, edit + unsaved-changes guard, images, delete. Not yet recorded: sign in/out, plain create, the Tablet/Mobile spot-check |
+| 2026-10-10 | `47529a6` (production) | Pass | Owner: RAWG autofill (cover + 3 screenshots, each `.webp` + `.thumb.webp` + `.small.webp`), duplicate warning, edit + unsaved-changes guard, images, delete. Then sign in/out (+ the ⋮ card menu), plain create of a Game and a Figure, and the Tablet/Mobile spot-check — the whole list passes |

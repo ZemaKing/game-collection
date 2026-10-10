@@ -93,7 +93,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
 | 39 | Performance Pass (was Phase 29) | ✅ Done (2026-10-10; gap 3's phone-sized `small` variant shipped: mobile listing LCP 4.50 → 3.99 s, search 5.10 → 4.25 s) | Optional: route-level data loading (gaps 1 and 3) |
 | 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E job enabled by the secrets (2026-10-10) | Repo secrets added 2026-10-10 (required check not applicable: straight-to-`main` workflow); confirm the `e2e` job is green in GitHub → Actions |
-| 41 | Operations, Docs & Production Verification | 🟡 Docs done and `RAWG_API_KEY` live (2026-10-10); the production sweep waits for the owner | Production sweep (`docs/production-verification.md`); go/no-go |
+| 41 | Operations, Docs & Production Verification | 🟡 Docs done, `RAWG_API_KEY` live, production sweep passed (2026-10-10) | Go/no-go; Open decision 2 (originals online?) |
 
 ---
 
@@ -335,7 +335,7 @@ Close the `DEVELOPMENT_PLAN.md` final checklist and ship it all.
 - [x] ~~Release on a preview deployment → the owner checks it → `main`~~ **Not applicable (owner, 2026-10-10):** no branches, so Vercel builds no previews; every push to `main` is a production deploy, checked there (`docs/production-verification.md`)
 
 ### Verification
-- [ ] On production: Desktop/Tablet/Mobile sweep of every screen (the final checklist item), sign-ups off, images WebP, autofill works
+- [x] On production: Desktop/Tablet/Mobile sweep of every screen (the final checklist item), sign-ups off, images WebP, autofill works. *2026-10-10: owner ran the whole `docs/production-verification.md` list on production (sign in/out, create, RAWG autofill with screenshots, duplicate warning, edit guard, images, delete) at Desktop with Tablet/Mobile spot-checks, and opened every item type; all pass*
 
 ### Definition of Done
 Every `DEVELOPMENT_PLAN.md` final-checklist item is ticked or explicitly deferred by the owner.
