@@ -4,13 +4,16 @@ import {mkdtempSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import sharp from "sharp";
-import {afterAll, beforeAll, describe, expect, it} from "vitest";
+import {afterAll, beforeAll, describe, expect, it, vi} from "vitest";
 
 import {checkSources, download, loadOriginal, mapPool, plannedPaths, runBatch} from "./batch.ts";
 import {convertVariant, readImageInfo, sha256, variantSettings} from "./convert.ts";
 import {emptyManifest, isDone, type Manifest} from "./manifest.ts";
 import type {ImageJob, ImageSource, StorageTarget} from "./types.ts";
 import {verifyObjects} from "./verify.ts";
+
+// Each test runs several real sharp conversions; a shared CI runner can take longer than the 5 s default.
+vi.setConfig({testTimeout: 30_000});
 
 const noSleep = () => Promise.resolve();
 
