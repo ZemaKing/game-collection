@@ -251,7 +251,7 @@ Remove the 1,811 original files from Storage once WebP has been live and stable,
 
 ### Verification
 - [ ] The bucket is ≈ 0.26 GB; the org's Usage page shows Storage < 1 GB and uploads allowed. *`images:audit` 2026-10-10: 4,622 objects, **437 MB**, all WebP, 0 orphans (more than 0.26 GB because ≈ 520 items' images were added since the estimate). The Usage page lags; owner to confirm*
-- [ ] Every row still resolves (HEAD 200); the app is checked on each item type
+- [x] Every row still resolves (HEAD 200); the app is checked on each item type. *2026-10-10: `images:verify` → 2,318 rows, 6,954 URLs (full + thumb + small) all 200; owner checked every item type in the app. The one orphan left by a failed screenshot upload was deleted by the owner*
 
 ### Definition of Done
 Only WebP variants remain in Storage; originals live in the off-Supabase backup.
