@@ -17,7 +17,7 @@ This file was the live progress tracker for the game-collection site. Update che
 
 ## Project Status
 
-Current Phase: Phase 29 — Performance Pass (Post-MVP)  
+Current Phase: none — all phases complete (29 and 30 finished as ROADMAP.md 39 and 40; release signed off by the owner 2026-10-10)  
 MVP Status: Complete
 
 ## MVP Progress
@@ -54,8 +54,8 @@ MVP Status: Complete
 - [x] Phase 26 — Profile & Collection Overview
 - [x] Phase 27 — Responsive Refinement Pass
 - [x] Phase 28 — Accessibility Pass
-- [ ] Phase 29 — Performance Pass
-- [ ] Phase 30 — Testing Hardening
+- [x] Phase 29 — Performance Pass *(finished as ROADMAP.md Phase 39, 2026-10-10)*
+- [x] Phase 30 — Testing Hardening *(finished as ROADMAP.md Phase 40, 2026-10-10)*
 
 ---
 
@@ -1152,7 +1152,7 @@ Keep the collection fast as its item and image counts grow.
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete *(as ROADMAP.md Phase 39, 2026-10-10 — results in `docs/performance.md`)*
 
 ---
 
@@ -1190,7 +1190,7 @@ Protect the complete product with a maintainable automated test suite.
 
 ### Phase Status
 
-- [ ] Phase Complete
+- [x] Phase Complete *(as ROADMAP.md Phase 40, 2026-10-10 — E2E is read-only by decision; owner flows are `docs/production-verification.md`)*
 
 ---
 
@@ -1217,8 +1217,8 @@ Promote an item below to a numbered phase only after explicit approval:
 ## Final Completion Checklist
 
 - [x] All MVP phases complete
-- [ ] All Post-MVP phases selected for the release complete
-- [ ] Every user-facing screen verified on Desktop, Tablet, and Mobile
-- [ ] Public read and owner-only write security verified
-- [ ] Production backup/recovery procedure documented
-- [ ] README updated with setup, migrations, seed, environment, testing, and deployment instructions
+- [x] All Post-MVP phases selected for the release complete *(Phases 24–28 here, then ROADMAP.md 31–41)*
+- [x] Every user-facing screen verified on Desktop, Tablet, and Mobile *(owner, on production, 2026-10-10)*
+- [x] Public read and owner-only write security verified *(ROADMAP.md Phase 31, `npm run verify:rls`)*
+- [x] Production backup/recovery procedure documented *(`docs/backup.md`)*
+- [x] README updated with setup, migrations, seed, environment, testing, and deployment instructions *(2026-10-10)*

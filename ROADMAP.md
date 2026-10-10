@@ -4,7 +4,7 @@ Follow-up to [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md), which built the app (
 
 The image pipeline reuses the one built for the diecast app (`../diecast-collection/scripts/images/` + `src/lib/image-resize.ts`), which was written app-agnostic for this purpose (diecast ROADMAP Phase 21).
 
-**Status: Phase 33 code done and its migration applied; Phases 35 and 36 code done ahead of Phase 34 (owner-approved, 2026-10-09): the app reads thumbs as soon as Phase 34 fills them, and new uploads are already stored as WebP. The full image backup (Phase 32) waits for the egress reset on 2026-10-10, then the full Phase 33 dry run, then Phase 34.** Research done 2026-10-04 (findings below).
+**Status (2026-10-10): every phase is done and the owner signed off the release. One check is left: the org Usage page should show Storage < 1 GB once it refreshes (Phase 37).** Research done 2026-10-04 (findings below).
 
 ---
 
@@ -93,7 +93,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
 | 39 | Performance Pass (was Phase 29) | ✅ Done (2026-10-10; gap 3's phone-sized `small` variant shipped: mobile listing LCP 4.50 → 3.99 s, search 5.10 → 4.25 s) | Optional: route-level data loading (gaps 1 and 3) |
 | 40 | Testing Hardening (was Phase 30) | ✅ Done (2026-10-10: CI green on GitHub with E2E, run #34) | — |
-| 41 | Operations, Docs & Production Verification | 🟡 Docs done, `RAWG_API_KEY` live, production sweep passed (2026-10-10) | Go/no-go |
+| 41 | Operations, Docs & Production Verification | ✅ Done (2026-10-10: production sweep passed, owner go) | — |
 
 ---
 
@@ -339,6 +339,8 @@ Close the `DEVELOPMENT_PLAN.md` final checklist and ship it all.
 
 ### Definition of Done
 Every `DEVELOPMENT_PLAN.md` final-checklist item is ticked or explicitly deferred by the owner.
+
+- [x] Every final-checklist item ticked; owner go on 2026-10-10
 
 ---
 
