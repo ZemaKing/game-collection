@@ -13,6 +13,7 @@ import {
   ITEM_TYPE_ROUTES,
   PLATFORM_ICONS,
   PLATFORM_SHORT_LABELS,
+  stuffCategoryMeta,
 } from '@/features/items/constants'
 import { COMPLETED_TEXT_CLASS, CompletedCheck } from '@/features/items/components/CompletedMarks'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
@@ -108,9 +109,20 @@ function FormatOverlayBadge({ slug, size = 'md' }: { slug?: string | null; size?
   )
 }
 
-/** Genre pill — same design as the genre badges on the item detail screen. */
-function GenreBadge({ slug, name }: { slug: string; name: string | null }) {
-  const meta = GENRE_META[slug] ?? DEFAULT_GENRE_META
+/** A Stuff item's category — the `all_items` subtitle for that type, shown as a pill rather than as text. */
+function stuffCategoryOf(item: AllItemRow) {
+  return item.item_type === 'stuff' ? item.subtitle : null
+}
+
+/**
+ * Genre pill (or, for Stuff, category pill) — same design as the badges on the
+ * item detail screen. Renders nothing when the item has neither.
+ */
+function GenreBadge({ item }: { item: AllItemRow }) {
+  const category = stuffCategoryOf(item)
+  if (!item.genre_slug && !category) return null
+  const meta = item.genre_slug ? (GENRE_META[item.genre_slug] ?? DEFAULT_GENRE_META) : stuffCategoryMeta(category ?? '')
+  const name = item.genre_slug ? item.genre_name : category
   const Icon = meta.icon
   return (
     <span
@@ -170,7 +182,7 @@ function ListTitle({ item }: { item: AllItemRow }) {
  */
 function Subtitle({ item, className = '' }: { item: AllItemRow; className?: string }) {
   const editionName = editionNameOf(item)
-  const text = hasEditionField(item.item_type) && item.item_type !== 'game' ? null : item.subtitle
+  const text = (hasEditionField(item.item_type) && item.item_type !== 'game') || stuffCategoryOf(item) ? null : item.subtitle
   return (
     <div className={`flex min-h-4 min-w-0 items-center gap-1.5 ${className}`}>
       {text && <p className="min-w-0 truncate text-xs text-muted">{text}</p>}
@@ -200,8 +212,8 @@ export function ItemCard({
 
     const shortPlatform = (platformSlug && PLATFORM_SHORT_LABELS[platformSlug]) || platformName
     const editionName = editionNameOf(item)
-    // For special editions/steelbooks the subtitle *is* the edition name, so it's shown only as the badge.
-    const publisher = hasEditionField(item.item_type) && item.item_type !== 'game' ? null : item.subtitle
+    // For special editions/steelbooks the subtitle *is* the edition name (shown only as the badge); for Stuff it's the category pill.
+    const publisher = (hasEditionField(item.item_type) && item.item_type !== 'game') || stuffCategoryOf(item) ? null : item.subtitle
 
     return (
       <Link
@@ -233,10 +245,10 @@ export function ItemCard({
               <EditionBadge name={editionNameOf(item) ?? ''} size="sm" className="-my-0.5 min-w-0 shrink" />
             </div>
           ) : (
-            <p className="truncate text-xs text-muted">{[typeLabel, item.subtitle].filter(Boolean).join(' · ') || ' '}</p>
+            <p className="truncate text-xs text-muted">{[typeLabel, stuffCategoryOf(item) ? null : item.subtitle].filter(Boolean).join(' · ') || ' '}</p>
           )}
           <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
-            {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+            <GenreBadge item={item} />
             <span className="flex min-w-0 items-center gap-1 truncate text-xs text-muted">
               {shortPlatform && (
                 <PlatformLabel platformName={shortPlatform} platformSlug={platformSlug} className="shrink-0" />
@@ -264,7 +276,7 @@ export function ItemCard({
           </div>
           <div className="flex min-w-0 items-center gap-4">
             {showTypeBadge && <TypeBadge item={item} />}
-            {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+            <GenreBadge item={item} />
             {platformName ? (
               <PlatformLabel platformName={platformName} platformSlug={platformSlug} className="text-xs text-muted" />
             ) : (
@@ -287,7 +299,7 @@ export function ItemCard({
         <div className="hidden shrink-0 items-center gap-6 @4xl:flex">
           {showTypeBadge && <TypeBadge item={item} />}
           <div className="flex w-28 justify-start">
-            {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+            <GenreBadge item={item} />
           </div>
           {platformName ? (
             <PlatformLabel platformName={platformName} platformSlug={platformSlug} className="w-32 text-xs text-muted" />
@@ -377,9 +389,9 @@ export function ItemCard({
                   <EditionBadge name={editionNameOf(item) ?? ''} size="sm" className="-my-0.5" />
                 </div>
               ) : (
-                <p className="min-w-0 flex-1 truncate text-xs text-muted">{item.subtitle}</p>
+                <p className="min-w-0 flex-1 truncate text-xs text-muted">{stuffCategoryOf(item) ? null : item.subtitle}</p>
               )}
-              {item.genre_slug && <GenreBadge slug={item.genre_slug} name={item.genre_name} />}
+              <GenreBadge item={item} />
             </div>
           )}
           <div className="mt-1 flex min-w-0 items-center justify-between gap-2">

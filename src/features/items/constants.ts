@@ -1,6 +1,15 @@
 import {
   Archive,
+  Award,
   BookOpen,
+  Cable,
+  Coins,
+  Frame,
+  Gamepad,
+  KeyRound,
+  Mail,
+  Sticker,
+  WalletCards,
   Boxes,
   ChessKnight,
   Cloud,
@@ -191,6 +200,36 @@ export const GENRE_META: Record<string, { icon: LucideIcon; color: { icon: strin
 export const DEFAULT_GENRE_META = {
   icon: Gamepad2,
   color: { icon: 'text-slate-600 dark:text-slate-400', badge: 'bg-slate-500/15 text-slate-800 dark:text-slate-300' },
+}
+
+/**
+ * The known Stuff categories, in picker order, each with one glyph + accent
+ * color (same `{ icon, badge }` shape as `GENRE_META`). `stuff.category` is
+ * free text, so match a stored value with `stuffCategoryMeta` (case- and
+ * whitespace-insensitive), which falls back for unknown names.
+ */
+export const STUFF_CATEGORIES: { name: string; icon: LucideIcon; color: { icon: string; badge: string } }[] = [
+  { name: 'Cable Guys', icon: Cable, color: { icon: 'text-teal-600 dark:text-teal-400', badge: 'bg-teal-500/15 text-teal-800 dark:text-teal-300' } },
+  { name: 'Card', icon: WalletCards, color: { icon: 'text-violet-600 dark:text-violet-400', badge: 'bg-violet-500/15 text-violet-800 dark:text-violet-300' } },
+  { name: 'Coin', icon: Coins, color: { icon: 'text-amber-600 dark:text-amber-400', badge: 'bg-amber-500/15 text-amber-800 dark:text-amber-300' } },
+  { name: 'Controller', icon: Gamepad, color: { icon: 'text-blue-600 dark:text-blue-400', badge: 'bg-blue-500/15 text-blue-800 dark:text-blue-300' } },
+  { name: 'Key', icon: KeyRound, color: { icon: 'text-yellow-600 dark:text-yellow-400', badge: 'bg-yellow-500/15 text-yellow-800 dark:text-yellow-300' } },
+  { name: 'Map', icon: Map, color: { icon: 'text-emerald-600 dark:text-emerald-400', badge: 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300' } },
+  { name: 'Patch', icon: Award, color: { icon: 'text-red-600 dark:text-red-400', badge: 'bg-red-500/15 text-red-800 dark:text-red-300' } },
+  { name: 'Postcard', icon: Mail, color: { icon: 'text-sky-600 dark:text-sky-400', badge: 'bg-sky-500/15 text-sky-800 dark:text-sky-300' } },
+  { name: 'Poster', icon: Frame, color: { icon: 'text-orange-600 dark:text-orange-400', badge: 'bg-orange-500/15 text-orange-800 dark:text-orange-300' } },
+  { name: 'Stickers', icon: Sticker, color: { icon: 'text-pink-600 dark:text-pink-400', badge: 'bg-pink-500/15 text-pink-800 dark:text-pink-300' } },
+]
+
+/** Fallback for a Stuff category not present in `STUFF_CATEGORIES` (a new free-text value). */
+export const DEFAULT_STUFF_CATEGORY_META = {
+  icon: Package,
+  color: { icon: 'text-slate-600 dark:text-slate-400', badge: 'bg-slate-500/15 text-slate-800 dark:text-slate-300' },
+}
+
+export function stuffCategoryMeta(category: string) {
+  const key = category.trim().toLowerCase()
+  return STUFF_CATEGORIES.find((c) => c.name.toLowerCase() === key) ?? DEFAULT_STUFF_CATEGORY_META
 }
 
 /**

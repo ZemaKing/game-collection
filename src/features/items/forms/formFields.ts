@@ -10,6 +10,7 @@ export type FieldKind =
   | 'platformSelect'
   | 'conditionSelect'
   | 'editionSelect'
+  | 'categorySelect'
   | 'completedToggle'
   | 'gameSelect'
   | 'dlcTypeToggle'
@@ -154,7 +155,7 @@ export const FORM_SECTIONS: Record<ItemType, FormSectionDef[]> = {
       titleKey: 'form.sectionBasicInfo',
       fields: [
         titleField,
-        { name: 'category', labelKey: 'detail.category', kind: 'text' },
+        { name: 'category', labelKey: 'detail.category', kind: 'categorySelect' },
         { name: 'manufacturer', labelKey: 'detail.manufacturer', kind: 'text' },
         releaseDateField,
         collectionDateField,

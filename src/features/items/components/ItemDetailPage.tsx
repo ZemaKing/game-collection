@@ -20,6 +20,7 @@ import {
 } from '@/features/items/constants'
 import { CompletedRibbon } from '@/features/items/components/CompletedMarks'
 import { CompletenessBadge } from '@/features/items/components/CompletenessBadge'
+import { CategoryPill } from '@/features/items/components/CategorySelect'
 import { DETAIL_FIELDS } from '@/features/items/detailFields'
 import { EditionBadge } from '@/features/items/components/EditionBadge'
 import { GameDlcSection } from '@/features/items/components/GameDlcSection'
@@ -327,6 +328,16 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
                         <ConditionIcon size={12} />
                         {t(CONDITION_LABEL_KEYS[detail.condition])}
                       </span>
+                    </dd>
+                  </div>
+                )
+              }
+              if (field.labelKey === 'detail.category' && field.text) {
+                return (
+                  <div key={field.labelKey}>
+                    <dt className="text-xs font-medium text-muted">{t(field.labelKey)}</dt>
+                    <dd className="mt-1 flex">
+                      <CategoryPill name={field.text} />
                     </dd>
                   </div>
                 )

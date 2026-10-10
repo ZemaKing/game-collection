@@ -15,6 +15,7 @@ import {
   GENRE_META,
   ITEM_CONDITIONS,
 } from '@/features/items/constants'
+import { CategorySelect } from '@/features/items/components/CategorySelect'
 import { ConditionSelect } from '@/features/items/components/ConditionSelect'
 import { CompletionToggle } from '@/features/items/components/CompletionToggle'
 import { DlcTypeToggle } from '@/features/items/components/DlcTypeToggle'
@@ -218,6 +219,18 @@ export function ItemForm({
     if (field.kind === 'editionSelect') {
       return (
         <EditionSelect
+          key={field.name}
+          label={label}
+          name={field.name}
+          value={value as string}
+          onChange={(v) => setField(field.name, v as never)}
+          error={error}
+        />
+      )
+    }
+    if (field.kind === 'categorySelect') {
+      return (
+        <CategorySelect
           key={field.name}
           label={label}
           name={field.name}

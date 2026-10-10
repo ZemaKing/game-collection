@@ -92,6 +92,28 @@ describe('ItemForm', () => {
     expect(values.title).toBe('Wrath of the Druids')
   })
 
+  it('picks a Stuff category from the category list', async () => {
+    const { onSubmit } = setup({ itemType: 'stuff', title: 'Add stuff' })
+    await userEvent.type(titleInput(), 'GreedFall Map')
+    await userEvent.click(screen.getByRole('button', { name: /^Category/ }))
+    await userEvent.type(screen.getByRole('combobox', { name: 'Search or type a category…' }), 'ma')
+    await userEvent.click(screen.getByRole('option', { name: 'Map' }))
+    expect(screen.getByRole('button', { name: /^Category/ }).textContent).toContain('Map')
+    await userEvent.click(saveButton())
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit.mock.calls[0][0].values.category).toBe('Map')
+  })
+
+  it('keeps a typed Stuff category that is not in the list', async () => {
+    const { onSubmit } = setup({ itemType: 'stuff', title: 'Add stuff' })
+    await userEvent.type(titleInput(), 'Keychain')
+    await userEvent.click(screen.getByRole('button', { name: /^Category/ }))
+    await userEvent.type(screen.getByRole('combobox', { name: 'Search or type a category…' }), 'Keychain{Enter}')
+    await userEvent.click(saveButton())
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit.mock.calls[0][0].values.category).toBe('Keychain')
+  })
+
   it('cancels straight away when nothing changed', async () => {
     const { onCancel } = setup()
     await userEvent.click(screen.getAllByRole('button', { name: /cancel/i })[0])
