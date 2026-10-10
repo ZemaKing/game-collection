@@ -92,7 +92,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 37 | Retire Originals (free the quota) | ✅ Done (2026-10-10, owner-approved: 1,426 originals / 1.45 GB deleted; bucket 437 MB, all WebP) | Check the Usage page shows Storage < 1 GB once it refreshes |
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
 | 39 | Performance Pass (was Phase 29) | ✅ Done (2026-10-10; gap 3's phone-sized `small` variant shipped: mobile listing LCP 4.50 → 3.99 s, search 5.10 → 4.25 s) | Optional: route-level data loading (gaps 1 and 3) |
-| 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E job enabled by the secrets (2026-10-10) | Repo secrets added 2026-10-10 (required check not applicable: straight-to-`main` workflow); confirm the `e2e` job is green in GitHub → Actions |
+| 40 | Testing Hardening (was Phase 30) | ✅ Done (2026-10-10: CI green on GitHub with E2E, run #34) | — |
 | 41 | Operations, Docs & Production Verification | 🟡 Docs done, `RAWG_API_KEY` live, production sweep passed (2026-10-10) | Go/no-go |
 
 ---
@@ -314,7 +314,7 @@ Finish the old Phase 30: protect the core flows end to end.
 - [x] ~~Owner: make the CI check required on `main`~~ **Not applicable (owner, 2026-10-10):** all work is pushed straight to `main`, no branches or PRs, and a required check only gates PR merges. CI still runs on every push and GitHub mails a failure
 
 ### Verification
-- [ ] E2E is green 3 runs in a row (no flakes); CI blocks a deliberately broken commit. *2026-10-09, locally: `--repeat-each=3` → 186 passed, 0 flaky, 3 skipped (Ctrl K on phones, by design). The CI half waits for the required-check setting and the secrets*
+- [x] E2E is green 3 runs in a row (no flakes); CI blocks a deliberately broken commit. *2026-10-09, locally: `--repeat-each=3` → 186 passed, 0 flaky, 3 skipped (Ctrl K on phones, by design). 2026-10-10 on GitHub: run #33 went red on a failing test (a sharp test timing out on the runner) and e2e didn't start; after the fix run #34 (`b3e888b`) is green with verify + e2e, 2 m 51 s. The required-check half is not applicable (main-only workflow)*
 
 ### Definition of Done
 Core public flows are covered by E2E; owner flows by E2E or a documented manual checklist.
