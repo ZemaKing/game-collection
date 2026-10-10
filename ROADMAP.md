@@ -93,7 +93,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
 | 39 | Performance Pass (was Phase 29) | ✅ Done (2026-10-10; gap 3's phone-sized `small` variant shipped: mobile listing LCP 4.50 → 3.99 s, search 5.10 → 4.25 s) | Optional: route-level data loading (gaps 1 and 3) |
 | 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E job enabled by the secrets (2026-10-10) | Repo secrets added 2026-10-10 (required check not applicable: straight-to-`main` workflow); confirm the `e2e` job is green in GitHub → Actions |
-| 41 | Operations, Docs & Production Verification | 🟡 Docs done, `RAWG_API_KEY` live, production sweep passed (2026-10-10) | Go/no-go; Open decision 2 (originals online?) |
+| 41 | Operations, Docs & Production Verification | 🟡 Docs done, `RAWG_API_KEY` live, production sweep passed (2026-10-10) | Go/no-go |
 
 ---
 
@@ -347,7 +347,7 @@ Every `DEVELOPMENT_PLAN.md` final-checklist item is ticked or explicitly deferre
 | # | Question | Needed by |
 | --- | --- | --- |
 | 1 | **Over the Storage quota (≈ 2.1 GB of 1 GB, org-wide).** If uploads are already blocked, the WebP variants (~0.26 GB) can't be uploaded before space is freed. Options: (a) upgrade to Pro for one month ($25) during the migration; (b) after the verified local backup, delete originals per batch *before* uploading their WebP (the rollback then depends on the local backup); (c) migrate the recipes app first (frees ~70 MB, not enough on its own). Recommended: check the Usage page first; if blocked, (a) is the safest | Ph 32 / 34 |
-| 2 | Keep originals anywhere online after Phase 37 (e.g. a cloud drive), or is the local + second-copy backup enough? | Ph 37 |
+| 2 | ~~Keep originals anywhere online after Phase 37?~~ **Decided 2026-10-10:** no — the local backup plus the owner's copy on an external HDD is enough | ~~Ph 37~~ |
 | 3 | ~~E2E: a separate test project or read-only against production?~~ **Decided 2026-10-09:** read-only against production (the diecast choice); owner flows are a manual checklist | ~~Ph 40~~ |
 | 4 | ~~GIF uploads: convert or reject?~~ **Decided 2026-10-09:** convert to a still WebP (first frame); the upload area says so. Input limit stays 10 MB | ~~Ph 36~~ |
 | 5 | ~~Thumb size 600 px vs 400 px~~ **Decided 2026-10-09:** thumb 600×750, full 1600, both q85 | ~~Ph 33~~ |
