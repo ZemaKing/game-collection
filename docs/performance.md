@@ -36,14 +36,14 @@ included). Before the Phase 34 WebP flip the photos were the 1–7 MB originals.
 | --- | --- | --- | --- |
 | LCP, mobile — dashboard, listing, statistics | < 2.5 s | 2.35 / 2.36 / 1.87 s | ✅ |
 | LCP, mobile — search | < 2.5 s | 2.77 s | ❌ gap 1 |
-| LCP, mobile — with photos (listing / search / detail) | < 2.5 s | 4.50 / 5.10 / 3.65 s | ❌ gap 3 |
-| LCP, desktop — with photos | < 1.0 s | 0.70–1.51 s (listing 1.40, search 1.51, detail 1.02) | ❌ gap 3 |
+| LCP, mobile — with photos (listing / search / detail) | < 2.5 s | 3.99 / 4.25 / 3.66 s (was 4.50 / 5.10 / 3.65 before the small variant) | ❌ gap 3 |
+| LCP, desktop — with photos | < 1.0 s | 0.68–1.33 s (listing 1.25, search 1.33, detail 0.98) | ❌ gap 3 |
 | LCP, desktop — every page | < 1.0 s | 0.32–0.80 s | ✅ |
 | CLS | < 0.1 | ≤ 0.084 (dashboard, desktop) | ✅ |
 | TBT (INP proxy), mobile | < 200 ms | ≤ 71 ms | ✅ |
 | Initial JS (scripts in `index.html`, gzip) | ≤ 170 kB | ≈ 201 kB | ❌ gap 2 |
 | JS per page, transferred | — | 207–220 kB | |
-| Listing images (20 cards, all thumbs loaded) | ≤ 1 MB | ≈ 1.07–1.12 MB (was ≈ 22 MB); mobile first load 434 kB | ≈ ✅ |
+| Listing images, first load (mobile / desktop) | ≤ 1 MB | 306 kB / 709 kB (was 434 / 1,117 kB with thumbs only, ≈ 22 MB as originals) | ✅ |
 | `all_items` listing response (20 rows) | — | 2.2 kB transferred | |
 
 ## Before / after (2026-10-09, medians of 5)
@@ -77,6 +77,22 @@ on the listing, search and detail pages:
 
 CLS stays ≤ 0.084 and TBT ≤ 41 ms. For comparison, before the flip one listing load was ≈ 22 MB of
 originals.
+
+## After the small variant (2026-10-10, gap 3, medians of 5)
+
+A 4:5 `small` crop (400×500, ≈ 31 kB; covers 40.6 kB vs 69 kB as thumbs) offered through
+`srcset`/`sizes` next to the thumb. `npm run perf:vitals -- --with-images`:
+
+| Page | Mobile LCP | Mobile images | Desktop LCP | Desktop images |
+| --- | --- | --- | --- | --- |
+| `/` | 2,340 ms (hero) | 259 kB × 10 (was 364) | 684 ms | 443 kB × 14 (was 612) |
+| `/games` | **3,992 ms** (was 4,504) | 306 kB × 11 (was 434) | 1,248 ms (was 1,404) | 709 kB × 21 (was 1,117) |
+| `/games/04a0…` | 3,660 ms (full WebP, unchanged) | 122 kB × 7 | 980 ms | 122 kB × 7 |
+| `/items?q=creed` | **4,248 ms** (was 5,096) | 414 kB × 11 (was 719) | 1,332 ms (was 1,508) | 731 kB × 20 (was 1,138) |
+| `/statistics` | 1,872 ms | 10 kB × 1 | 336 ms | 10 kB × 1 |
+
+Image bytes fell 29–42 %, and the listing and search LCP by 0.5–0.85 s on mobile. The rest of
+gap 3 is the half the variant can't touch: the images still can't start before ≈ 2.75 s.
 
 ## What changed
 
@@ -128,15 +144,16 @@ so it wasn't worth the code.
    clients, a rewrite of every query module for ≈ 15 kB. Not worth it now; the budget should
    probably become ≤ 205 kB unless that's done.
 
-3. **Photo LCP on mobile (4.5 s listing, 5.1 s search, 3.65 s detail) and desktop (1.0–1.5 s).**
-   The `/games` waterfall (mobile, `--waterfall`) shows two halves. (a) The images can't start
+3. **Photo LCP on mobile (now 4.0 s listing, 4.25 s search, 3.66 s detail; was 4.5 / 5.1 / 3.65) and
+   desktop (1.0–1.3 s).** The `/games` waterfall (measured before the small variant) (mobile, `--waterfall`) shows two halves. (a) The images can't start
    before ≈ 2.75 s: JS done 1.43 s → route chunk 1.76 s → `all_items` 2.69 s, which is gap 1's
    chain. (b) Then 11 thumbs (≈ 30–85 kB each, 434 kB) download in parallel over 1.6 Mbps, so each
-   takes ≈ 2 s and the LCP card lands at ≈ 4.6 s. Instant images would still leave ≈ 2.8 s. Options,
-   for the owner to choose:
-   - **A smaller phone variant**, e.g. ≈ 320×400 (a 2-column card is ≈ 180 CSS px × 1.75 DPR ≈ 315
-     px), served through `srcset`/`sizes`. ≈ 12 kB each would cut (b) to ≈ 0.7 s. Costs a third
-     variant: one more upload run of ≈ 1,400 objects (≈ 20 MB) and a schema/read-path change.
+   takes ≈ 2 s and the LCP card lands at ≈ 4.6 s. Instant images would still leave ≈ 2.8 s.
+   - **Done (owner's choice, 2026-10-10): a smaller phone variant.** A 4:5 crop at 400×500
+     (`small`), served through `srcset`/`sizes` with phones at ≥ 2.5× capped to 2×; see "After the
+     small variant" above. (b) shrank, not to ≈ 0.7 s: 400×500 at q85 is ≈ 28–40 kB, not the
+     ≈ 12 kB a 320×400 q75 guess suggested, because the sizes were kept sharp at 2×.
+   Still open:
    - **Fewer images competing:** priority only for the first visible row (2 cards on phones)
      instead of 6. Chrome still loads the other lazy cards near the viewport, so the gain is small.
    - **Route-level data loading** (gap 1) to start the query, and so the images, ≈ 0.7 s earlier.

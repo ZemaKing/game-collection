@@ -91,7 +91,7 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Check the RAWG cover import on the next autofill (migration applied, test uploads verified 2026-10-09) |
 | 37 | Retire Originals (free the quota) | ✅ Done (2026-10-10, owner-approved: 1,426 originals / 1.45 GB deleted; bucket 437 MB, all WebP) | Check the Usage page shows Storage < 1 GB once it refreshes |
 | 38 | Static Assets (dashboard hero, icons) | ✅ Done (2026-10-09; 37 skipped for now, owner-approved) | Optional: a better hero source image (drop it in `static-src/`, run `images:static`) |
-| 39 | Performance Pass (was Phase 29) | ✅ Done (2026-10-10, image numbers measured; photo LCP on mobile is gap 3 in `docs/performance.md`) | Decide on gap 3 (a phone-sized image variant, and/or route-level data loading) |
+| 39 | Performance Pass (was Phase 29) | ✅ Done (2026-10-10; gap 3's phone-sized `small` variant shipped: mobile listing LCP 4.50 → 3.99 s, search 5.10 → 4.25 s) | Optional: route-level data loading (gaps 1 and 3) |
 | 40 | Testing Hardening (was Phase 30) | 🟡 Code done (2026-10-09); E2E in CI waits for the secrets | Add repo secrets `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`; make the `verify` CI check required (GitHub setting) |
 | 41 | Operations, Docs & Production Verification | 🟡 Docs done and `RAWG_API_KEY` live (2026-10-10); the production sweep waits for the owner | Production sweep (`docs/production-verification.md`); go/no-go |
 
