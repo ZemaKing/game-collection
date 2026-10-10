@@ -26,7 +26,12 @@ export interface RawgGameDetail {
   genres: string[]
   platforms: string[]
   backgroundImage: string | null
+  /** Up to `MAX_SCREENSHOTS` screenshot URLs, without the background image. Empty if RAWG has none. */
+  screenshots: string[]
 }
+
+/** With the background image, an autofill imports at most 4 pictures. */
+export const MAX_SCREENSHOTS = 3
 
 interface RawgPlatformEntry {
   platform?: { name?: string | null } | null
@@ -55,6 +60,10 @@ interface RawgDetailResponse {
   genres?: RawgNamedEntry[] | null
   platforms?: RawgPlatformEntry[] | null
   background_image?: string | null
+}
+
+interface RawgScreenshotsResponse {
+  results?: { image?: string | null }[]
 }
 
 async function rawgFetch(path: string, apiKey: string): Promise<unknown> {
@@ -94,8 +103,25 @@ export async function searchRawgGames(query: string, apiKey: string): Promise<Ra
   }))
 }
 
+/** The screenshots are extra: if that request fails, the details still come back (with none). */
+async function getRawgScreenshots(id: string, apiKey: string): Promise<string[]> {
+  try {
+    const data = (await rawgFetch(
+      `/games/${encodeURIComponent(id)}/screenshots?page_size=${MAX_SCREENSHOTS + 1}`,
+      apiKey,
+    )) as RawgScreenshotsResponse
+    return (data.results ?? []).map((shot) => shot.image).filter((url): url is string => Boolean(url))
+  } catch {
+    return []
+  }
+}
+
 export async function getRawgGameDetails(id: string, apiKey: string): Promise<RawgGameDetail> {
-  const data = (await rawgFetch(`/games/${encodeURIComponent(id)}`, apiKey)) as RawgDetailResponse
+  const [data, shots] = await Promise.all([
+    rawgFetch(`/games/${encodeURIComponent(id)}`, apiKey) as Promise<RawgDetailResponse>,
+    getRawgScreenshots(id, apiKey),
+  ])
+  const backgroundImage = data.background_image ?? null
 
   return {
     title: data.name ?? '',
@@ -107,6 +133,8 @@ export async function getRawgGameDetails(id: string, apiKey: string): Promise<Ra
     platforms: (data.platforms ?? [])
       .map((entry) => entry.platform?.name)
       .filter((name): name is string => Boolean(name)),
-    backgroundImage: data.background_image ?? null,
+    backgroundImage,
+    // RAWG's background image is often one of the screenshots too.
+    screenshots: shots.filter((url) => url !== backgroundImage).slice(0, MAX_SCREENSHOTS),
   }
 }

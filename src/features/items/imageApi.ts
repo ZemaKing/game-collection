@@ -180,14 +180,25 @@ export async function replaceItemImageFile(image: ItemImageRow, file: File): Pro
 }
 
 /**
- * Appends one image (e.g. imported cover artwork) the same way
- * `useItemImages.addFiles` does for the first manually-picked file: cover
- * only if the item has no images yet, positioned after whatever's there.
+ * Appends imported images in order (an autofill's cover, then its screenshots) the same way
+ * `useItemImages.addFiles` does for picked files: converted to WebP like any upload, positioned
+ * after whatever's there, the first one the cover only if the item has no images yet. One failed
+ * file doesn't stop the rest; returns how many failed.
  */
-export async function appendItemCoverImage(itemType: ItemType, itemId: string, file: File): Promise<ItemImageRow> {
-  // Converted like a picked file, so an imported RAWG cover is stored as WebP too.
+export async function appendItemImages(itemType: ItemType, itemId: string, files: File[]): Promise<number> {
+  if (files.length === 0) return 0
   const existing = await fetchItemImages(itemType, itemId)
-  return uploadItemImage(itemType, itemId, file, existing.length, existing.length === 0)
+  let position = existing.length
+  let failed = 0
+  for (const file of files) {
+    try {
+      await uploadItemImage(itemType, itemId, file, position, position === 0)
+      position += 1
+    } catch {
+      failed += 1
+    }
+  }
+  return failed
 }
 
 export async function reorderItemImages(orderedIds: string[]): Promise<void> {

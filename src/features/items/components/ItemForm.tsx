@@ -44,7 +44,8 @@ export interface ItemFormSubmitResult {
   relatedItems: RelatedItemSelection[]
   /** Only present for special editions — the games this edition is the special edition of. */
   baseGames?: RelatedItemSelection[]
-  coverImageFile?: File
+  /** Pictures an autofill fetched (cover first, then screenshots), uploaded after the item is saved. */
+  importedImageFiles?: File[]
 }
 
 interface ItemFormProps {
@@ -102,15 +103,15 @@ export function ItemForm({
   const isAlwaysPhysical = itemType === 'steelbook' || itemType === 'figure'
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [stepIndex, setStepIndex] = useState(0)
-  const [pendingCoverFile, setPendingCoverFile] = useState<File | undefined>(undefined)
+  const [pendingImageFiles, setPendingImageFiles] = useState<File[]>([])
 
   const isDirty = useMemo(
     () =>
       JSON.stringify(form) !== JSON.stringify(initialValues) ||
       JSON.stringify(sortedIds(relatedItems)) !== JSON.stringify(sortedIds(initialRelatedItems)) ||
       JSON.stringify(sortedIds(baseGames)) !== JSON.stringify(sortedIds(initialBaseGames)) ||
-      pendingCoverFile !== undefined,
-    [form, initialValues, relatedItems, initialRelatedItems, baseGames, initialBaseGames, pendingCoverFile],
+      pendingImageFiles.length > 0,
+    [form, initialValues, relatedItems, initialRelatedItems, baseGames, initialBaseGames, pendingImageFiles],
   )
   const { isBlocked, guardAction, confirmDiscard, cancelDiscard } = useUnsavedChangesGuard(isDirty)
 
@@ -266,9 +267,9 @@ export function ItemForm({
               form={form}
               genres={genres}
               platforms={platforms}
-              onApply={(values, coverImageFile) => {
+              onApply={(values, imageFiles) => {
                 setForm((prev) => ({ ...prev, ...values }))
-                if (coverImageFile) setPendingCoverFile(coverImageFile)
+                if (imageFiles.length > 0) setPendingImageFiles(imageFiles)
               }}
             />
           )}
@@ -367,7 +368,7 @@ export function ItemForm({
       values,
       relatedItems,
       baseGames: isSpecialEdition ? baseGames : undefined,
-      coverImageFile: pendingCoverFile,
+      importedImageFiles: pendingImageFiles,
     })
   }
 

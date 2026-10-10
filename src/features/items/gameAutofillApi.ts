@@ -15,6 +15,8 @@ export interface GameAutofillDetail {
   genres: string[]
   platforms: string[]
   backgroundImage: string | null
+  /** Up to 3 screenshot URLs (media.rawg.io), imported after the cover when checked. */
+  screenshots?: string[]
 }
 
 export type AutofillErrorKind = 'rateLimited' | 'unavailable' | 'network'

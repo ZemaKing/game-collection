@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ItemImageRow } from '@/features/items/detailTypes'
-import { replaceItemImageFile, uploadItemImage } from '@/features/items/imageApi'
+import { appendItemImages, replaceItemImageFile, uploadItemImage } from '@/features/items/imageApi'
 import type { ResizedImage, ResizeVariant } from '@/lib/image-resize'
 
 // A fake Supabase: records every Storage call and the row written, and can be told to fail.
@@ -13,6 +13,12 @@ const fake = vi.hoisted(() => ({
   resizeCalls: [] as ResizeVariant[][],
   encoded: 'image/webp',
   resizeError: null as Error | null,
+  existingImages: 0,
+}))
+
+vi.mock('@/features/items/detailApi', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/items/detailApi')>()),
+  fetchItemImages: async () => Array.from({ length: fake.existingImages }, (_, i) => ({ id: `old-${i}` })),
 }))
 
 vi.mock('@/lib/supabaseClient', () => {
@@ -73,6 +79,7 @@ beforeEach(() => {
     resizeCalls: [],
     encoded: 'image/webp',
     resizeError: null,
+    existingImages: 0,
   })
 })
 
@@ -186,5 +193,28 @@ describe('replaceItemImageFile', () => {
     const [full, thumb, small] = fake.uploads.map((u) => u.path)
     expect(fake.log.at(-1)).toBe(`remove ${full} ${thumb} ${small}`)
     expect(fake.log.some((l) => l.includes('old'))).toBe(false)
+  })
+})
+
+describe('appendItemImages', () => {
+  const shot = (name: string) => new File(['x'], name, { type: 'image/jpeg' })
+
+  it('appends in order after the existing images; the first is the cover only on an empty item', async () => {
+    expect(await appendItemImages('game', 'item-1', [shot('cover.jpg'), shot('s1.jpg'), shot('s2.jpg')])).toBe(0)
+    const rows = fake.log.filter((l) => l === 'insert row').length
+    expect(rows).toBe(3)
+    // The last written row: third position, not the cover.
+    expect(fake.written).toMatchObject({ position: 2, is_cover: false })
+
+    Object.assign(fake, { log: [], uploads: [], existingImages: 2 })
+    await appendItemImages('game', 'item-1', [shot('cover.jpg')])
+    expect(fake.written).toMatchObject({ position: 2, is_cover: false })
+  })
+
+  it('keeps going past a failed file and reports how many failed', async () => {
+    fake.failUploadOf = '.small.webp'
+    expect(await appendItemImages('game', 'item-1', [shot('a.jpg'), shot('b.jpg')])).toBe(2)
+    fake.failUploadOf = null
+    expect(await appendItemImages('game', 'item-1', [])).toBe(0)
   })
 })

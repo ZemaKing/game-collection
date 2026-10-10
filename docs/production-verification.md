@@ -22,7 +22,7 @@ Back/Next/Save bar and the bottom tab bar's + button).
 ## Create
 
 - [ ] `/items/new` → Game → fill title, platform, genre, condition → Save → lands on the new detail page with everything shown
-- [ ] The RAWG autofill finds a game and imports its cover as WebP (the Phase 36 open check)
+- [ ] The RAWG autofill finds a game and imports its cover plus up to 3 screenshots (cover first, the cover marked as cover), each stored as `.webp` + `.thumb.webp` + `.small.webp` (the Phase 36 open check)
 - [ ] One more type with its own fields (e.g. a Figure: manufacturer, character, scale)
 
 ## Duplicate warning

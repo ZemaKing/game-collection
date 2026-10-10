@@ -18,10 +18,20 @@ interface GameAutofillPanelProps {
   form: ItemFormState
   genres: Genre[]
   platforms: Platform[]
-  onApply: (values: Partial<ItemFormState>, coverImageFile?: File) => void
+  /** `imageFiles`: the checked pictures, cover first, then screenshots (may be empty). */
+  onApply: (values: Partial<ItemFormState>, imageFiles: File[]) => void
 }
 
-type RowKey = 'title' | 'release_date' | 'description' | 'developer' | 'publisher' | 'genres' | 'platform' | 'artwork'
+type RowKey =
+  | 'title'
+  | 'release_date'
+  | 'description'
+  | 'developer'
+  | 'publisher'
+  | 'genres'
+  | 'platform'
+  | 'artwork'
+  | 'screenshots'
 
 function matchIdsByName(names: string[], options: { id: string; name: string }[]): string[] {
   const lower = new Map(options.map((option) => [option.name.toLowerCase(), option.id]))
@@ -89,6 +99,7 @@ export function GameAutofillPanel({ form, genres, platforms, onApply }: GameAuto
         genres: form.genreIds.length === 0 && matchIdsByName(detail.genres, genres).length > 0,
         platform: form.platform_id.trim() === '' && matchSinglePlatformId(detail.platforms, platforms) !== null,
         artwork: Boolean(detail.backgroundImage),
+        screenshots: (detail.screenshots?.length ?? 0) > 0,
       })
     } catch (err) {
       setDetailError(err instanceof AutofillError ? err : new AutofillError('network', 'Unexpected error.'))
@@ -113,18 +124,30 @@ export function GameAutofillPanel({ form, genres, platforms, onApply }: GameAuto
     }
     if (checks.platform && matchedPlatformId) values.platform_id = matchedPlatformId
 
-    let coverImageFile: File | undefined
+    const name = selected.title || 'cover'
+    let coverFile: File | undefined
     if (checks.artwork && selected.backgroundImage) {
       try {
-        coverImageFile = await fetchGameCoverFile(selected.backgroundImage, `${selected.title || 'cover'}.jpg`)
+        coverFile = await fetchGameCoverFile(selected.backgroundImage, `${name}.jpg`)
       } catch (err) {
         setArtworkError(err instanceof AutofillError ? err : new AutofillError('network', 'Unexpected error.'))
         setApplying(false)
         return
       }
     }
+    // Screenshots are extras: one that fails to download is skipped, not an error.
+    const screenshotUrls = checks.screenshots ? (selected.screenshots ?? []) : []
+    const screenshots = await Promise.allSettled(
+      screenshotUrls.map((url, i) => fetchGameCoverFile(url, `${name}-${i + 1}.jpg`)),
+    )
+    const screenshotFiles = screenshots.flatMap((shot) => (shot.status === 'fulfilled' ? [shot.value] : []))
+    if (screenshotUrls.length > 0 && screenshotFiles.length === 0 && !coverFile) {
+      setArtworkError(new AutofillError('unavailable', 'Artwork download failed.'))
+      setApplying(false)
+      return
+    }
 
-    onApply(values, coverImageFile)
+    onApply(values, coverFile ? [coverFile, ...screenshotFiles] : screenshotFiles)
     setApplying(false)
     reset()
   }
@@ -227,6 +250,12 @@ export function GameAutofillPanel({ form, genres, platforms, onApply }: GameAuto
             )}
             {selected.backgroundImage &&
               renderRow('artwork', 'autofill.artwork', t('autofill.artworkAvailable'))}
+            {(selected.screenshots?.length ?? 0) > 0 &&
+              renderRow(
+                'screenshots',
+                'autofill.screenshots',
+                t('autofill.screenshotsAvailable', { count: String(selected.screenshots?.length ?? 0) }),
+              )}
           </div>
 
           {artworkError && <p className="text-xs text-danger">{t(errorMessageKey(artworkError.kind))}</p>}

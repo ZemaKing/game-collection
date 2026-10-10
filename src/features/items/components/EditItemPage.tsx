@@ -6,7 +6,7 @@ import { ItemNotFound } from '@/features/items/components/ItemNotFound'
 import { ITEM_TYPE_META, ITEM_TYPE_ROUTES } from '@/features/items/constants'
 import { detailToFormState } from '@/features/items/forms/formState'
 import { useSaveItem } from '@/features/items/forms/useSaveItem'
-import { appendItemCoverImage } from '@/features/items/imageApi'
+import { appendItemImages } from '@/features/items/imageApi'
 import type { ItemType } from '@/features/items/types'
 import { useItemDetail } from '@/features/items/useItemDetail'
 import { useItemRelationships } from '@/features/items/useItemRelationships'
@@ -74,9 +74,9 @@ export function EditItemPage({ itemType }: EditItemPageProps) {
     )
     if (!savedId) return
     let coverFailed = false
-    if (result.coverImageFile) {
+    if (result.importedImageFiles?.length) {
       try {
-        await appendItemCoverImage(itemType, savedId, result.coverImageFile)
+        coverFailed = (await appendItemImages(itemType, savedId, result.importedImageFiles)) > 0
       } catch {
         coverFailed = true
       }
