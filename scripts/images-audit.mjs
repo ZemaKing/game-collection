@@ -13,7 +13,7 @@ const [rows, items, objects] = await Promise.all([
   fetchAll(
     client,
     'item_images',
-    'id, item_type, item_id, storage_path, is_cover, thumb_path, original_path',
+    'id, item_type, item_id, storage_path, is_cover, thumb_path, small_path, original_path',
   ),
   fetchAll(client, 'all_items', 'id, item_type'),
   listAllObjects(client),

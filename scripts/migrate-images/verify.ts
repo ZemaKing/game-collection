@@ -1,6 +1,6 @@
 // `npm run images:verify` (ROADMAP Phase 34) — what the app loads, against the live database:
 //
-//   every item_images row's storage_path and thumb_path answers HEAD 200 with image/webp
+//   every item_images row's storage_path, thumb_path and small_path answers HEAD 200 with image/webp
 //   (a row still on its original is reported, not failed, so this also works before the flip);
 //   `--originals` also HEADs every original_path — the rollback path until Phase 37;
 //   `--sample=N` also downloads N random manifest objects and checks sha256 + dimensions.
@@ -57,11 +57,16 @@ async function head({ what, path, webp }: Check): Promise<void> {
 
 const checks: Check[] = []
 let onWebp = 0
+let withSmall = 0
 for (const row of rows) {
   if (row.thumb_path) {
     onWebp++
     checks.push({ what: `${row.id} full`, path: row.storage_path, webp: true })
     checks.push({ what: `${row.id} thumb`, path: row.thumb_path, webp: true })
+    if (row.small_path) {
+      withSmall++
+      checks.push({ what: `${row.id} small`, path: row.small_path, webp: true })
+    }
   } else {
     checks.push({
       what: `${row.id} original (not flipped)`,
@@ -78,7 +83,7 @@ for (const row of rows) {
 }
 
 console.log(
-  `item_images: ${rows.length} rows · ${onWebp} on WebP (full + thumb) · ${rows.length - onWebp} still on the original`,
+  `item_images: ${rows.length} rows · ${onWebp} on WebP (full + thumb) · ${withSmall} with small · ${rows.length - onWebp} still on the original`,
 )
 await mapPool(checks, 3, head) // more at a time draws HTTP 429s from Storage
 console.log(

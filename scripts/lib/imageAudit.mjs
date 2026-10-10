@@ -39,16 +39,16 @@ function tally(map, key, size) {
 
 /**
  * @param {{ rows: Array<{id: string, item_type: string, item_id: string, storage_path: string, is_cover: boolean,
- *                          thumb_path?: string | null, original_path?: string | null}>,
+ *                          thumb_path?: string | null, small_path?: string | null, original_path?: string | null}>,
  *           objects: Array<{path: string, size: number, mimetype: string, eTag: string, cacheControl: string}>,
  *           items: Array<{id: string, item_type: string}> }} input
  */
 export function analyzeImages({ rows, objects, items }) {
   const objectByPath = new Map(objects.map((o) => [o.path, o]))
-  // A row owns its full image plus, since Phase 33, its thumbnail and the kept original
+  // A row owns its full image plus, since Phase 33, its thumbnail and the kept original, and its small crop (Phase 39)
   const rowPaths = new Set(
     rows.flatMap((r) =>
-      [r.storage_path, r.thumb_path, r.original_path].filter(Boolean),
+      [r.storage_path, r.thumb_path, r.small_path, r.original_path].filter(Boolean),
     ),
   )
 

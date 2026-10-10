@@ -30,6 +30,7 @@ export type ImageRow = {
   item_id: string
   storage_path: string
   thumb_path?: string | null // absent before the Phase 33 migration
+  small_path?: string | null // Phase 39 gap 3 (migration 20261013120000)
   original_path?: string | null // set by the Phase 34 flip; absent before the migration is applied
   width?: number | null
   height?: number | null
