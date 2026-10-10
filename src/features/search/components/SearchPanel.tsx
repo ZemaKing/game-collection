@@ -125,38 +125,40 @@ export function SearchPanel({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative shrink-0 p-4 pb-0">
-        <Search
-          size={16}
-          className="pointer-events-none absolute top-1/2 left-7 -translate-y-1/2 text-muted"
-        />
-        <input
-          ref={inputRef}
-          type="search"
-          role="combobox"
-          aria-label={t('search.dialogTitle')}
-          aria-autocomplete="list"
-          aria-expanded={showResults}
-          aria-controls={showResults ? listboxId : undefined}
-          aria-activedescendant={
-            showResults ? optionId(activeIndex) : undefined
-          }
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={t('topbar.searchPlaceholder')}
-          className="w-full rounded-full border border-input bg-bg py-2.5 pr-9 pl-9 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent [&::-webkit-search-cancel-button]:appearance-none"
-        />
-        {query && (
-          <button
-            type="button"
-            aria-label={t('search.clear')}
-            onClick={() => setQuery('')}
-            className="absolute top-1/2 right-7 -translate-y-1/2 text-muted hover:text-text"
-          >
-            <X size={16} />
-          </button>
-        )}
+      <div className="shrink-0 p-4 pb-0">
+        <div className="relative">
+          <Search
+            size={16}
+            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted"
+          />
+          <input
+            ref={inputRef}
+            type="search"
+            role="combobox"
+            aria-label={t('search.dialogTitle')}
+            aria-autocomplete="list"
+            aria-expanded={showResults}
+            aria-controls={showResults ? listboxId : undefined}
+            aria-activedescendant={
+              showResults ? optionId(activeIndex) : undefined
+            }
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={t('topbar.searchPlaceholder')}
+            className="w-full rounded-full border border-input bg-bg py-2.5 pr-9 pl-9 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent [&::-webkit-search-cancel-button]:appearance-none"
+          />
+          {query && (
+            <button
+              type="button"
+              aria-label={t('search.clear')}
+              onClick={() => setQuery('')}
+              className="absolute top-1/2 right-3 -translate-y-1/2 text-muted hover:text-text"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       <p role="status" className="sr-only">
