@@ -84,8 +84,8 @@ Existing files:    scripts/images (sharp) ─► WebP variants at new paths ─�
 | # | Phase | Status | Needs from owner |
 | --- | --- | --- | --- |
 | 31 | Security Lockdown | ✅ Done (2026-10-09) | — |
-| 32 | Image Audit & Local Backup | 🟡 Scripts done; full backup after 10 Oct | Run `images:backup -- --apply` after the reset (≈ 1.45 GB); copy `backups/` to a second place |
-| 33 | Image Pipeline Port & Schema | 🟡 Code done; dry run over 615/1,426 (the rest after the backup) | After the full backup, run `images:migrate` (dry run) |
+| 32 | Image Audit & Local Backup | 🟡 Full backup done and verified (2026-10-10) | Copy `backups/` (≈ 1.6 GB) to a second place |
+| 33 | Image Pipeline Port & Schema | ✅ Done (2026-10-10: dry run 1,426/1,426, 0 failures) | — |
 | 34 | WebP Migration of Existing Images | ⬜ Not started | Run the scripts with the service-role key |
 | 35 | Read Path: Thumbnails Everywhere | 🟡 Code done (before 34, owner-approved); size/blur checks after the Phase 34 flip | — |
 | 36 | Upload Path: WebP in the Browser | 🟡 Code done (before 34, owner-approved) | Check the RAWG cover import on the next autofill (migration applied, test uploads verified 2026-10-09) |
@@ -131,14 +131,14 @@ Take one complete, checksummed copy of every original before anything is convert
 - [x] Owner: add `SUPABASE_SERVICE_ROLE_KEY` to `.env.local` (git-ignored, never `VITE_`)
 - [x] `scripts/images-audit.mjs` (`npm run images:audit`): lists every `item_images` row and Storage object, then reports counts, bytes by format and type, orphans (row without object / object without row), and duplicates. Uses the Storage list API's metadata (no `HEAD`s needed), so almost no egress. Writes `docs/images-audit.md`. *Plain `.mjs` like `verify-rls.mjs`, so no `tsx` until Phase 33*
 - [x] `scripts/images-backup.mjs` (`npm run images:backup`): downloads every original to git-ignored `backups/images/<path>`, writes `backups/images/manifest.json` (path, bytes, sha256, width, height, content-type, plus the `item_images` rows using each file), and resumes (skips files already there with a matching sha256). It prints the expected download size and needs `--apply`; `--limit=N` for a trial, `--verify [--root=…]` re-hashes a copy offline. Tried on 3 files (1.57 MB)
-- [ ] **Run the full backup after the reset on 10 Oct** (≈ 1.45 GB; this cycle has only ~1.1 GB of egress left)
+- [x] **Run the full backup after the reset on 10 Oct** (≈ 1.45 GB; this cycle has only ~1.1 GB of egress left). *2026-10-10: by then the bucket had grown to 3,196 objects / 1.63 GB (images uploaded on 2026-10-09 through the Phase 36 path, each a WebP + thumb); all of it backed up*
 - [ ] Copy the backup to a second place (external disk / cloud drive) — owner
 - [x] Also export the database (Dashboard → Database → Backups is not on Free, so: `pg_dump` with the DB connection string, or a CSV export of every table) and document it in `docs/backup.md`. *`npm run db:export` → JSON per table + checksummed manifest (no `pg_dump` installed; the Docker route is documented). First export 2026-10-09: 15 tables, 1.29 MB*
 
 ### Verification
 - [x] The audit totals match the findings above (±new uploads): ~1,811 objects, ~2.0 GB, 0 orphans. *1,426 objects / 1.45 GB, 0 orphans — the difference is the owner's deletion of the non-game images on 2026-10-08 (see the update in the findings)*
-- [ ] The backup has all 1,426 files; a second run downloads 0 bytes; all sha256 recorded (`--verify` green)
-- [ ] Egress used by the backup (≈ 1.45 GB) is noted against the month's budget
+- [x] The backup has all 1,426 files; a second run downloads 0 bytes; all sha256 recorded (`--verify` green). *2026-10-10: 3,196/3,196 files (the 1,426 originals plus the newer WebPs); second run 0 B; `--verify` 3,196/3,196*
+- [x] Egress used by the backup (≈ 1.45 GB) is noted against the month's budget. *≈ 1.6 GB of the 5 GB cycle that started 2026-10-10 (dashboard before it: egress 0.017 GB, cached 0.026 GB; Storage 1.511 GB = 151 % of the Free 1 GB)*
 
 ### Definition of Done
 A verified local copy of every original plus a DB export exists in two places.
@@ -160,7 +160,7 @@ Bring the diecast WebP converter in, and give `item_images` room for variants. N
 - [x] Tests: the copied suites pass; local-source tests (reads the file, no network; a missing file or a sha256 mismatch fails without retry); a path-pattern test for every item type; the overwrite guard (149 tests in total)
 
 ### Verification
-- [ ] `npm run images:migrate` (dry run) converts all 1,426 from the local backup and prints the before/after sizes. *2026-10-09, with 615 backed up: 615/615 converted, 0 conversion failures, every sha256 matched; 557.7 MB → 105.2 MB (full avg 134.5 KB, thumb 40.7 KB) ⇒ ≈ 0.25 GB for all. Re-run after the full backup*
+- [x] `npm run images:migrate` (dry run) converts all 1,426 from the local backup and prints the before/after sizes. *2026-10-10, full run: 1,426/1,426, 0 failed; originals 1,385.8 MB → 248.2 MB (full 191.4 MB, avg 137.5 KB; thumb 56.8 MB, avg 40.8 KB). Rows born WebP since Phase 36 (thumb set, no original) are skipped by design. 2026-10-09, with 615 backed up: 615/615 converted, 0 conversion failures, every sha256 matched; 557.7 MB → 105.2 MB (full avg 134.5 KB, thumb 40.7 KB) ⇒ ≈ 0.25 GB for all. Re-run after the full backup*
 - [x] The app works unchanged after the migration (new columns are null, the view still returns everything). *2026-10-09: migration applied by the owner; `all_items` returns all 432 items with `cover_thumb_path` last (all null), and the listing renders with no console errors*
 
 ### Definition of Done

@@ -74,6 +74,25 @@ describe('analyzeImages', () => {
     expect(a.bands.reduce((sum, [, n]) => sum + n, 0)).toBe(objects.length)
   })
 
+  it("counts a row's thumbnail and kept original as owned, not orphans", () => {
+    const variants = analyzeImages({
+      rows: [
+        {
+          ...row('r6', 'stuff', 'x2', 'stuff/x2/d.webp'),
+          thumb_path: 'stuff/x2/d.thumb.webp',
+          original_path: 'stuff/x2/d.png',
+        },
+      ],
+      objects: [
+        object('stuff/x2/d.webp', 90_000, 'image/webp'),
+        object('stuff/x2/d.thumb.webp', 30_000, 'image/webp'),
+        object('stuff/x2/d.png', 900_000),
+      ],
+      items: [{ id: 'x2', item_type: 'stuff' }],
+    })
+    expect(variants.objectsWithoutRow).toEqual([])
+  })
+
   it('renders the report', () => {
     const md = renderAuditMarkdown(a, '2026-10-09 07:00 UTC')
     expect(md).toContain(
