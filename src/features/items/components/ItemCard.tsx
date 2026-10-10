@@ -19,6 +19,7 @@ import { CompletenessBadge } from '@/features/items/components/CompletenessBadge
 import { EditionBadge } from '@/features/items/components/EditionBadge'
 import { editionNameOf, hasEditionField } from '@/features/items/editions'
 import { ItemImage } from '@/features/items/components/ItemImage'
+import { CARD_IMAGE_SIZES, STRIP_IMAGE_SIZES } from '@/features/items/imageSizes'
 import type { AllItemRow } from '@/features/items/types'
 import {
   DropdownMenu,
@@ -211,6 +212,8 @@ export function ItemCard({
           <ItemImage
             storagePath={item.cover_image_path}
             thumbPath={item.cover_thumb_path}
+            smallPath={item.cover_small_path}
+            sizes={STRIP_IMAGE_SIZES}
             priority={priority}
             itemType={item.item_type}
             alt=""
@@ -309,6 +312,8 @@ export function ItemCard({
         <ItemImage
           storagePath={item.cover_image_path}
           thumbPath={item.cover_thumb_path}
+          smallPath={item.cover_small_path}
+          sizes={CARD_IMAGE_SIZES}
           priority={priority}
           itemType={item.item_type}
           alt=""

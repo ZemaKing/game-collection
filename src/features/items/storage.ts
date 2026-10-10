@@ -13,10 +13,14 @@ export function getImagePublicUrl(storagePath: string): string {
   return supabase.storage.from(ITEM_IMAGES_BUCKET).getPublicUrl(storagePath).data.publicUrl
 }
 
-/** Where an image's variants live: `storage_path` is the full image, `thumb_path` its small WebP. */
+/**
+ * Where an image's variants live: `storage_path` is the full image, `thumb_path` its card-sized
+ * WebP, `small_path` the 4:5 phone-sized crop (offered next to the thumb through `srcset`).
+ */
 export interface ImagePaths {
   storage_path: string
   thumb_path?: string | null
+  small_path?: string | null
 }
 
 export type ImageVariant = 'thumb' | 'full'
@@ -34,7 +38,8 @@ export function getImageUrls(paths: ImagePaths): { full: string; thumb: string }
   }
 }
 
-/** Every Storage object an image row owns (full, thumb, pre-WebP original), for deletes. */
+/** Every Storage object an image row owns (full, thumb, small, pre-WebP original), for deletes. */
 export function imageObjectPaths(row: ImagePaths & { original_path?: string | null }): string[] {
-  return [...new Set([row.storage_path, row.thumb_path, row.original_path].filter((p): p is string => !!p))]
+  const paths = [row.storage_path, row.thumb_path, row.small_path, row.original_path]
+  return [...new Set(paths.filter((p): p is string => !!p))]
 }

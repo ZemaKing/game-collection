@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { Spinner } from '@/components/ui/Spinner'
 import { ITEM_TYPE_META } from '@/features/items/constants'
 import { ItemImage } from '@/features/items/components/ItemImage'
+import { CARD_IMAGE_SIZES } from '@/features/items/imageSizes'
 import type { ItemImageRow } from '@/features/items/detailTypes'
 import { ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGES_PER_ITEM } from '@/features/items/imageApi'
 import type { ItemType } from '@/features/items/types'
@@ -189,6 +190,8 @@ export function ImageManager({ itemType, itemId }: ImageManagerProps) {
                 <ItemImage
                   storagePath={image.storage_path}
                   thumbPath={image.thumb_path}
+                  smallPath={image.small_path}
+                  sizes={CARD_IMAGE_SIZES}
                   itemType={itemType}
                   alt={image.alt_text ?? t(meta.labelKey)}
                   className="aspect-[4/5] w-full rounded-lg"

@@ -25,5 +25,8 @@ describe('image variants', () => {
       imageObjectPaths({ storage_path: 'g/1/r.webp', thumb_path: 'g/1/r.thumb.webp', original_path: 'g/1/u.png' }),
     ).toEqual(['g/1/r.webp', 'g/1/r.thumb.webp', 'g/1/u.png'])
     expect(imageObjectPaths({ storage_path: 'g/1/u.png', thumb_path: null, original_path: null })).toEqual(['g/1/u.png'])
+    expect(
+      imageObjectPaths({ storage_path: 'g/1/r.webp', thumb_path: 'g/1/r.thumb.webp', small_path: 'g/1/r.small.webp' }),
+    ).toEqual(['g/1/r.webp', 'g/1/r.thumb.webp', 'g/1/r.small.webp'])
   })
 })

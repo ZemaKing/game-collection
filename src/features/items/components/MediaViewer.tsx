@@ -2,6 +2,7 @@ import * as RadixDialog from '@radix-ui/react-dialog'
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from 'lucide-react'
 import { useEffect, useRef, useState, type TouchEvent } from 'react'
 import { ItemImage } from '@/features/items/components/ItemImage'
+import { STRIP_IMAGE_SIZES } from '@/features/items/imageSizes'
 import type { ItemImageRow } from '@/features/items/detailTypes'
 import { getImageUrls } from '@/features/items/storage'
 import type { ItemType } from '@/features/items/types'
@@ -197,6 +198,8 @@ export function MediaViewer({
                   <ItemImage
                     storagePath={image.storage_path}
                     thumbPath={image.thumb_path}
+                    smallPath={image.small_path}
+                    sizes={STRIP_IMAGE_SIZES}
                     itemType={itemType}
                     alt=""
                     className="h-full w-full"

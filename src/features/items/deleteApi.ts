@@ -24,7 +24,7 @@ export async function deleteItem(itemType: ItemType, itemId: string): Promise<vo
 
   const { data: images, error: imagesFetchError } = await supabase
     .from('item_images')
-    .select('storage_path, thumb_path, original_path')
+    .select('storage_path, thumb_path, small_path, original_path')
     .eq('item_type', itemType)
     .eq('item_id', itemId)
   if (imagesFetchError) throw imagesFetchError

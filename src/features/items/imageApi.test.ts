@@ -52,8 +52,8 @@ vi.mock('@/lib/image-resize', () => ({
     return variants.map((v) => ({
       name: v.name,
       blob: new Blob(['x'], { type: fake.encoded }),
-      width: v.name === 'full' ? 1600 : 600,
-      height: v.name === 'full' ? 900 : 338,
+      width: v.name === 'full' ? 1600 : v.name === 'thumb' ? 600 : 400,
+      height: v.name === 'full' ? 900 : v.name === 'thumb' ? 338 : 500,
       type: fake.encoded,
       ext,
     }))
@@ -77,25 +77,28 @@ beforeEach(() => {
 })
 
 describe('uploadItemImage', () => {
-  it('converts to full + thumb WebP, uploads both cached for a year, then writes the row', async () => {
+  it('converts to full + thumb + small WebP, uploads all three cached for a year, then writes the row', async () => {
     const stages: string[] = []
     const row = await uploadItemImage('game', 'item-1', photo, 3, false, (s) => stages.push(s))
 
     expect(fake.resizeCalls[0]).toEqual([
       { name: 'full', maxWidth: 1600, maxHeight: 1600, quality: 0.85 },
       { name: 'thumb', maxWidth: 600, maxHeight: 750, quality: 0.85 },
+      { name: 'small', maxWidth: 400, maxHeight: 500, quality: 0.85, fit: 'cover' },
     ])
     expect(stages).toEqual(['optimizing', 'uploading'])
-    const [full, thumb] = fake.uploads
+    const [full, thumb, small] = fake.uploads
     expect(full.path).toMatch(PATH)
     expect(thumb.path).toBe(full.path.replace(/\.webp$/, '.thumb.webp'))
+    expect(small.path).toBe(full.path.replace(/\.webp$/, '.small.webp'))
     for (const upload of fake.uploads) expect(upload).toMatchObject({ contentType: 'image/webp', cacheControl: '31536000' })
-    expect(fake.log.map((l) => l.split(' ')[0])).toEqual(['upload', 'upload', 'insert'])
+    expect(fake.log.map((l) => l.split(' ')[0])).toEqual(['upload', 'upload', 'upload', 'insert'])
     expect(fake.written).toEqual({
       item_type: 'game',
       item_id: 'item-1',
       storage_path: full.path,
       thumb_path: thumb.path,
+      small_path: small.path,
       width: 1600,
       height: 900,
       position: 3,
@@ -110,6 +113,7 @@ describe('uploadItemImage', () => {
     expect(fake.uploads.map((u) => [u.path.split('.').slice(1).join('.'), u.contentType])).toEqual([
       ['png', 'image/png'],
       ['thumb.png', 'image/png'],
+      ['small.png', 'image/png'],
     ])
   })
 
@@ -121,11 +125,19 @@ describe('uploadItemImage', () => {
     expect(fake.written).toBeNull()
   })
 
-  it('removes both uploads when the row insert fails', async () => {
-    fake.dbError = { message: 'RLS says no' }
-    await expect(uploadItemImage('game', 'item-1', photo, 0, true)).rejects.toMatchObject({ message: 'RLS says no' })
+  it('removes the full image and thumb when the small upload fails', async () => {
+    fake.failUploadOf = '.small.webp'
+    await expect(uploadItemImage('game', 'item-1', photo, 0, true)).rejects.toMatchObject({ message: 'Storage is full' })
     const [full, thumb] = fake.uploads.map((u) => u.path)
     expect(fake.log.at(-1)).toBe(`remove ${full} ${thumb}`)
+    expect(fake.written).toBeNull()
+  })
+
+  it('removes every upload when the row insert fails', async () => {
+    fake.dbError = { message: 'RLS says no' }
+    await expect(uploadItemImage('game', 'item-1', photo, 0, true)).rejects.toMatchObject({ message: 'RLS says no' })
+    const [full, thumb, small] = fake.uploads.map((u) => u.path)
+    expect(fake.log.at(-1)).toBe(`remove ${full} ${thumb} ${small}`)
   })
 
   it('uploads nothing when the image cannot be decoded', async () => {
@@ -140,6 +152,7 @@ describe('replaceItemImageFile', () => {
     id: 'row-1',
     storage_path: 'game/item-1/old.webp',
     thumb_path: 'game/item-1/old.thumb.webp',
+    small_path: 'game/item-1/old.small.webp',
     original_path: 'game/item-1/old-original.png',
     width: 1200,
     height: 900,
@@ -150,12 +163,19 @@ describe('replaceItemImageFile', () => {
 
   it('stores the new variants, points the row at them, then removes every old object', async () => {
     const row = await replaceItemImageFile(old, photo)
-    const [full, thumb] = fake.uploads.map((u) => u.path)
+    const [full, thumb, small] = fake.uploads.map((u) => u.path)
     expect(full).toMatch(PATH)
-    expect(fake.written).toEqual({ storage_path: full, thumb_path: thumb, width: 1600, height: 900, original_path: null })
+    expect(fake.written).toEqual({
+      storage_path: full,
+      thumb_path: thumb,
+      small_path: small,
+      width: 1600,
+      height: 900,
+      original_path: null,
+    })
     expect(fake.log.slice(-2)).toEqual([
       'update row',
-      'remove game/item-1/old.webp game/item-1/old.thumb.webp game/item-1/old-original.png',
+      'remove game/item-1/old.webp game/item-1/old.thumb.webp game/item-1/old.small.webp game/item-1/old-original.png',
     ])
     expect(row).toMatchObject({ storage_path: full, thumb_path: thumb })
   })
@@ -163,8 +183,8 @@ describe('replaceItemImageFile', () => {
   it('keeps the old objects and removes the new ones when the row update fails', async () => {
     fake.dbError = { message: 'offline' }
     await expect(replaceItemImageFile(old, photo)).rejects.toMatchObject({ message: 'offline' })
-    const [full, thumb] = fake.uploads.map((u) => u.path)
-    expect(fake.log.at(-1)).toBe(`remove ${full} ${thumb}`)
+    const [full, thumb, small] = fake.uploads.map((u) => u.path)
+    expect(fake.log.at(-1)).toBe(`remove ${full} ${thumb} ${small}`)
     expect(fake.log.some((l) => l.includes('old'))).toBe(false)
   })
 })

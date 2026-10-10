@@ -4,6 +4,7 @@
 > - **Local source:** `ImageSource.file` reads the original from disk instead of downloading `url` (no egress, never falls back to the network), and `ImageSource.sha256` fails a source whose original doesn't match it (`loadOriginal()` in `batch.ts`). The games job reads from the Phase 32 backup.
 > - **Per-variant path:** `Variant.pathPattern` overrides the job's pattern for one variant (here `{id}.webp` + `{id}.thumb.webp`).
 > - `cli.ts` prints "Originals read" instead of "Downloaded originals".
+> - **Cover crop:** `Variant.fit: "cover"` fills the box and crops the centre (sharp `fit: "cover"`), for slots that show the image cropped; `variantSettings()` adds `:cover` only then, so older manifests stay valid. The browser side has the same option (`fit` in `src/lib/image-resize.ts`, `coverCrop()`).
 >
 > The games job is [`../migrate-images/`](../migrate-images/README.md).
 

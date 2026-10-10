@@ -233,7 +233,7 @@ export async function fetchItemDetail(itemType: ItemType, id: string): Promise<I
 }
 
 /** The `item_images` columns behind `ItemImageRow`. */
-export const ITEM_IMAGE_COLUMNS = 'id, storage_path, thumb_path, width, height, original_path, position, is_cover, alt_text'
+export const ITEM_IMAGE_COLUMNS = 'id, storage_path, thumb_path, small_path, width, height, original_path, position, is_cover, alt_text'
 
 export async function fetchItemImages(itemType: ItemType, id: string): Promise<ItemImageRow[]> {
   const { data, error } = await supabase

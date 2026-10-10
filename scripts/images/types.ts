@@ -9,6 +9,9 @@ export type Variant = {
     maxWidth: number;
     maxHeight?: number; // default: maxWidth, i.e. the longest edge is bounded
     quality: number; // WebP quality, 1–100
+    // "inside" (default): fit inside the box. "cover": fill the box and crop the overflow from the
+    // centre, so the output has the box's aspect ratio (for slots that show the image cropped).
+    fit?: "inside" | "cover";
     // Storage key for this variant only, instead of the job's pathPattern — for layouts where the
     // variants differ by more than a {variant} segment (e.g. "{id}.webp" + "{id}.thumb.webp").
     pathPattern?: string;

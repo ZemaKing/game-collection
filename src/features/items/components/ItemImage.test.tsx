@@ -31,6 +31,28 @@ describe('ItemImage', () => {
     expect(screen.queryByRole('img', { name: 'Cover' })).toBeNull()
   })
 
+  it('offers the small crop next to the thumb through srcset when the slot has sizes', () => {
+    const { unmount } = renderWithProviders(
+      <ItemImage {...paths} smallPath="game/1/r.small.webp" sizes="120px" itemType="game" alt="Cover" />,
+    )
+    expect(img().getAttribute('src')).toBe(`${BASE}/game/1/r.thumb.webp`)
+    expect(img().getAttribute('srcset')).toBe(`${BASE}/game/1/r.small.webp 400w, ${BASE}/game/1/r.thumb.webp 600w`)
+    expect(img().getAttribute('sizes')).toBe('120px')
+    unmount()
+    // No sizes (an unknown slot): the thumb alone, as before.
+    renderWithProviders(<ItemImage {...paths} smallPath="game/1/r.small.webp" itemType="game" alt="Cover" />)
+    expect(img().getAttribute('srcset')).toBeNull()
+  })
+
+  it('drops the srcset when the thumb or small file fails, falling back to the full image', () => {
+    renderWithProviders(
+      <ItemImage {...paths} smallPath="game/1/r.small.webp" sizes="120px" itemType="game" alt="Cover" />,
+    )
+    fireEvent.error(img())
+    expect(img().getAttribute('src')).toBe(`${BASE}/game/1/r.webp`)
+    expect(img().getAttribute('srcset')).toBeNull()
+  })
+
   it('loads lazily and async by default; priority images eagerly at high priority', () => {
     const { unmount } = renderWithProviders(<ItemImage {...paths} itemType="game" alt="Cover" />)
     expect(img().getAttribute('loading')).toBe('lazy')

@@ -13,7 +13,7 @@ import type { AllItemRow, Genre, ItemCondition, ItemType, Platform } from '@/fea
  * request after every query.
  */
 export const ALL_ITEM_COLUMNS =
-  'id, item_type, title, subtitle, platform_id, release_date, collection_date, condition, cover_image_path, cover_thumb_path, genre_slug, genre_name, edition_name, completed, parent_game_id, created_at, updated_at, has_description, format_slug'
+  'id, item_type, title, subtitle, platform_id, release_date, collection_date, condition, cover_image_path, cover_thumb_path, cover_small_path, genre_slug, genre_name, edition_name, completed, parent_game_id, created_at, updated_at, has_description, format_slug'
 
 export async function fetchPlatforms(): Promise<Platform[]> {
   const { data, error } = await supabase.from('platforms').select('id, name, slug').order('name')

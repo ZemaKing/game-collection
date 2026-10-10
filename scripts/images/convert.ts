@@ -15,8 +15,9 @@ export const sha256 = (data: Buffer | Uint8Array): string => createHash("sha256"
 
 // Identifies a variant's output settings. A manifest entry made with other settings is redone.
 export function variantSettings(variant: Variant): string {
-    const {name, maxWidth, maxHeight = maxWidth, quality} = variant;
-    return `${name}:${OUTPUT_EXT}:${maxWidth}x${maxHeight}:q${quality}`;
+    const {name, maxWidth, maxHeight = maxWidth, quality, fit = "inside"} = variant;
+    // "inside" adds nothing, so manifests written before `fit` existed stay valid.
+    return `${name}:${OUTPUT_EXT}:${maxWidth}x${maxHeight}${fit === "cover" ? ":cover" : ""}:q${quality}`;
 }
 
 export async function readImageInfo(data: Buffer): Promise<ImageInfo> {
@@ -34,7 +35,7 @@ export async function readImageInfo(data: Buffer): Promise<ImageInfo> {
 export async function convertVariant(input: Buffer, variant: Variant): Promise<Converted> {
     const {data, info} = await sharp(input, {failOn: "error"})
         .rotate()
-        .resize({width: variant.maxWidth, height: variant.maxHeight ?? variant.maxWidth, fit: "inside", withoutEnlargement: true})
+        .resize({width: variant.maxWidth, height: variant.maxHeight ?? variant.maxWidth, fit: variant.fit ?? "inside", position: "centre", withoutEnlargement: true})
         .webp({quality: variant.quality, effort: 6})
         .toBuffer({resolveWithObject: true});
     return {data, width: info.width, height: info.height, bytes: data.length, sha256: sha256(data)};

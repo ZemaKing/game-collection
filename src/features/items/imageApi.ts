@@ -55,10 +55,11 @@ async function removeStorageObjects(storagePaths: string[]): Promise<void> {
   await supabase.storage.from(ITEM_IMAGES_BUCKET).remove(storagePaths)
 }
 
-/** What a file becomes once stored: the `item_images` columns of its two variants. */
+/** What a file becomes once stored: the `item_images` columns of its three variants. */
 interface StoredVariants {
   storage_path: string
   thumb_path: string
+  small_path: string
   width: number
   height: number
 }
@@ -67,10 +68,10 @@ interface StoredVariants {
 export type UploadStage = 'optimizing' | 'uploading'
 
 /**
- * Converts `file` to the full + thumb variants (`IMAGE_VARIANTS`) in the
- * browser and uploads both as `{itemType}/{itemId}/{uuid}.webp` and
- * `{uuid}.thumb.webp` (`.png` where a browser can't encode WebP), cached for a
- * year. If an upload fails, whatever was already uploaded is removed again.
+ * Converts `file` to the full + thumb + small variants (`IMAGE_VARIANTS`) in
+ * the browser and uploads them as `{itemType}/{itemId}/{uuid}.webp`,
+ * `{uuid}.thumb.webp` and `{uuid}.small.webp` (`.png` where a browser can't
+ * encode WebP), cached for a year. If an upload fails, whatever was already uploaded is removed again.
  */
 async function storeVariants(
   itemType: ItemType,
@@ -79,15 +80,17 @@ async function storeVariants(
   onStage?: (stage: UploadStage) => void,
 ): Promise<StoredVariants> {
   onStage?.('optimizing')
-  const [full, thumb] = await resizeImageVariants(file, [
+  const [full, thumb, small] = await resizeImageVariants(file, [
     { name: 'full', ...IMAGE_VARIANTS.full, quality: IMAGE_VARIANTS.full.quality / 100 },
     { name: 'thumb', ...IMAGE_VARIANTS.thumb, quality: IMAGE_VARIANTS.thumb.quality / 100 },
+    { name: 'small', ...IMAGE_VARIANTS.small, quality: IMAGE_VARIANTS.small.quality / 100 },
   ])
 
   const base = `${itemType}/${itemId}/${crypto.randomUUID()}`
   const stored: StoredVariants = {
     storage_path: `${base}.${full.ext}`,
     thumb_path: `${base}.thumb.${thumb.ext}`,
+    small_path: `${base}.small.${small.ext}`,
     width: full.width,
     height: full.height,
   }
@@ -98,6 +101,7 @@ async function storeVariants(
     for (const [path, image] of [
       [stored.storage_path, full],
       [stored.thumb_path, thumb],
+      [stored.small_path, small],
     ] as const) {
       const { error } = await supabase.storage
         .from(ITEM_IMAGES_BUCKET)
@@ -129,7 +133,7 @@ export async function uploadItemImage(
     .single()
 
   if (insertError) {
-    await removeStorageObjects([stored.storage_path, stored.thumb_path])
+    await removeStorageObjects([stored.storage_path, stored.thumb_path, stored.small_path])
     throw insertError
   }
 
@@ -167,7 +171,7 @@ export async function replaceItemImageFile(image: ItemImageRow, file: File): Pro
     .single()
 
   if (updateError) {
-    await removeStorageObjects([stored.storage_path, stored.thumb_path])
+    await removeStorageObjects([stored.storage_path, stored.thumb_path, stored.small_path])
     throw updateError
   }
 

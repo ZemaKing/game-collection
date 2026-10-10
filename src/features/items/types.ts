@@ -49,6 +49,8 @@ export interface AllItemRow {
   parent_game_id?: string | null
   /** The cover's WebP thumbnail (`item_images.thumb_path`); null until the image migration has run. Absent until the image-variants migration is applied. */
   cover_thumb_path?: string | null
+  /** The cover's 4:5 phone-sized WebP (`item_images.small_path`); null until backfilled. Migration `20261013120000`. */
+  cover_small_path?: string | null
   /** Slug of the item's Digital / Physical tag, if set. Computed field (migration `20261011130000_all_items_format_slug.sql`), selected by `ALL_ITEM_COLUMNS`. */
   format_slug?: string | null
   created_at: string

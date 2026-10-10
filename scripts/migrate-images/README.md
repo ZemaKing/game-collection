@@ -37,6 +37,19 @@ npm run images:verify -- --originals       # also HEAD every original_path (the 
 
 The app needs no deploy either way: the read path (Phase 35) falls back to `storage_path` when a row has no thumb. The WebP objects stay in Storage after a rollback, so flipping forward again is just `images:flip -- --apply`. The rollback path lasted until Phase 37 deleted the originals.
 
+## The small variant (Phase 39, gap 3)
+
+A third variant, `{name}.small.webp` next to each full image: a 4:5 centre crop at 400×500 (q85), which is exactly what a card or strip shows (`aspect-[4/5]` + `object-cover`). The app offers it next to the thumb through `srcset`/`sizes` (`src/features/items/imageSizes.ts`), and the browser upload makes it for new images. [`small-job.ts`](small-job.ts) makes it for the rows that predate that, reading the pruned original from the backup (via `prune-log.json`) or the backed-up full image, and downloading only what isn't on disk.
+
+```bash
+npm run images:small                       # dry run: convert, print sizes
+npm run images:small -- --apply            # upload (resumes; small-manifest.json is the record)
+npm run images:small-check -- --full       # every object vs small-manifest.json
+npm run images:small-flip [-- --apply]     # HEAD every object, then write small_path in one transaction
+```
+
+Needs migration `20261013120000_item_image_small.sql` (`small_path`, `all_items.cover_small_path`, `set_item_image_small`) before the flip and before deploying the app code that selects those columns. Undo: `update item_images set small_path = null`, and the app loads the thumb alone again.
+
 ## Retiring the originals (Phase 37, done 2026-10-10)
 
 ```bash

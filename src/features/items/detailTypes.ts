@@ -61,6 +61,8 @@ export interface ItemImageRow {
   // them yet (Phase 35); null until the image migration has run (Phase 34).
   /** Small WebP (fits 600×750) for cards, strips and lists. */
   thumb_path?: string | null
+  /** 4:5 crop at 400×500 for phone cards and strips (`srcset` next to the thumb); null until backfilled. */
+  small_path?: string | null
   /** Pixel size of the image at `storage_path`. */
   width?: number | null
   height?: number | null

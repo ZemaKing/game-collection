@@ -1,6 +1,6 @@
 import {afterEach, describe, expect, it, vi} from "vitest";
 
-import {downscaleSteps, extensionFor, fitWithin, resizeImage, resizeImageVariants} from "./image-resize.ts";
+import {coverCrop, downscaleSteps, extensionFor, fitWithin, resizeImage, resizeImageVariants} from "./image-resize.ts";
 
 describe("fitWithin", () => {
     it("fits inside the box keeping the aspect ratio", () => {
@@ -16,6 +16,33 @@ describe("fitWithin", () => {
     it("rejects empty sizes", () => {
         expect(() => fitWithin(0, 10, 100)).toThrow();
         expect(() => fitWithin(10, 10, 0)).toThrow();
+    });
+});
+
+describe("coverCrop", () => {
+    it("fills the box and crops a landscape image's sides, centred", () => {
+        const {size, crop} = coverCrop(1600, 900, 400, 500);
+        expect(size).toEqual({width: 400, height: 500});
+        expect(crop.width).toBeCloseTo(720); // 900 × 4/5
+        expect(crop.height).toBe(900);
+        expect(crop.x).toBeCloseTo(440);
+        expect(crop.y).toBe(0);
+    });
+
+    it("crops a tall portrait image's top and bottom", () => {
+        const {size, crop} = coverCrop(600, 1000, 400, 500);
+        expect(size).toEqual({width: 400, height: 500});
+        expect(crop.width).toBe(600);
+        expect(crop.height).toBe(750);
+        expect(crop.y).toBe(125);
+    });
+
+    it("never enlarges: a source smaller than the box keeps its size", () => {
+        expect(coverCrop(360, 482, 400, 500)).toEqual({size: {width: 360, height: 482}, crop: {x: 0, y: 0, width: 360, height: 482}});
+    });
+
+    it("crops without enlarging when only one side is too small", () => {
+        expect(coverCrop(380, 600, 400, 500).size).toEqual({width: 380, height: 500});
     });
 });
 

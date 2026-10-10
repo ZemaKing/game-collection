@@ -25,6 +25,7 @@ import { EditionBadge } from '@/features/items/components/EditionBadge'
 import { GameDlcSection } from '@/features/items/components/GameDlcSection'
 import { ItemDetailSkeleton } from '@/features/items/components/ItemDetailSkeleton'
 import { ItemImage } from '@/features/items/components/ItemImage'
+import { STRIP_IMAGE_SIZES } from '@/features/items/imageSizes'
 import { ItemNotFound } from '@/features/items/components/ItemNotFound'
 import { RelatedItemsSection } from '@/features/items/components/RelatedItemsSection'
 import { useDeleteItem } from '@/features/items/useDeleteItem'
@@ -231,6 +232,8 @@ export function ItemDetailPage({ itemType }: ItemDetailPageProps) {
                   <ItemImage
                     storagePath={image.storage_path}
                     thumbPath={image.thumb_path}
+                    smallPath={image.small_path}
+                    sizes={STRIP_IMAGE_SIZES}
                     itemType={itemType}
                     alt=""
                     className="aspect-[4/5] w-full"

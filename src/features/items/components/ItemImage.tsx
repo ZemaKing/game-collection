@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CoverPlaceholder } from '@/features/items/components/CoverPlaceholder'
 import { getImagePublicUrl, imagePathFor, type ImageVariant } from '@/features/items/storage'
+import { IMAGE_VARIANTS } from '@/features/items/imageVariants'
 import type { ItemType } from '@/features/items/types'
 import { useSettings } from '@/hooks/useSettings'
 
@@ -9,6 +10,13 @@ interface ItemImageProps {
   storagePath: string | null
   /** Its small WebP (`thumb_path` / `cover_thumb_path`), if the row has one yet. */
   thumbPath?: string | null
+  /** Its 4:5 phone-sized WebP (`small_path` / `cover_small_path`). Used only together with `sizes`. */
+  smallPath?: string | null
+  /**
+   * The slot's `sizes` (`imageSizes.ts`). With a `smallPath` and a thumb, the browser picks
+   * between them through `srcset`. Only for 4:5 `object-cover` slots: the small file is pre-cropped.
+   */
+  sizes?: string
   /** `thumb` (default) for cards, strips and lists; `full` only for the detail image and the viewer. */
   variant?: ImageVariant
   /** Pixel size of the full image, when known: gives the `<img>` its intrinsic aspect ratio. */
@@ -40,6 +48,8 @@ interface ItemImageProps {
 export function ItemImage({
   storagePath,
   thumbPath,
+  smallPath,
+  sizes,
   variant = 'thumb',
   width,
   height,
@@ -61,12 +71,19 @@ export function ItemImage({
   }
 
   const path = imagePathFor({ storage_path: storagePath, thumb_path: thumbPath }, thumbFailed ? 'full' : variant)
+  // Small and thumb as width candidates; a failure of either falls back to the full image (no srcset).
+  const srcSet =
+    sizes && smallPath && thumbPath && path === thumbPath
+      ? `${getImagePublicUrl(smallPath)} ${IMAGE_VARIANTS.small.maxWidth}w, ${getImagePublicUrl(thumbPath)} ${IMAGE_VARIANTS.thumb.maxWidth}w`
+      : undefined
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
       <CoverPlaceholder itemType={itemType} className="absolute inset-0 h-full w-full" iconSize={iconSize} />
       <img
         src={getImagePublicUrl(path)}
+        srcSet={srcSet}
+        sizes={srcSet ? sizes : undefined}
         alt={alt}
         width={width ?? undefined}
         height={height ?? undefined}
