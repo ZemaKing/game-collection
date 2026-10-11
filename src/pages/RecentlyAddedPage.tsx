@@ -99,6 +99,7 @@ function RecentlyAddedPage() {
       genreIds: [],
       tagIds: [],
       editions: [],
+      categories: [],
       years: [],
       conditions: [],
       collectionDateFrom: null,

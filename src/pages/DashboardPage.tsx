@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { SummaryPanel } from '@/features/dashboard/SummaryPanel'
 import {
   fetchAvailableEditions,
+  fetchAvailableCategories,
   fetchAvailableYears,
   fetchDashboardSummary,
   fetchGenreSummary,
@@ -59,6 +60,7 @@ function DashboardPage() {
   const [tags, setTags] = useState<Tag[]>([])
   const [years, setYears] = useState<number[]>([])
   const [editions, setEditions] = useState<string[]>([])
+  const [categories, setCategories] = useState<string[]>([])
   const [summary, setSummary] = useState<DashboardSummary | null>(null)
   const [genreSummary, setGenreSummary] = useState<GenreSummaryRow[]>([])
   const [recentItems, setRecentItems] = useState<AllItemRow[]>([])
@@ -85,17 +87,19 @@ function DashboardPage() {
       fetchTags(),
       fetchAvailableYears(),
       fetchAvailableEditions(),
+      fetchAvailableCategories(),
       fetchDashboardSummary(),
       fetchGenreSummary(),
       fetchRecentlyAdded(5),
     ])
-      .then(([platformsData, genresData, tagsData, yearsData, editionsData, summaryData, genreSummaryData, recentData]) => {
+      .then(([platformsData, genresData, tagsData, yearsData, editionsData, categoriesData, summaryData, genreSummaryData, recentData]) => {
         if (cancelled) return
         setPlatforms(platformsData)
         setGenres(genresData)
         setTags(tagsData)
         setYears(yearsData)
         setEditions(editionsData)
+        setCategories(categoriesData)
         setSummary(summaryData)
         setGenreSummary(genreSummaryData)
         setRecentItems(recentData)
@@ -170,6 +174,7 @@ function DashboardPage() {
             tags={tags}
             years={years}
             editions={editions}
+            categories={categories}
           />
         </div>
       )}
@@ -255,6 +260,7 @@ function DashboardPage() {
                 tags={tags}
                 years={years}
                 editions={editions}
+                categories={categories}
               />
             </div>
           )}

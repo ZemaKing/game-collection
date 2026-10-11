@@ -11,6 +11,7 @@ export interface Filters {
   genreIds: string[]
   tagIds: string[]
   editions: string[]
+  categories: string[]
   years: number[]
   conditions: ItemCondition[]
   collectionDateFrom: string | null
@@ -25,6 +26,7 @@ export const DEFAULT_FILTERS: Filters = {
   genreIds: [],
   tagIds: [],
   editions: [],
+  categories: [],
   years: [],
   conditions: [],
   collectionDateFrom: null,
@@ -39,6 +41,7 @@ const PARAM_KEYS = {
   genreIds: 'genre',
   tagIds: 'tag',
   editions: 'edition',
+  categories: 'category',
   years: 'year',
   conditions: 'condition',
   collectionDateFrom: 'from',
@@ -72,6 +75,7 @@ export function parseFilters(
     genreIds: params.get(PARAM_KEYS.genreIds)?.split(',').filter(Boolean) ?? [],
     tagIds: params.get(PARAM_KEYS.tagIds)?.split(',').filter(Boolean) ?? [],
     editions: params.get(PARAM_KEYS.editions)?.split(',').filter(Boolean) ?? [],
+    categories: params.get(PARAM_KEYS.categories)?.split(',').filter(Boolean) ?? [],
     years,
     conditions,
     collectionDateFrom: params.get(PARAM_KEYS.collectionDateFrom) || null,
@@ -92,6 +96,7 @@ export function serializeFilters(
   next.delete(PARAM_KEYS.genreIds)
   next.delete(PARAM_KEYS.tagIds)
   next.delete(PARAM_KEYS.editions)
+  next.delete(PARAM_KEYS.categories)
   next.delete(PARAM_KEYS.years)
   next.delete(PARAM_KEYS.conditions)
   next.delete(PARAM_KEYS.collectionDateFrom)
@@ -109,6 +114,8 @@ export function serializeFilters(
     next.set(PARAM_KEYS.tagIds, filters.tagIds.join(','))
   if (filters.editions.length)
     next.set(PARAM_KEYS.editions, filters.editions.join(','))
+  if (filters.categories.length)
+    next.set(PARAM_KEYS.categories, filters.categories.join(','))
   if (filters.years.length) next.set(PARAM_KEYS.years, filters.years.join(','))
   if (filters.conditions.length)
     next.set(PARAM_KEYS.conditions, filters.conditions.join(','))
@@ -129,6 +136,7 @@ export function hasActiveFacets(filters: Filters): boolean {
     filters.genreIds.length > 0 ||
     filters.tagIds.length > 0 ||
     filters.editions.length > 0 ||
+    filters.categories.length > 0 ||
     filters.years.length > 0 ||
     filters.conditions.length > 0 ||
     filters.collectionDateFrom !== null ||

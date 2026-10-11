@@ -20,7 +20,7 @@ describe('parseFilters', () => {
   it('reads every facet from its short parameter', () => {
     const filters = parseFilters(
       params(
-        'q=zelda&type=game,dlc&platform=p1,p2&genre=g1&tag=t1&edition=Collector%27s&year=2017,2023' +
+        'q=zelda&type=game,dlc&platform=p1,p2&genre=g1&tag=t1&edition=Collector%27s&category=Map,Cable%20Guys&year=2017,2023' +
           '&condition=sealed&from=2024-01-01&to=2024-12-31&sort=release_date',
       ),
       'title',
@@ -32,6 +32,7 @@ describe('parseFilters', () => {
       genreIds: ['g1'],
       tagIds: ['t1'],
       editions: ["Collector's"],
+      categories: ['Map', 'Cable Guys'],
       years: [2017, 2023],
       conditions: ['sealed'],
       collectionDateFrom: '2024-01-01',
@@ -109,6 +110,7 @@ describe('serializeFilters', () => {
       genreIds: ['g1', 'g2'],
       tagIds: ['t2'],
       editions: ['Limited, Signed'],
+      categories: ['Stickers'],
       years: [2007],
       conditions: ['fair'],
       collectionDateFrom: '2020-05-01',

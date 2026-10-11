@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   fetchAvailableEditions,
+  fetchAvailableCategories,
   fetchAvailableYears,
   fetchGenres,
   fetchPlatforms,
@@ -71,6 +72,9 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
   const [tags, setTags] = useState<Tag[]>([])
   const [years, setYears] = useState<number[]>([])
   const [editions, setEditions] = useState<string[]>([])
+  const [categories, setCategories] = useState<string[]>([])
+  // Stuff has no platform, so the category facet only fits the all-items and Stuff listings.
+  const showCategoryFilter = (!itemType && !platform) || itemType === 'stuff'
 
   useEffect(() => {
     let cancelled = false
@@ -80,14 +84,16 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
       fetchTags(),
       fetchAvailableYears(),
       fetchAvailableEditions(itemType),
+      showCategoryFilter ? fetchAvailableCategories() : Promise.resolve([]),
     ])
-      .then(([platformsData, genresData, tagsData, yearsData, editionsData]) => {
+      .then(([platformsData, genresData, tagsData, yearsData, editionsData, categoriesData]) => {
         if (cancelled) return
         setPlatforms(platformsData)
         setGenres(genresData)
         setTags(tagsData)
         setYears(yearsData)
         setEditions(editionsData)
+        setCategories(categoriesData)
       })
       .catch(() => {
         // Filter option lists are supplementary; the grid below surfaces load errors.
@@ -95,7 +101,7 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
     return () => {
       cancelled = true
     }
-  }, [itemType])
+  }, [itemType, showCategoryFilter])
 
   const platformById = useMemo(() => new Map(platforms.map((p) => [p.id, p])), [platforms])
 
@@ -129,10 +135,12 @@ export function ItemListingPage({ itemType, platform }: ItemListingPageProps) {
         tags={tags}
         years={years}
         editions={editions}
+        categories={categories}
         showTypeFilter={!itemType}
         showPlatformFilter={!platform}
         showGenreFilter={showGenreFilter}
         showEditionFilter={!itemType || hasEditionField(itemType)}
+        showCategoryFilter={showCategoryFilter}
       />
 
       {deletedBannerTitle && (

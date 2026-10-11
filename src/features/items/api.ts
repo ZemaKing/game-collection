@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
-import { FORMAT_TAG_SLUGS, ITEM_TYPES } from '@/features/items/constants'
+import { FORMAT_TAG_SLUGS, ITEM_TYPES, STUFF_CATEGORIES } from '@/features/items/constants'
 import { SORT_KEYS, type SortKey } from '@/features/items/sort'
 import { searchTokens, tokenPattern } from '@/features/search/searchQuery'
 import { combineIdRestrictions, pageRange, releaseYearsExpression } from '@/features/items/listingQuery'
@@ -56,6 +56,21 @@ export async function fetchAvailableEditions(itemType?: ItemType): Promise<strin
   return Array.from(new Set((data ?? []).map((row) => row.edition_name as string).filter(Boolean)))
 }
 
+/**
+ * Distinct stored Stuff categories, known ones (`STUFF_CATEGORIES`) first in
+ * their picker order, then any other free-text values alphabetically.
+ */
+export async function fetchAvailableCategories(): Promise<string[]> {
+  const { data, error } = await supabase.from('stuff').select('category').not('category', 'is', null)
+  if (error) throw error
+  const names = Array.from(new Set((data ?? []).map((row) => (row.category as string).trim()).filter(Boolean)))
+  const order = (name: string) => {
+    const index = STUFF_CATEGORIES.findIndex((c) => c.name.toLowerCase() === name.toLowerCase())
+    return index === -1 ? STUFF_CATEGORIES.length : index
+  }
+  return names.sort((a, b) => order(a) - order(b) || a.localeCompare(b))
+}
+
 /** Distinct release years present in the collection, newest first. */
 export async function fetchAvailableYears(): Promise<number[]> {
   const { data, error } = await supabase
@@ -89,6 +104,7 @@ export interface FetchItemsParams {
   genreIds: string[]
   tagIds: string[]
   editions: string[]
+  categories: string[]
   years: number[]
   conditions: ItemCondition[]
   collectionDateFrom: string | null
@@ -160,6 +176,8 @@ export async function fetchItems(params: FetchItemsParams): Promise<FetchItemsRe
   if (params.itemTypes.length) query = query.in('item_type', params.itemTypes)
   if (params.platformIds.length) query = query.in('platform_id', params.platformIds)
   if (params.editions.length) query = query.in('edition_name', params.editions)
+  // A Stuff item's category is its `all_items` subtitle (other types put publisher etc. there).
+  if (params.categories.length) query = query.eq('item_type', 'stuff').in('subtitle', params.categories)
   if (params.conditions.length) query = query.in('condition', params.conditions)
   if (params.collectionDateFrom) query = query.gte('collection_date', params.collectionDateFrom)
   if (params.collectionDateTo) query = query.lte('collection_date', params.collectionDateTo)

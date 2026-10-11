@@ -6,7 +6,7 @@ import { FilterSheet } from '@/features/items/components/FilterSheet'
 import { DEFAULT_FILTERS } from '@/features/items/useFilters'
 import { renderWithProviders } from '@/test/render'
 
-function setup(filters = DEFAULT_FILTERS) {
+function setup(filters = DEFAULT_FILTERS, { showCategoryFilter = true } = {}) {
   const onApply = vi.fn()
   const onOpenChange = vi.fn()
   renderWithProviders(
@@ -19,11 +19,13 @@ function setup(filters = DEFAULT_FILTERS) {
       showPlatformFilter
       showGenreFilter={false}
       showEditionFilter={false}
+      showCategoryFilter={showCategoryFilter}
       platforms={[{ id: 'p1', name: 'PlayStation 5', slug: 'ps5' }]}
       genres={[]}
       tags={[]}
       years={[2020, 2021]}
       editions={[]}
+      categories={['Map', 'Stickers']}
     />,
   )
   return { onApply, onOpenChange }
@@ -38,6 +40,14 @@ describe('FilterSheet', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
     expect(onApply).toHaveBeenCalledWith({ ...DEFAULT_FILTERS, platformIds: ['p1'] })
     expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('filters by a Stuff category', async () => {
+    const { onApply } = setup()
+    expect(screen.getByText('Category (Stuff)')).toBeTruthy()
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Stickers' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
+    expect(onApply).toHaveBeenCalledWith({ ...DEFAULT_FILTERS, categories: ['Stickers'] })
   })
 
   it('toggles a value off again', async () => {
@@ -57,8 +67,9 @@ describe('FilterSheet', () => {
   })
 
   it('hides sections that are switched off', () => {
-    setup()
+    setup(undefined, { showCategoryFilter: false })
     expect(screen.queryByText('Genre')).toBeNull()
     expect(screen.queryByText('Edition')).toBeNull()
+    expect(screen.queryByText('Category (Stuff)')).toBeNull()
   })
 })

@@ -18,6 +18,7 @@ import {
   FORMAT_TAG_META,
   GENRE_META,
   PLATFORM_ICONS,
+  stuffCategoryMeta,
 } from '@/features/items/constants'
 import { EditionGlyph } from '@/features/items/components/EditionBadge'
 import { editionDisplayName, groupEditionNames } from '@/features/items/editions'
@@ -78,12 +79,15 @@ interface FilterSheetProps {
   showPlatformFilter: boolean
   showGenreFilter: boolean
   showEditionFilter: boolean
+  showCategoryFilter: boolean
   platforms: Platform[]
   genres: Genre[]
   tags: Tag[]
   years: number[]
   /** Distinct stored edition names present in the collection. */
   editions: string[]
+  /** Distinct stored Stuff categories, in display order. */
+  categories: string[]
 }
 
 export function FilterSheet({
@@ -95,11 +99,13 @@ export function FilterSheet({
   showPlatformFilter,
   showGenreFilter,
   showEditionFilter,
+  showCategoryFilter,
   platforms,
   genres,
   tags,
   years,
   editions,
+  categories,
 }: FilterSheetProps) {
   const { t } = useLocale()
   const editionGroups = useMemo(() => groupEditionNames(editions), [editions])
@@ -191,6 +197,28 @@ export function FilterSheet({
                         checked={draft.genreIds.includes(genre.id)}
                         onChange={() =>
                           setDraft((d) => ({ ...d, genreIds: toggleValue(d.genreIds, genre.id) }))
+                        }
+                      />
+                    )
+                  })}
+                </div>
+              </FilterSection>
+            )}
+
+            {showCategoryFilter && categories.length > 0 && (
+              <FilterSection title={t('filters.stuffCategory')}>
+                <div className="flex flex-col">
+                  {categories.map((category) => {
+                    const meta = stuffCategoryMeta(category)
+                    return (
+                      <CheckboxRow
+                        key={category}
+                        label={category}
+                        icon={meta.icon}
+                        iconColor={meta.color.icon}
+                        checked={draft.categories.includes(category)}
+                        onChange={() =>
+                          setDraft((d) => ({ ...d, categories: toggleValue(d.categories, category) }))
                         }
                       />
                     )

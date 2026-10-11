@@ -27,6 +27,7 @@ import {
   ITEM_TYPE_COLORS,
   ITEM_TYPE_META,
   PLATFORM_ICONS,
+  stuffCategoryMeta,
 } from '@/features/items/constants'
 import { editionDisplayName, groupEditionNames } from '@/features/items/editions'
 import { EditionGlyph } from '@/features/items/components/EditionBadge'
@@ -62,6 +63,8 @@ interface ItemListingToolbarProps {
   years: number[]
   /** Distinct stored edition names present in the collection. */
   editions: string[]
+  /** Distinct stored Stuff categories, in display order. */
+  categories?: string[]
   /** Hide the item-type facet on single-type listing pages. */
   showTypeFilter?: boolean
   /** Hide the platform facet on per-platform listing pages. */
@@ -70,6 +73,8 @@ interface ItemListingToolbarProps {
   showGenreFilter?: boolean
   /** Hide the edition facet where it can never match (artbook/figure/stuff pages). */
   showEditionFilter?: boolean
+  /** Hide the Stuff category facet where it can never match (other type pages). */
+  showCategoryFilter?: boolean
 }
 
 export function ItemListingToolbar({
@@ -83,10 +88,12 @@ export function ItemListingToolbar({
   tags,
   years,
   editions,
+  categories = [],
   showTypeFilter = true,
   showPlatformFilter = true,
   showGenreFilter = true,
   showEditionFilter = true,
+  showCategoryFilter = true,
 }: ItemListingToolbarProps) {
   const { t } = useLocale()
   const sortLabelId = useId()
@@ -145,6 +152,16 @@ export function ItemListingToolbar({
         key: `genre:${id}`,
         label: genre?.name ?? id,
         onRemove: () => setFilters({ genreIds: filters.genreIds.filter((v) => v !== id) }),
+        icon: meta.icon,
+        iconColor: meta.color.icon,
+      }
+    }),
+    ...(showCategoryFilter ? filters.categories : []).map((category) => {
+      const meta = stuffCategoryMeta(category)
+      return {
+        key: `category:${category}`,
+        label: category,
+        onRemove: () => setFilters({ categories: filters.categories.filter((v) => v !== category) }),
         icon: meta.icon,
         iconColor: meta.color.icon,
       }
@@ -343,11 +360,13 @@ export function ItemListingToolbar({
             showPlatformFilter={showPlatformFilter}
             showGenreFilter={showGenreFilter}
             showEditionFilter={showEditionFilter}
+            showCategoryFilter={showCategoryFilter}
             platforms={platforms}
             genres={genres}
             tags={tags}
             years={years}
             editions={editions}
+            categories={categories}
           />
         </Suspense>
       )}
