@@ -49,23 +49,32 @@ function groupByType(
 interface SearchPanelProps {
   onNavigate?: () => void
   autoFocus?: boolean
+  /** Query to start with, e.g. restored from the URL on the search page. */
+  initialQuery?: string
+  /** Called on every query change, so a page can mirror it (e.g. into the URL). */
+  onQueryChange?: (query: string) => void
 }
 
 export function SearchPanel({
   onNavigate,
   autoFocus = false,
+  initialQuery = '',
+  onQueryChange,
 }: SearchPanelProps) {
   const { t } = useLocale()
   const navigate = useNavigate()
   const inputRef = useRef<HTMLInputElement>(null)
   const listboxId = useId()
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(initialQuery)
+  // Only arrow-key moves scroll the highlighted option into view, not results arriving (which
+  // would undo the scroll position restored on Back).
+  const keyboardNavRef = useRef(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const { results, loading, error, reload } = useSearch(query)
   const { recent, addRecent, removeRecent, clearRecent } = useRecentSearches()
 
   useEffect(() => {
-    if (autoFocus) inputRef.current?.focus()
+    if (autoFocus) inputRef.current?.focus({ preventScroll: true })
   }, [autoFocus])
 
   // Reset the keyboard-nav selection whenever the result set changes, during
@@ -96,12 +105,17 @@ export function SearchPanel({
   // The highlighted option is tracked with aria-activedescendant (focus stays in the input),
   // so nothing scrolls it into view natively.
   useEffect(() => {
-    if (showResults) {
+    if (showResults && keyboardNavRef.current) {
       document.getElementById(optionId(activeIndex))?.scrollIntoView({ block: 'nearest' })
     }
     // optionId is derived from listboxId, which is stable.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex, showResults])
+
+  function changeQuery(next: string) {
+    setQuery(next)
+    onQueryChange?.(next)
+  }
 
   function selectResult(item: AllItemRow) {
     addRecent(trimmed)
@@ -112,9 +126,11 @@ export function SearchPanel({
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
+      keyboardNavRef.current = true
       setActiveIndex((i) => Math.min(i + 1, orderedResults.length - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
+      keyboardNavRef.current = true
       setActiveIndex((i) => Math.max(i - 1, 0))
     } else if (e.key === 'Enter') {
       e.preventDefault()
@@ -143,7 +159,7 @@ export function SearchPanel({
               showResults ? optionId(activeIndex) : undefined
             }
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => changeQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('topbar.searchPlaceholder')}
             className="w-full rounded-full border border-input bg-bg py-2.5 pr-9 pl-9 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent [&::-webkit-search-cancel-button]:appearance-none"
@@ -152,7 +168,7 @@ export function SearchPanel({
             <button
               type="button"
               aria-label={t('search.clear')}
-              onClick={() => setQuery('')}
+              onClick={() => changeQuery('')}
               className="absolute top-1/2 right-3 -translate-y-1/2 text-muted hover:text-text"
             >
               <X size={16} />
@@ -190,7 +206,7 @@ export function SearchPanel({
                   <li key={entry} className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setQuery(entry)}
+                      onClick={() => changeQuery(entry)}
                       className="flex-1 truncate rounded-md px-2 py-1.5 text-left text-sm text-text hover:bg-card-hover"
                     >
                       {entry}

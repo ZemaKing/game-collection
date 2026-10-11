@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
 import { Spinner } from '@/components/ui/Spinner'
 import { useLocale } from '@/hooks/useLocale'
+import { useMainScrollRestoration } from '@/hooks/useMainScrollRestoration'
 import { usePageA11y } from '@/hooks/usePageA11y'
 
 export function AppShell() {
@@ -13,6 +14,7 @@ export function AppShell() {
   const location = useLocation()
   const mainRef = useRef<HTMLElement>(null)
   const announcement = usePageA11y(mainRef)
+  useMainScrollRestoration(mainRef)
   // Add/Edit forms render their own sticky mobile action bar in place of the bottom tab bar.
   const isItemFormRoute = location.pathname === '/items/new' || location.pathname.endsWith('/edit')
 
